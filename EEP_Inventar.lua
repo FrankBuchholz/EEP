@@ -6,7 +6,7 @@ Analyse einer EEP-Anlage-Datei
 Frank Buchholz, 2019
 ]]
 
-local _VERSION = 'v2019-01-29'
+local _VERSION = 'v2019-01-30'
 
 -- In Variable input_file wird der Pfad zur Anlagen-Datei eingetragen
 -- Hier einige Varianten unter der Annahme, dass dieses Script im LUA-Ordner der EEP-Installation liegt:
@@ -22,7 +22,7 @@ local input_files = {
 
 }
 -- Welche Datei soll es sein?
-input_file = input_files[ 1 ]
+local input_file = input_files[ 1 ]
 
 -- Hier den Pfad zur zusätzlichen Ausgabe-Datei angeben (siehe printtofile)
 local output_file = "C:/temp/output.txt"
@@ -451,7 +451,7 @@ end
 
 -- Laden und Verarbeiten der EEP-Anlagen-Datei
 -- Der optionale Rückgabewert sutrackp enthält die Tabellenstruktur in der Form wie sie xml2lua liefert (die Variable wird in diesem Beispiel-Skript nicht weiter verwendet). 
-local Anlage 				= require('EEP2Lua')
+local Anlage 				= require('../git/EEP2Lua')
 local sutrackp 				= Anlage.loadFile(input_file)
 
 -- statische Texte und Definitionen stehen direkt nach dem require-Befehl zur Verfügung (die Variablen werden in diesem Beispiel-Skript nicht weiter verwendet).
