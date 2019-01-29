@@ -19,7 +19,9 @@ Anlage.Zugverbaende
 Anlage.Rollmaterialien
 usw.
 
-Die Feldlisten werden entnimmt man am Besten den unten markierten Programmstellen oder dem Beispiel-Skript EEP_Inventar. (Die Feldlisten hier aufzuführen wäre mir bei Änderungen zu fehlerträchtig.)
+Die Feldlisten entnimmt man am Besten den unten markierten Programmstellen oder dem Beispiel-Skript EEP_Inventar.lua . (Die Feldlisten hier aufzuführen wäre mir bei Änderungen zu fehlerträchtig.)
+
+Die Lua-Datei EEP_Inventar.lua sollte im LUA-Ordner der EEP-Programminstallation angelegt werden und kann sowohl aus EEP heraus mit require('EEP_Inventar') wie auch standalone z.B. in SciTE in gestartet werden.
 
 Das Modul benötigt Teile des Paketes xml2lua
 Quelle:
@@ -44,6 +46,7 @@ sutrackp
 			Anfangsfuehrungsverdrehung
 			Charakteristik
 			Kontakt
+		Gleisverbindung
 	Kollektor
 		Dreibein
 			Vektor (s.o.)
@@ -144,6 +147,7 @@ local sutrackp = nil
 
 -- Konvertierte Daten
 local Gleise = {}
+local Gleisverbindungen = {}
 local Fuhrparks = {}
 local Zugverbaende = {}
 local Rollmaterialien = {}
@@ -237,7 +241,7 @@ local function processGleissystem(xmlGleissystem, Parameters)
 		--..											-- kein Elternknoten
 		GleissystemID		= GleissystemID,			-- Schlüssel des aktuellen Eintrages 
 		
-		Laenge 				= 0,
+		Laenge 				= 0,						-- Gesamtlaenge aller Gleise
 		Anzahl = { 
 			Gleise 			= 0,
 			Kontakte 		= 0,
@@ -245,6 +249,7 @@ local function processGleissystem(xmlGleissystem, Parameters)
 			Zugverbaende 	= 0,
 			Rollmaterialien = 0,
 		}	
+		--.. hier weitere Felder zu einem Gleissystem eintragen
 	}
 	local Gleissystem = Gleise[GleissystemID]
 	
@@ -253,30 +258,249 @@ end
 
 local function processGleis(xmlGleis, Gleissystem)
 	if log == true then print('processGleis') end
+
+--[[
+
+Wo befindet dich das Gleis, Der Kontakt oder das Signal?
+Wo befindet sich das 'heiße' Ende einer Weiche?
+
+Auch wenn eine grobe Näherungsantwort recht leicht anzugeben ist - man wählt dazu einfach die 
+Anfangskoordinaten des Gleises - ist eine exakte Angabe überraschend schwer genau zu ermitteln. 
+Zuerst müssen die entspechenden Attribute identifiziert werden und dann gilt es, entweder in 
+eine 3D-Matrix-Berechnung einzusteigen oder vereinfacht auf 2D einige trigonometrische  Formeln 
+aufzustellen.
+
+
+Parameter eines Gleises
+
+alle Gleise:
+Position x,y,z des Gleisanfangs [m]: Vektor[1]{x, y, z} / 100
+Laenge [m]: Charakteristik.Laenge / 100
+Kruemmung [°] des Gleises: math.deg( Charakteristik.Kruemmung * Charakteristik.Laenge )
+Skalierung: _attr.scale
+Gleisart: clsid  
+	['2E25C8E2-ADCD-469A-942E-7484556FF932'] = 'Normales Gleis',
+	['C889EADB-63B5-44A2-AAB9-457424CFF15F'] = '2-Weg-Weiche',
+	['B0818DD8-5DFD-409F-8022-993FD3C90759'] = '3-Weg-Weiche',
+	['06D80C90-4E4B-469B-BFE0-509A573EBC99'] = 'Prellbock-Gleis'
+	
+weitere Felder (die jetzt noch nicht berücksichtigt werden):
+Anfangsfuehrungsverdrehung: Anfangsfuehrungsverdrehung.Wert
+Fuehrungsverdrehung: Charakteristik.Fuehrungsverdrehung
+Biegung: Charakteristik.Korve
+Torsion: Charakteristik.Torsion
+	
+zusätzlich bei 2-Weg-Weiche / 3-Weg-Weiche:
+WeicheID: Key_Id 
+Stellung der Weiche: weichenstellung 
+
+	
+Die Krümmung eines Gleises wird im Bogenmass bezogen auf die Länge normalisiert gespeichert:
+Charakteristik.Kruemmung = math.rad( WinkelGrad ) / Laenge
+bzw.
+Winkel [°]:	deg( Charakteristik.Kruemmung * Charakteristik.Laenge )
+
+
+Der normalisiert Winkel (des Gleisanfangs) auf der xy-Ebene sowie die normalisierte Steigung 
+wird in den weiteren Dreibein-Vektoren gespeichert, die damit eine 3x3 Matrix darstellen.
+
+Mit solch einer Matrix lassen sich die Berechnungen für eine oder mehrerer Translationen (Verschiebungen), Skalierungen 
+oder Rotationen beschreiben und effizient über Matrixmultiplikationen berechnen. 
+
+http://www.mttcs.org/Skripte/Pra/Material/vorlesung3.pdf
+https://www.tu-ilmenau.de/fileadmin/media/gdv/Lehre/Computergrafik_I/Uebung/gdv1gt.pdf
+	
+a) Translation (Verschiebung)
+
+	1		0		Dx
+	0		1		Dy
+	0		0		1
+	
+Die Verschiebung wird in EEP nicht genutzt.	
+	
+b) Skalierung
+
+	Sx		0		0
+	0		Sy		0
+	0		0		1
+	
+Die Skalierung wird in EEP über ein separates Attribut dargestellt.	
+
+c) Rotation
+
+Winkel des Gleises (= Drehung um die z-Achse)
+Die Drehung eines Gleises auf der Ebene gegen den Uhrzeigersinn um den Winkel w wird mit einer Matrixmultiplikation berechnet:
+Dies entspricht dem 2D-Fall (die drei Zeilen der Matrix entsprechen den Werten von Dir, Nor und Bin):
+Drehung eines normalisierten Vektors r (mit der Laenge 1) um die z-Achse gegen den Uhrzeigersinn 
+um den Winkel w							
+
+	cos w	-sin w	0
+	sin w	cos w	0
+	0		0		1
+
+Damit ergibt sich folgende Formel für den Endpunkt eines Gleises dessen Anfang auf x0, y0 liegt:
+	x1 = x0 + l * cos( w ) 
+	y1 = y0 + l * sin( w ) 
+	
+Steigung des Gleises (= Drehung um die y-Achse)
+Drehung eines Vektors r um die y-Achse gegen den Uhrzeigersinn um den Winkel w							
+
+	cos w	0		sin w
+	0		1		0	
+	-sin w	0		cos w
+
+Verdrehung des Gleises
+Drehung eines Vektors r um die x-Achse gegen den Uhrzeigersinn um den Winkel w	
+
+	1		0		0		
+	0		cos w	-sin w
+	0		sin w	cos w
+
+Wenn mehrere dieser Rotationen vorgenommen werden, dann werden die jeweiligen Matixen multipliziert. 
+
+Umrechnung der Rotationsmatrix in Winkel:
+https://www.andre-gaschler.com/rotationconverter/
+http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/
+http://web.cs.iastate.edu/~cs577/handouts/homogeneous-transform.pdf
+
+Da in EEP anscheinend nur die Steigung und die Drehung in der Matrix abgebildet werden verwendet (und somit 
+genügend 0-en und 1-en bei einer Matrixmultiplikation beteiligt sind) werden lassen sich die Werte für den 
+Winkel und die Steigung zumeist vereinfacht ablesen:
+	
+Winkel [rad]: 	acos( Vektor[3].y ) * sign( Vektor[2].y )	
+Steigung [rad]:	acos( Vektor[4].z ) * sign( Vektor[2].z )	
+
+Eine genauere Rechnug würde z.B. über die Diagonale der Roationsmatrix laufen (Vorzeichen wie oben korrigieren):
+Winkel [rad]: 	acos( ( Vektor[2].x + Vektor[3].y + Vektor[z].z - 1) / 2 ) * sign( Vektor[2].z )
+	
+Für die Umrechnung zwischen Radius eines gebobenen Gleisen und dem Winkel gilt: 	
+	r = l / rad( a )
+	a = deg( l / r )
+	
+Für die Umrechnung der Steigung gilt:
+
+	s = asin( sm / l )  
+	sm = l * sin( s )
+
+--]]
+
+-- Gleisattribute, linke Seite (in Klammern die Einheit)
+
+	--	  Position des Gleisanfangs auf der Ebene [m]		
+	local x		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.x ) / 100 
+	local y		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.y ) / 100
+
+	--	  absolute Höhe des Gleisanfangs [m]
+	local z		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.z ) / 100
+
+	--	  relative Höhe [m]
+	local zr	= nil 
+
+	--	  Winkel der Drehung des Gleisanfangs um die Z-Achse gegen den Uhrzeigersinn [rad] (vereinfacht!!!)
+	local wc 	= tonumber( xmlGleis.Dreibein.Vektor[3]._attr.y )	-- cos(w)
+	local w		= math.acos( wc ) 									-- [rad]
+				  * ( tonumber( xmlGleis.Dreibein.Vektor[2]._attr.y ) < 0 and -1 or 1 )
+				  
+	--	  Skalierung, Faktor bezüglich der Laenge [dimensionslos]
+	local f		= tonumber( xmlGleis._attr.scale )
+
+-- Gleisattribute, rechte Seite
+	
+	--	  Laenge des Gleises [m]
+	local L		= tonumber( xmlGleis.Charakteristik._attr.Laenge )	/ 100
+
+	--	  Winkel der Kruemmung auf der Ebene gegen den Uhrzeigersinn [rad]
+	local al	= tonumber( xmlGleis.Charakteristik._attr.Kruemmung ) * 100	-- normalisiert
+	local a		= L * al											-- [rad]		-- a = 0 für gerade Gleise
+
+	--	  Radius der Kruemmung auf der Ebene [m] 
+	local r		= (a ~= 0 and L / a or 0)	-- oder r = 1 / al						-- r = 0 für gerade Gleise
+
+	--	  Steigung [rad] (vereinfacht!!!)
+	local sc 	= tonumber( xmlGleis.Dreibein.Vektor[4]._attr.z ) 	-- cos(s)
+	local s 	= math.acos( sc )									-- [rad]
+				  * ( tonumber( xmlGleis.Dreibein.Vektor[2]._attr.z ) < 0 and -1 or 1 )
+
+	--	  Steigung [m]
+	local sm 	= L * math.asin( s )
+
+-- vereinfachte 2D-Berechnung für das Gleisende 
+	
+	--	  Abstand zwischen Anfangs- und Endpunkt eines gekrümmtes Gleises [m]
+	local dx	= (a ~= 0 and r * math.sin( a )			or 0 )
+	local dy	= (a ~= 0 and r * ( 1 - math.cos( a ))	or 0 )
+
+	--	  effektive Länge eines Gleises
+	local d		= (a ~= 0 and math.sqrt( dx * dx + dy * dy ) or L)				-- d = L für gerade Gleise
+
+	--	  Winkel zwischen Anfangs- und Endpunkt [m]								-- a = 0 für gerade Gleise
+	local b		= a / 2 		-- bzw. asin( dy / d ) oder acos( dx / d ) 
+
+	--	  Position des Gleisendes auf der Ebene unter Berücksichtigung von Drehung und Krümmung [m]		
+	local xe	= x + d * math.cos( w + b )
+	local ye	= y + d * math.sin( w + b )
+
+	--	  Winkel der Drehung des Gleisendes um die Z-Achse gegen den Uhrzeigersinn [rad]
+	local we	= w + a
+	
 	
 	local GleisID = tonumber(xmlGleis._attr.GleisID)
 
 	local GleissystemID = Gleissystem.GleissystemID
-	local Laenge  = math.floor(tonumber(xmlGleis.Charakteristik._attr.Laenge) / 100 + 0.5)
-
+	
 	-- Felder von Gleissystem aktualisieren
-	Gleissystem.Laenge 			= Gleissystem.Laenge + Laenge
+	Gleissystem.Laenge 			= Gleissystem.Laenge + L
 	Gleissystem.Anzahl.Gleise 	= Gleissystem.Anzahl.Gleise + 1
 
+	if log == true then 
+		print(
+			'Gleis = ', GleisID, ' ',
+			'x = ',  x,  ' ',
+			'y = ',  y,  ' ',
+			'L = ',  L,  ' ',
+			'w = ',  w,  ' rad ', math.deg(w), ' grad ',
+			'a = ',  a,  ' rad ', math.deg(a), ' grad ',
+			'r = ',  r,  ' ',
+			'dx = ', dx, ' ',
+			'dy = ', dy, ' ',
+			'd = ',  d,  ' ', 
+			'b = ',  b,  ' rad ', math.deg(b), ' grad ',
+			'xe = ', xe, ' ',
+			'ye = ', ye, ' ',
+			'we = ', we, ' rad ', math.deg(we), ' grad '
+		)
+	end
+	
 	-- neues Gleis anlegen
 	Gleise[GleissystemID][GleisID] = {
-		Gleissystem	= Gleissystem,						-- Elternknoten
-		GleisID		= GleisID,							-- Schlüssel des aktuellen Eintrages 
+		Gleissystem		= Gleissystem,						-- Elternknoten
+		GleisID			= GleisID,							-- Schlüssel des aktuellen Eintrages 
 
-		Gleisart	= xmlGleis._attr.clsid,
-		Laenge		= Laenge,
-		Position	= {
-			x = math.floor(tonumber(xmlGleis.Dreibein.Vektor[1]._attr.x) / 100 + 0.5), 
-			y = math.floor(tonumber(xmlGleis.Dreibein.Vektor[1]._attr.y) / 100 + 0.5),
-			z = math.floor(tonumber(xmlGleis.Dreibein.Vektor[1]._attr.z) / 100 + 0.5)
-		},
-		KontaktZiel	= tonumber(xmlGleis.KontaktZiel),	-- Weichen sind potentielle Kontakt-Ziele
-		TipTxt		= xmlGleis._attr.TipTxt,			-- Tipp-Text (kann auch nil sein)
+		Gleisart		= xmlGleis._attr.clsid,
+
+		Laenge			= L,								-- [m]
+		Position		= { x = x,  y = y,  z = z },		-- [m]
+		PositionEnde	= { x = xe, y = ye, z = z },		-- [m] (z wird noch nicht berechnet)
+		WinkelAnfang	= w,								-- [Bogenmass]
+		WinkelEnde		= we,								-- [Bogenmass]
+		Kruemmung 		= a,								-- [Bogenmass]
+		Radius			= r, 								-- [m] (für gerades Gleis: 0)
+		Steigung 		= s, 								-- [Bogenmass]
+
+		WeicheID		= tonumber(xmlGleis._attr.Key_Id),		-- nil für normale Gleise
+		Weichenstellung = tonumber(xmlGleis._attr.weichenstellung), 
+		KontaktZiel		= tonumber(xmlGleis.KontaktZiel),	-- Weichen sind potentielle Kontakt-Ziele
+		
+		Verbindung 		= {},								-- Verbindungen zu anderen Gleisen werden später eingetragen
+															-- siehe Funktion verbindeGleise
+															-- es werden ggf. mehrere der folgenden Tabellen eingetragen:
+															-- 	{ Anfang = Gleis, AnfangAnschluss = ... }
+															-- 	{ Ende = Gleis, EndeAnschluss = ... }
+															-- 	{ EndeAbzweig = Gleis, EndeAbzweigAnschluss = ... }
+															-- 	{ EndeKoAbzweig = Gleis, EndeKoAbzweigAnschluss = ... }
+															
+		TipTxt			= xmlGleis._attr.TipTxt,			-- Tipp-Text (kann auch nil sein)
+		--.. hier weitere Felder zu einem Gleis eintragen
 	}
 	local Gleis = Gleise[GleissystemID][GleisID]
 	
@@ -301,7 +525,7 @@ end
 
 local function processKontakt(xmlKontakt, Gleis)
 	if log == true then print('processKontakt') end
-	
+
 	local KontaktID				= 0						-- keine KontaktID vorhanden (wird später bestimmt)
 
 	local GleisID				= Gleis.GleisID
@@ -311,14 +535,21 @@ local function processKontakt(xmlKontakt, Gleis)
 	-- Felder von Gleissystem aktualisieren
 	Gleise[GleissystemID].Anzahl.Kontakte = Gleise[GleissystemID].Anzahl.Kontakte + 1
 
+	-- Die Position kann in grober Näherung gleich der Anfangsposition des Gleises angenommen werden
+	local  Position = Gleis.Position
+	-- Ein verbesserte Position berücksichtigt den Winkel des Gleises und die relative Position auf dem Gleis
+	local relPosition = tonumber(xmlKontakt._attr.Position) / 100	-- Position relativ zum Gleisursprung [m]
+	Position = {
+		x = Gleis.Position.x + relPosition * math.cos( Gleis.WinkelAnfang ),
+		y = Gleis.Position.y + relPosition * math.sin( Gleis.WinkelAnfang ),
+		z = Gleis.Position.z,
+	}
+
 	-- erster Kontakt des Gleises
 	if not Kontakte[GleissystemID][GleisID] then
-		Kontakte[GleissystemID][GleisID] = {
-			-- Position des Gleises
-			Position 	= Gleise[GleissystemID][GleisID].Position
-		}
+		Kontakte[GleissystemID][GleisID] = {}
 	end
-	
+
 	-- neuen Kontakt anlegen
 	table.insert( 
 		Kontakte[GleissystemID][GleisID],
@@ -326,15 +557,20 @@ local function processKontakt(xmlKontakt, Gleis)
 			Gleis			= Gleis,					-- Elternknoten
 			KontaktID		= KontaktID,				-- Schlüssel des aktuellen Eintrages (vorläufig)						 
 		
-			relPosition 	= math.floor(tonumber(xmlKontakt._attr.Position) / 100 + 0.5),		-- Position relativ zum Gleisursprung
+			Position 		= Position,							-- (berechnet/geschätzt) [m]
+			relPosition 	= relPosition,						-- Position relativ zum Gleisursprung [m]
+
 			SetType			= tonumber(xmlKontakt._attr.SetType),		-- KontaktTyp (Bit-Vektor)
 			SetValue		= xmlKontakt._attr.SetValue,		-- Interpretation je nach Kontakttyp
+
 			Delay			= xmlKontakt._attr.Delay,			-- Startverzögerung		
 			Group			= xmlKontakt._attr.Group,			-- Kontaktgruppe
 			KontaktZiel		= tonumber(xmlKontakt._attr.KontaktZiel), 	-- Kontakt-Ziel des Kontaktes (kann auch nil sein)
 			LuaFn			= ( LuaFn == '' and nil or LuaFn ),	-- Lua-Funktion (nur wenn nicht leer)
 			clsid 			= xmlKontakt._attr.clsid,			-- konstanter Wert		
+
 			TipTxt			= xmlKontakt._attr.TipTxt,			-- Tipp-Text (kann auch nil sein)
+			--.. hier weitere Felder zu einem Kontakt eintragen
 		}
 	)
 	KontaktID = #Kontakte[GleissystemID][GleisID]			-- nun kann die KontaktID bestimmt werden
@@ -378,17 +614,29 @@ local function processMeldung(xmlMeldung, Gleis)
 	-- Felder von Gleissystem aktualisieren
 	Gleise[GleissystemID].Anzahl.Signale = Gleise[GleissystemID].Anzahl.Signale + 1
 
+	-- Die Position kann in grober Näherung gleich der Anfangsposition des Gleises angenommen werden
+	local  Position = Gleis.Position
+	-- Ein verbesserte Position berücksichtigt den Winkel des Gleises und die relative Position auf dem Gleis
+	local relPosition = tonumber(xmlMeldung._attr.Position) / 100	-- Position relativ zum Gleisursprung [m]
+	Position = {
+		x = Gleis.Position.x + relPosition * math.cos( Gleis.WinkelAnfang ),
+		y = Gleis.Position.y + relPosition * math.sin( Gleis.WinkelAnfang ),
+		z = Gleis.Position.z,
+	}
+
 	-- neues Signal anlegen
 	Signale[GleissystemID][SignalID] = {
-		Gleis			= Gleis,						-- Elternknoten
-		SignalID		= SignalID,						-- Schlüssel des aktuellen Eintrages
+		Gleis			= Gleis,							-- Elternknoten
+		SignalID		= SignalID,							-- Schlüssel des aktuellen Eintrages
 		
-		Position 		= Gleise[GleissystemID][GleisID].Position,						-- vorläufig, müsste genau berechnet werden
-		relPosition 	= math.floor(tonumber(xmlMeldung._attr.Position) / 100 + 0.5),	-- Position relativ zum Gleisursprung
+		Position 		= Position,							-- (berechnet/geschätzt) [m]
+		relPosition 	= relPosition,						-- Position relativ zum Gleisursprung
 		name			= xmlMeldung._attr.name,
 		Stellung		= xmlMeldung.Signal._attr.stellung,
 		KontaktZiel		= tonumber(xmlMeldung.KontaktZiel),	-- Signale sind potentielle Kontakt-Ziele
-		TipTxt			= xmlMeldung._attr.TipTxt,		-- Tipp-Text (kann auch nil sein)
+		
+		TipTxt			= xmlMeldung._attr.TipTxt,			-- Tipp-Text (kann auch nil sein)
+		--.. hier weitere Felder zu einem Signal eintragen
 	}
 	local Signal = Signale[GleissystemID][SignalID]
 	
@@ -449,15 +697,16 @@ local function processZugverband(xmlZugverband, Fuhrpark)
 
 	-- neuen Zugverband anlegen
 	Zugverbaende[ZugID] = {
-		Fuhrpark		= Fuhrpark,						-- Elternknoten
-		ZugID			= ZugID,						-- Schlüssel des aktuellen Eintrages
+		Fuhrpark		= Fuhrpark,							-- Elternknoten
+		ZugID			= ZugID,							-- Schlüssel des aktuellen Eintrages
+		Gleis			= Gleise[GleissystemID][GleisID],	-- Querverweis auf das Gleis 
+		GleissystemID 	= GleissystemID,					-- kann auch über .Gleis.GleisID ermittelt werden
+		GleisID 		= GleisID,							-- kann auch über .Gleis.Gleissystem.GleisID ermittelt werden
 		
 		name 			= xmlZugverband._attr.name, 
 		FuhrparkID      = Fuhrpark.FuhrparkID,
-		GleissystemID 	= GleissystemID,
-		GleisID 		= GleisID,
-		Position 		= Gleise[GleissystemID][GleisID].Position,
-		Geschwindigkeit = math.floor(tonumber(xmlZugverband._attr.Geschwindigkeit) * 36 + 0.5) / 10, -- Umgerechnet und gerundet in km/h
+		Position 		= Gleise[GleissystemID][GleisID].Position,		-- Annahme: Zug steht am Enfang des Gleises
+		Geschwindigkeit = tonumber(xmlZugverband._attr.Geschwindigkeit) * 3.6 , -- Umgerechnet in km/h
 		Rollmaterialien = {},		-- Querverweise werden später eingetragen
 		--.. hier weitere Felder zu einem Zugverband eintragen
 	}	
@@ -486,7 +735,7 @@ local function processRollmaterial(xmlRollmaterial, Zugverband)
 
 		typ 			= xmlRollmaterial._attr.typ,
 		Zugmaschine 	= tableHasKey(xmlRollmaterial, 'Zugmaschine'),
-		ZugID           = Zugverband.ZugID,
+		ZugID           = Zugverband.ZugID,			-- kann auch über .Zugverband.ZugID ermittelt werden
 		--.. hier weitere Felder zu einem Rollmaterial eintragen
 	}
 	local Rollmaterial				= Rollmaterialien[name]
@@ -536,9 +785,9 @@ local function processImmobile(xmlImmobile, Gebaeudesammlung)
 		ImmoIdx  		 = ImmoIdx,						-- Schlüssel des aktuellen Eintrages
 		
 		Position = {
-			x = math.floor(tonumber(xmlImmobile.Dreibein.Vektor[1]._attr.x) / 100 + 0.5), 
-			y = math.floor(tonumber(xmlImmobile.Dreibein.Vektor[1]._attr.y) / 100 + 0.5), 
-			z = math.floor(tonumber(xmlImmobile.Dreibein.Vektor[1]._attr.z) / 100 + 0.5),
+			x = tonumber(xmlImmobile.Dreibein.Vektor[1]._attr.x) / 100, 
+			y = tonumber(xmlImmobile.Dreibein.Vektor[1]._attr.y) / 100, 
+			z = tonumber(xmlImmobile.Dreibein.Vektor[1]._attr.z) / 100,
 		},
 		TipTxt		= xmlImmobile._attr.TipTxt,			-- Tipp-Text (kann auch nil sein)
 		--.. hier weitere Felder zu einer Immobilie eintragen
@@ -556,7 +805,7 @@ end
 
 
 local function processOptions(xmlOptions, Parameters)
-	if log == true then print('processOptions')end
+	if log == true then print('processOptions') end
 	
 	local I
 	local Route = {}
@@ -614,6 +863,124 @@ local function processOptions(xmlOptions, Parameters)
 	return Parameters
 end
 
+local function processGleisverbindung(xmlGleisverbindung, Gleissystem)
+	if log == true then print('processGleisverbindung') end
+	
+	-- Attribute: GleisID1, Anschluss1, GleisID2, Anschluss2
+	-- Werte für Anschluss: Anfang, Ende, EndeAbzweig, EndeKoAbzweig
+
+	-- neues Gleissystem?
+	if not Gleisverbindungen[Gleissystem.GleissystemID] then Gleisverbindungen[Gleissystem.GleissystemID] = {} end
+
+	-- Sammle Verbindungen
+	table.insert(
+		Gleisverbindungen[Gleissystem.GleissystemID],
+		{
+			GleisID1 			= tonumber(xmlGleisverbindung._attr.GleisID1),
+			Anschluss1			= xmlGleisverbindung._attr.Anschluss1,
+			GleisID2 			= tonumber(xmlGleisverbindung._attr.GleisID2),
+			Anschluss2			= xmlGleisverbindung._attr.Anschluss2,
+			Flags				= tonumber(xmlGleisverbindung._attr.Flags),		-- 1 = virtuelle Gleisverbindung
+		}
+	)
+	
+	return Gleisverbindungen[Gleissystem.GleissystemID]
+end
+
+local function verbindeGleise()
+	-- Erst nachdem alle Tokens verarbeitet wurden, koennen mit dieser Funktion 
+	-- die Verweise zwischen verbundenen Gleisen eingetragen werden
+	
+	local function verbindeGleis(GleisA, AnschlussA, GleisB, AnschlussB, Flags)
+		-- Die Gleisverbindung wird in beiden Richtugen bei den Gleisen eingetragen.
+		-- Diese lokale Funktion macht das für jeweils eine Richt 
+		
+		-- neue Verbindung
+		if not GleisA.Verbindung then GleisA.Verbindung = {} end
+
+		-- Verbindung eintragen
+		if	   AnschlussA == 'Anfang' 		 	then
+			table.insert(GleisA.Verbindung, 
+				{
+					Anfang					= GleisB,			-- das andere Gleis eintragen
+					AnfangAnschluss			= AnschlussB,		-- den Anschluss des anderen Gleises eintragen
+					Virtuell				= Flags == 1,
+				}
+			)
+		
+		elseif AnschlussA == 'Ende' 			then
+			table.insert(GleisA.Verbindung, 
+				{
+					Ende					= GleisB,
+					EndeAnschluss			= AnschlussB,
+					Virtuell				= Flags == 1,
+				}
+			)
+			
+		elseif AnschlussA == 'EndeAbzweig' 		then
+			table.insert(GleisA.Verbindung, 
+				{
+					EndeAbzweig				= GleisB,
+					EndeAbzweigAnschluss	= AnschlussB,
+					Virtuell				= Flags == 1,
+				}
+			)
+
+		elseif AnschlussA == 'EndeKoAbzweig' 	then
+			table.insert(GleisA.Verbindung, 
+				{
+					EndeKoAbzweig			= GleisB,
+					EndeKoAbzweigAnschluss	= AnschlussB,
+					Virtuell				= Flags == 1,
+				}
+			)
+			
+		else
+			print('Fehler: Anschluss=', AnschlussA, ' nicht bekannt')
+
+		end
+	end -- function verbindeGleis
+	
+	if log == true then print('verbindeGleise') end
+	
+	for GleissystemID, Gleissystem in pairs(Gleisverbindungen) do
+
+		for key, Gleisverbindung in pairs(Gleissystem) do
+	
+			if log == true then 
+				print(
+					  'GleissystemID=',	GleissystemID, 	' '
+					, 'key=', 			key, 		' '
+					, 'GleisID1=', 		Gleisverbindung.GleisID1, 			' '
+					, 'Anschluss1=', 	Gleisverbindung.Anschluss1, 		' '
+					, 'GleisID2=', 		Gleisverbindung.GleisID2, 			' '
+					, 'Anschluss2=', 	Gleisverbindung.Anschluss2, 		' '
+					, ( Gleisverbindung.Flags == 1 and 'virtuell' or ''), 	' '
+				)
+			end
+
+			-- verbinde Gleise 1->2
+			verbindeGleis(
+				Gleise[GleissystemID][Gleisverbindung.GleisID1],
+				Gleisverbindung.Anschluss1,
+				Gleise[GleissystemID][Gleisverbindung.GleisID2],
+				Gleisverbindung.Anschluss2,
+				Gleisverbindung.Flags								-- 1: virtueller Anschluss
+			)
+		
+			-- verbinde Gleise 2->1
+			verbindeGleis(
+				Gleise[GleissystemID][Gleisverbindung.GleisID2],
+				Gleisverbindung.Anschluss2,
+				Gleise[GleissystemID][Gleisverbindung.GleisID1],
+				Gleisverbindung.Anschluss1,
+				Gleisverbindung.Flags								-- 1: virtueller Anschluss
+			)
+			
+		end
+	end
+
+end -- function verbindeGleise
 
 -- Aufrufhierarchie der zu verarbeitenden Token gemäß XML-Struktur, optional mit Funktionen, die die einzelnen Token verarbeiten
 local xmlHierarchy = {				_Call = nil,
@@ -623,14 +990,15 @@ local xmlHierarchy = {				_Call = nil,
 				Kontakt = { 		_Call = processKontakt 			},
 				Meldung = { 		_Call = processMeldung 			}, 
 			}, 
+			Gleisverbindung = {		_Call = processGleisverbindung,	},
 		}, 
 		Fuhrpark = {				_Call = processFuhrpark,
 			Zugverband = {			_Call = processZugverband,
-				Rollmaterial = { 	_Call = processRollmaterial 		}, 
+				Rollmaterial = { 	_Call = processRollmaterial 	}, 
 			}, 
 		}, 
 		Gebaeudesammlung = {		_Call = processGebaeudesammlung,	
-			Immobile = { 			_Call = processImmobile 			}, 
+			Immobile = { 			_Call = processImmobile 		}, 
 		},
 		Options = { 				_Call = processOptions 			}, 
 	}, 
@@ -674,7 +1042,12 @@ local function processToken(
 		-- einzelnes Token verarbeiten
 		local Results = Parameters
 		if xmlHierarchy._Call and type(xmlHierarchy._Call) == 'function' then
-			if log == true then print('= ', Name, ' Call') for key, value in pairs(Token) do print('  Sub=', key) end end
+			if log == true then 
+				print('= ', Name, ' Call') 
+				for key, value in pairs(Token) do 
+					print('  Sub=', key) 
+				end 
+			end
 			
 			Results = xmlHierarchy._Call(Token, Parameters)	
 		end
@@ -726,6 +1099,11 @@ local function loadFile(input_file)
 	
 	-- xml-Tabelle verarbeiten
 	processToken('root', handler.root, xmlHierarchy)
+	
+	-- Übertrage die Gleisverbindungen in die Gleise
+	-- Erst nachdem alle Tokens verarbeitet wurden, koennen mit dieser Funktion 
+	-- die Verweise zwischen verbundenen Gleisen eingetragen werden
+	verbindeGleise()
 
 	Statistics.ProcessTime = os.clock() - t0
 	Statistics.TotalTime   = Statistics.LoadFileTime + Statistics.ParserTime + Statistics.ProcessTime
@@ -756,7 +1134,7 @@ end
 
 -- Öffentliche Schnittstelle des Moduls -------------------------------
 
-EEP2Lua._VERSION 				= "2019-01-25"
+EEP2Lua._VERSION 				= "2019-01-29"
 
 -- Laufzeit in Sekunden für { LoadFile, Parser, Process, Total }
 EEP2Lua.Statistics				= Statistics

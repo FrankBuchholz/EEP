@@ -6,7 +6,7 @@ Analyse einer EEP-Anlage-Datei
 Frank Buchholz, 2019
 ]]
 
-local _VERSION = 'v2019-01-25'
+local _VERSION = 'v2019-01-29'
 
 -- In Variable input_file wird der Pfad zur Anlagen-Datei eingetragen
 -- Hier einige Varianten unter der Annahme, dass dieses Script im LUA-Ordner der EEP-Installation liegt:
@@ -15,14 +15,14 @@ local input_files = {
 	[1] = "./Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3", 		-- Laufzeit ca 0.5 Sekunden		
 	[2] = "./Anlagen/Demo.anl3",											-- Laufzeit ca 12 Sekunden
 	[3] = "./Anlagen/Wasser Demo.anl3",	
-	[4] = "./Anlagen/02 Kontakte.anl3",	
+	[4] = "./Anlagen/01 Weichen.anl3",	
 	-- relativer Pfad bei standalone-Ausführung im Editor SciTE
 	[11] = "../Resourcen/Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3", 		
 	[12] = "../Resourcen/Anlagen/Demo.anl3"		
 
 }
 -- Welche Datei soll es sein?
-input_file = input_files[1]
+input_file = input_files[ 1 ]
 
 -- Hier den Pfad zur zusätzlichen Ausgabe-Datei angeben (siehe printtofile)
 local output_file = "C:/temp/output.txt"
@@ -94,7 +94,7 @@ local function printGleisUebersicht(Anlage)
 		if Gleissystem.Anzahl.Gleise > 0 then 
 		print(
 			  Anlage.GleissystemText[GleissystemID], ' '
-			, 'Laenge=', 			Gleissystem.Laenge, 'm ' 
+			, 'Laenge=', 			string.format('%d', Gleissystem.Laenge), 'm ' 
 			, 'Gleise=', 			Gleissystem.Anzahl.Gleise, ' '
 			, 'Kontakte=', 			Gleissystem.Anzahl.Kontakte, ' '
 			, 'Signale=', 			Gleissystem.Anzahl.Signale, ' '
@@ -105,32 +105,101 @@ local function printGleisUebersicht(Anlage)
 	end
 end
 
+local function printGleise(Anlage)
+
+	local function printAnschluss(Text, GleisA, PositionA, GleisB, AnschlussB, Virtuell)
+		if GleisB then 
+		
+			local PositionB = (AnschlussB == 'Anfang' and GleisB.Position or GleisB.PositionEnde)
+		
+			print( '  '
+				, 'Gleis=', GleisA.GleisID, ' '
+				, Text, ' '
+				, 'x=' .. string.format('%d', PositionA.x) .. 'm' .. ' '
+				, 'y=' .. string.format('%d', PositionA.y) .. 'm' .. ' '
+				, ( math.abs(PositionA.z) >= 1 and 'z=' .. string.format('%d', PositionA.z) .. 'm' or '') .. ' '
+
+				, 'Gleis=', GleisB.GleisID, ' '
+				, AnschlussB, ' '
+				, 'x=' .. string.format('%d', PositionB.x) .. 'm' .. ' '
+				, 'y=' .. string.format('%d', PositionB.y) .. 'm' .. ' '
+				, ( math.abs(PositionB.z) >= 1 and 'z=' .. string.format('%d', PositionB.z) .. 'm' or '') .. ' '
+
+				, ( Virtuell and 'virtuell' or '') .. ' '
+
+				, ( (math.abs(PositionA.x - PositionB.x) > 10 or math.abs(PositionA.y - PositionB.y) > 10 )
+					and 'Sprungverbindung' or '') .. ' '
+				)
+		
+		end
+	end -- function printAnschluss
+			
+	print('')
+	print('Gleise:')
+	for GleissystemID, Gleissystem in pairs(Anlage.Gleise) do
+		for GleisID, Gleis in pairs(Gleissystem) do
+			if type(GleisID) == 'number' then 
+			
+				print(
+					  Anlage.GleissystemText[GleissystemID], ' '
+					, 'Gleis=', GleisID, ' ', ' '
+					, 'x=' .. string.format('%d', Gleis.Position.x) .. 'm' .. ' '
+					, 'y=' .. string.format('%d', Gleis.Position.y) .. 'm' .. ' '
+					, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Gleis.Position.z) .. 'm' or '') .. ' '
+				)
+
+				for key, Verbindung in pairs(Gleis.Verbindung) do
+					printAnschluss('Anfang', 		Gleis, Gleis.Position, 		Verbindung.Anfang, 		Verbindung.AnfangAnschluss,			Verbindung.Virtuell)
+					printAnschluss('Ende', 			Gleis, Gleis.PositionEnde, 	Verbindung.Ende, 		Verbindung.EndeAnschluss,			Verbindung.Virtuell)
+					printAnschluss('EndeAbzweig', 	Gleis, Gleis.PositionEnde, 	Verbindung.Abzweig, 	Verbindung.EndeAbzweigAnschluss,	Verbindung.Virtuell)
+					printAnschluss('EndeKoAbzweig', Gleis, Gleis.PositionEnde, 	Verbindung.KoAbzweig, 	Verbindung.EndeKoAbzweigAnschluss,	Verbindung.Virtuell)
+				end
+			
+			end
+		end
+	end
+end
+
 local function printKontakte(Anlage)
 	print('')
 	print('Kontakte:')
 	for GleissystemID, Gleissystem in pairs(Anlage.Kontakte) do
 		for GleisID, Gleis in pairs(Gleissystem) do
 			if type(Gleis) == 'table' then 
-
+--[[
+			print('Gleis ', GleisID, ' ', type(Gleis), Gleis)
+			for k, v in pairs(Gleis) do
+				print( 'Gleis.', k, '=', v)
+			end
+			print(Gleis.Position)
+			for k, v in pairs(Gleis.Position) do
+				print( 'Gleis.Position.', k, '=', v)
+			end
+			
 			print(
 				  Anlage.GleissystemText[GleissystemID], ' '
 				, 'Gleis ', GleisID, ' '
-				, 'x=' .. Gleis.Position.x .. 'm', ' '
-				, 'y=' .. Gleis.Position.y .. 'm', ' '
-					, ( Gleis.Position.z ~= 0 and 'z=' .. Gleis.Position.z .. 'm' or ''), ' '
+				, 'x=' .. string.format('%d', Gleis.Position.x) .. 'm', ' '
+				, 'y=' .. string.format('%d', Gleis.Position.y) .. 'm', ' '
+					, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Gleis.Position.z) .. 'm' or ''), ' '
 			)
-		
+		]]
 			for Nr, Kontakt in pairs(Gleis) do
 				if type(Nr) == 'number' then 
 				print(
-					  '  Kontakt ', 	Nr, ' '
+					  Anlage.GleissystemText[Kontakt.Gleis.Gleissystem.GleissystemID]
+					, ' Gleis=', Kontakt.Gleis.GleisID, ' ' 
+					, ' Kontakt ', 	Nr, ' '
+
+				--	, 'x=' .. string.format('%d', Gleis.Position.x) .. 'm', ' '
+				--	, 'y=' .. string.format('%d', Gleis.Position.y) .. 'm', ' '
+				--	, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Gleis.Position.z) .. 'm' or ''), ' '
+					, '+', 			string.format('%d', Kontakt.relPosition), 'm', ' '
+
 					, 'Typ=', 		Kontakt.SetType, ' '
 					, ( Anlage.KontaktTyp[Kontakt.SetType] and Anlage.KontaktTyp[Kontakt.SetType].Typ .. ' ' or '' )
-				--	, 'x=' .. Gleis.Position.x .. 'm', ' '
-				--	, 'y=' .. Gleis.Position.y .. 'm', ' '
-				--	, ( Gleis.Position.z ~= 0 and 'z=' .. Gleis.Position.z .. 'm' or ''), ' '
-					, '+', 			Kontakt.relPosition, 'm', ' '
 					, 'SetValue=', 	Kontakt.SetValue, ' '
+
 					, 'Delay=', 	Kontakt.Delay, ' '
 					, ( Kontakt.Group ~= 0 	and 'Group=' 		.. Kontakt.Group 		.. ' ' or '' )
 					, ( Kontakt.KontaktZiel and 'Kontakt-Ziel=' .. Kontakt.KontaktZiel 	.. ' ' or '' ) 
@@ -169,10 +238,11 @@ local function printSignale(Anlage)
 			print(
 				  'Signal ', SignalID, ' \"', Signal.name, '\": '
 				, Anlage.GleissystemText[Signal.Gleis.Gleissystem.GleissystemID], ' Gleis=', Signal.Gleis.GleisID, ' ' 
-	--			, 'x=' .. 			Signal.Position.x .. 'm', ' '
-	--			, 'y=' .. 			Signal.Position.y .. 'm', ' '
-		--		, ( Signal.Position.z ~= 0 and 'z=' .. Signal.Position.z .. 'm' or ''), ' '
-				, '+', 				Signal.relPosition, 'm, '
+			--	, 'x=' .. 			string.format('%d', Signal.Position.x) .. 'm', ' '
+			--	, 'y=' .. 			string.format('%d', Signal.Position.y) .. 'm', ' '
+			--	, ( math.abs(Signal.Position.z) >= 1 and 'z=' .. string.format('%d', Signal.Position.z) .. 'm' or ''), ' '
+				, '+', 				string.format('%d', Signal.relPosition), 'm, '
+
 				, 'Stellung: ', 	Signal.Stellung, ' '
 				, 'Kontakt-Ziel: ', Signal.KontaktZiel, ' ', KontakteString, ' '
 				, ( Signal.TipTxt 		and 'TipTxt=\"' 	.. Signal.TipTxt 		.. '\" ' or '' )
@@ -246,10 +316,10 @@ local function printZugverbaende(Anlage)
 			  'Zugverband ', 	ZugID, ': ', Zugverband.name, ' '
 			, 'Gleisort: ', 	Anlage.GleissystemText[Zugverband.GleissystemID], ' '
 			, 'Gleis: ', 		Zugverband.Gleis.GleisID,  ' '
-			, 'x=' ..			Zugverband.Gleis.Position.x .. 'm', ' '
-			, 'y=' .. 			Zugverband.Gleis.Position.y .. 'm', ' '
-			, ( Zugverband.Gleis.Position.z ~= 0 and 'z=' .. Zugverband.Gleis.Position.z .. 'm' or ''), ' '
-			, ( Zugverband.Geschwindigkeit ~= 0 and 'v=' .. Zugverband.Geschwindigkeit .. 'km/h' or ''), ' '
+			, 'x=' ..			string.format('%d', Zugverband.Gleis.Position.x) .. 'm', ' '
+			, 'y=' .. 			string.format('%d', Zugverband.Gleis.Position.y) .. 'm', ' '
+			, ( math.abs(Zugverband.Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Zugverband.Gleis.Position.z) .. 'm' or ''), ' '
+			, ( math.abs(Zugverband.Geschwindigkeit) >= 1 and 'v=' .. string.format('%.1d', Zugverband.Geschwindigkeit) .. 'km/h' or ''), ' '
 		)
 		for Nr, Rollmaterial in pairs(Zugverband.Rollmaterialien) do
 			print(
@@ -272,9 +342,9 @@ local function printRollmaterialien(Anlage)
 			  name, ' '
 			, ( Rollmaterial.Zugmaschine and 'Zugmaschine' or 'Rollmaterial' ), ' '
 			, 'Zugverband: ', 	Rollmaterial.ZugID, ' ', Rollmaterial.Zugverband.name, ' '
-			, 'x=' .. 			Rollmaterial.Zugverband.Position.x .. 'm', ' '
-			, 'y=' .. 			Rollmaterial.Zugverband.Position.y .. 'm', ' '
-			, ( Rollmaterial.Zugverband.Position.z ~= 0 and 'z=' .. Rollmaterial.Zugverband.Position.z .. 'm' or ''), ' '
+			, 'x=' .. 			string.format('%d', Rollmaterial.Zugverband.Position.x) .. 'm', ' '
+			, 'y=' .. 			string.format('%d', Rollmaterial.Zugverband.Position.y) .. 'm', ' '
+			, ( math.abs(Rollmaterial.Zugverband.Position.z) >= 1 and 'z=' .. string.format('%d', Rollmaterial.Zugverband.Position.z) .. 'm' or ''), ' '
 			, 'Datei: ', 		Rollmaterial.typ
 		)
 	end
@@ -289,9 +359,9 @@ local function printLuaFunktionen(Anlage)
 		local PositionenString = ''
 		if value.Positionen[1] then 
 			PositionenString =
-				   'x=' .. value.Positionen[1].x .. 'm '
-				.. 'y=' .. value.Positionen[1].y .. 'm ' 
-				.. ( value.Positionen[1].z ~= 0 and 'z=' .. value.Positionen[1].z .. 'm ' or '' )
+				   'x=' .. string.format('%d', value.Positionen[1].x) .. 'm '
+				.. 'y=' .. string.format('%d', value.Positionen[1].y) .. 'm ' 
+				.. ( math.abs(value.Positionen[1].z) >= 1 and 'z=' .. string.format('%d', value.Positionen[1].z) .. 'm ' or '' )
 				.. ( #value.Positionen > 1 and 	'...' or '' )
 		end
 	
@@ -326,9 +396,9 @@ local function printDateien(Anlage)
 			print(
 				  Dateiname 
 				, ' Anzahl=', 	Datei.Anzahl, ' '
-				, ( Datei.Positionen[1] and 'x=' .. Datei.Positionen[1].x .. 'm ' or '' )	-- bis zu 10 Positionen stehen zur Verfügung
-				, ( Datei.Positionen[1] and 'y=' .. Datei.Positionen[1].y .. 'm ' or '' )	-- davon zeigen wir hier nur die erste Postion
-				, ( Datei.Positionen[1] and Datei.Positionen[1].z ~= 0 and 'z=' .. Datei.Positionen[1].z .. 'm' or ''), ' '
+				, ( Datei.Positionen[1] and 'x=' .. string.format('%d', Datei.Positionen[1].x) .. 'm ' or '' )	-- bis zu 10 Positionen stehen zur Verfügung
+				, ( Datei.Positionen[1] and 'y=' .. string.format('%d', Datei.Positionen[1].y) .. 'm ' or '' )	-- davon zeigen wir hier nur die erste Postion
+				, ( Datei.Positionen[1] and math.abs(Datei.Positionen[1].z) >= 1 and 'z=' .. string.format('%d', Datei.Positionen[1].z) .. 'm' or ''), ' '
 				, ( #Datei.Positionen > 1 and '...' or '' )
 		)
 		end
@@ -374,7 +444,7 @@ end
 
 if EEPVer then -- Nur möglich und sinnvoll wenn das Skript aus EEP heraus gestartet wird
 	clearlog()
-	print("EEP Version", " ", EEPVer, " ", "Lua Version", " ", _G._VERSION)
+	print("EEP Version", " ", string.format('%.1d', EEPVer), " ", "Lua Version", " ", _G._VERSION)
 else
 	print("Lua Version", " ", _G._VERSION)
 end
@@ -395,7 +465,7 @@ print('EEP2Lua Version', ' ', 			Anlage._VERSION)
 
 print('Auswertung der Anlage', ' ', 	Anlage.Datei )
 
---	printUebersicht(Anlage)
+	printUebersicht(Anlage)
 	printGleisUebersicht(Anlage)
 	printKontakte(Anlage)
 	printSignale(Anlage)
@@ -408,6 +478,7 @@ print('Auswertung der Anlage', ' ', 	Anlage.Datei )
 	printRollmaterialien(Anlage)
 	printLuaFunktionen(Anlage)
 	printDateien(Anlage)
+	printGleise(Anlage)
 
 -- EEPMain --------------------------------------------------------------
 function EEPMain()
