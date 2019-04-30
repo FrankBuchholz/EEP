@@ -16,7 +16,7 @@ ShowGlobalVariables(true)	-- Zeige alle Namen
 Frank Buchholz, 2019
 ]]
 
-local _VERSION = 'v2019-01-19'
+local _VERSION = 'v2019-04-30'
 
 -- Die Funktion reicht bis an das Ende des Moduls
 local function ShowGlobalVariables(all)
@@ -98,6 +98,42 @@ local NamesTable = {
 	'EEPStructureSetRotation',
 	'EEPStructureSetSmoke',
 	'EEPTrainLooseCoupling',
+	-- EEP 15 functions
+	'EEPAuxiliaryTrackSetTextureText',
+	'EEPGetRollingstockItemName',
+	'EEPGetRollingstockItemsCount',
+	'EEPGetSignalTrainName',
+	'EEPGetSignalTrainsCount',
+	'EEPGetTrainyardItemName',
+	'EEPGetTrainyardItemsCount',
+	'EEPGetTrainyardItemStatus',
+	'EEPGoodsGetModelType',
+	'EEPGoodsGetPosition',
+	'EEPGoodsSetPosition',
+	'EEPGoodsSetRotation',
+	'EEPGoodsSetTextureText',
+	'EEPPause',
+	'EEPRailTrackSetTextureText',
+	'EEPRoadTrackSetTextureText',
+	'EEPRollingstockGetLength',
+	'EEPRollingstockGetModelType',
+	'EEPRollingstockGetMotor',
+	'EEPRollingstockGetTagText',
+	'EEPRollingstockGetTrack',
+	'EEPRollingstockGetTrainName',
+	'EEPRollingstockSetTagText',
+	'EEPRollingstockSetTextureText',
+	'EEPSetTime',
+	'EEPSetTrainHookGlue',
+	'EEPSetTrainName',
+	'EEPSignalSetTextureText',
+	'EEPStructureGetModelType',
+	'EEPStructureGetPosition',
+	'EEPStructureGetTagText',
+	'EEPStructureIsAxisAnimate',
+	'EEPStructureSetTagText',
+	'EEPStructureSetTextureText',
+	'EEPTramTrackSetTextureText',
 	-- Lua standard variables
 	'_G',
 	'_VERSION',
@@ -110,6 +146,7 @@ local NamesTable = {
 	'package',
 	'string',
 	'table',
+	'utf8',
 	-- Lua standard functions
 	'assert',
 	'collectgarbage',
