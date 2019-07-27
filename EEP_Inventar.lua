@@ -6,25 +6,26 @@ Analyse einer EEP-Anlage-Datei
 Frank Buchholz, 2019
 ]]
 
-local _VERSION = 'v2019-01-30'
+local _VERSION = 'v2019-07-27'
 
 -- In Variable input_file wird der Pfad zur Anlagen-Datei eingetragen
 -- Hier einige Varianten unter der Annahme, dass dieses Script im LUA-Ordner der EEP-Installation liegt:
 local input_files = {
-	-- relativer Pfad beim Start aus EEP heraus
-	[1] = "./Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3", 		-- Laufzeit ca 0.5 Sekunden		
-	[2] = "./Anlagen/Demo.anl3",											-- Laufzeit ca 12 Sekunden
-	[3] = "./Anlagen/Wasser Demo.anl3",	
-	[4] = "./Anlagen/01 Weichen.anl3",	
-	-- relativer Pfad bei standalone-Ausführung im Editor SciTE
-	[11] = "../Resourcen/Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3", 		
-	[12] = "../Resourcen/Anlagen/Demo.anl3"		
+	-- relativer Pfad beim Start aus dem Lua Ordner von EEP heraus
+	[1] = "../Resourcen/Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3", 		-- Laufzeit ca 0.5 Sekunden
+	[2] = "../Resourcen/Anlagen/Demo.anl3",											-- Laufzeit ca 12 Sekunden
+	[3] = "../Resourcen/Anlagen/Wasser Demo.anl3",
+	[4] = "../Resourcen/Anlagen/01 Weichen.anl3",
+	[5] = "../Resourcen/Anlagen/b_maik_DEMO_T-Kreuzung_rechts_vor_links/b_maik_DEMO_T-Kreuzung_rechts_vor_links.anl3",
+	-- relativer Pfad bei standalone-Ausfuehrung im Editor SciTE
+	[11] = "../Resourcen/Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3",
+	[12] = "../Resourcen/Anlagen/Demo.anl3"
 
 }
 -- Welche Datei soll es sein?
-local input_file = input_files[ 1 ]
+local input_file = input_files[ 5 ]
 
--- Hier den Pfad zur zusätzlichen Ausgabe-Datei angeben (siehe printtofile)
+-- Hier den Pfad zur zusaezlichen Ausgabe-Datei angeben (siehe printtofile)
 local output_file = "C:/temp/output.txt"
 
 -- require('EEP_Inventar')--{file = '02 Kontakte.anl3'}
@@ -33,11 +34,11 @@ local output_file = "C:/temp/output.txt"
 Quelle:
 https://emaps-eep.de/lua/printtofile
 
-Benötigte Dateien im LUA-Ordner:
+Benoetigte Dateien im LUA-Ordner:
 PrintToFile_BH2.lua
 
 output:
-0: keine Ausgabe (kann Sinn machen, wenn direkt die Ausgabedatei überwacht wird)
+0: keine Ausgabe (kann Sinn machen, wenn direkt die Ausgabedatei ueberwacht wird)
 1: normale Ausgabe (Standardwert)
 2: Ausgabe wie in Datei (diese kann sich von der normalen Ausgabe leicht unterscheiden)
 --]]
@@ -51,13 +52,13 @@ local function sortedTable(tab, func)
 	-- Hilfsfunktion zur Sortierung einer Tabelle
 	-- siehe https://www.lua.org/pil/19.3.html
 	local a = {}
-	for n in pairs(tab) do table.insert(a, n) end	-- copy references to table entries into local table 
+	for n in pairs(tab) do table.insert(a, n) end	-- copy references to table entries into local table
 	table.sort(a, func)
 	local i = 0										-- iterator variable
 	local iter = function ()						-- iterator function
 		i = i + 1
 		if a[i] == nil then return nil
-		else return a[i], tab[a[i]]					-- return key, value
+		else return a[i], tab[a[i]]				-- return key, value
 		end
 	end
 	return iter
@@ -68,10 +69,10 @@ local function printUebersicht(Anlage)
 
 	print('Dateigroessee: ', 				math.floor(Anlage.Statistics.FileSize / 1000), ' kB')
 	print('Laufzeit:')
-	print('Datei laden: ', 					string.format("%.3f", Anlage.Statistics.LoadFileTime), ' sek') 
+	print('Datei laden: ', 					string.format("%.3f", Anlage.Statistics.LoadFileTime), ' sek')
 	print('XML in Lua-Tabelle umwandeln: ', string.format("%.3f", Anlage.Statistics.ParserTime),   ' sek')
-	print('XML verarbeiten: ', 				string.format("%.3f", Anlage.Statistics.ProcessTime),  ' sek') 
-	print('Gesamt: ', 						string.format("%.3f", Anlage.Statistics.TotalTime),    ' sek') 
+	print('XML verarbeiten: ', 				string.format("%.3f", Anlage.Statistics.ProcessTime),  ' sek')
+	print('Gesamt: ', 						string.format("%.3f", Anlage.Statistics.TotalTime),    ' sek')
 
 	print('')
 	print('Beschreibung:')
@@ -85,16 +86,16 @@ local function printUebersicht(Anlage)
 end
 
 local function printGleisUebersicht(Anlage)
-	-- Ausgabe der Informationen zur Anlage 
+	-- Ausgabe der Informationen zur Anlage
 	-- Das Komma am Anfang der Zeilen innerhalb von print erleichtert es, einzelne Zeilen auszukommentieren.
 
 	print('')
 	print('Gleise:')
 	for GleissystemID, Gleissystem in pairs(Anlage.Gleise) do
-		if Gleissystem.Anzahl.Gleise > 0 then 
+		if Gleissystem.Anzahl.Gleise > 0 then
 		print(
 			  Anlage.GleissystemText[GleissystemID], ' '
-			, 'Laenge=', 			string.format('%d', Gleissystem.Laenge), 'm ' 
+			, 'Laenge=', 			string.format('%d', Gleissystem.Laenge), 'm '
 			, 'Gleise=', 			Gleissystem.Anzahl.Gleise, ' '
 			, 'Kontakte=', 			Gleissystem.Anzahl.Kontakte, ' '
 			, 'Signale=', 			Gleissystem.Anzahl.Signale, ' '
@@ -108,10 +109,10 @@ end
 local function printGleise(Anlage)
 
 	local function printAnschluss(Text, GleisA, PositionA, GleisB, AnschlussB, Virtuell)
-		if GleisB then 
-		
+		if GleisB then
+
 			local PositionB = (AnschlussB == 'Anfang' and GleisB.Position or GleisB.PositionEnde)
-		
+
 			print( '  '
 				, 'Gleis=', GleisA.GleisID, ' '
 				, Text, ' '
@@ -130,16 +131,16 @@ local function printGleise(Anlage)
 				, ( (math.abs(PositionA.x - PositionB.x) > 10 or math.abs(PositionA.y - PositionB.y) > 10 )
 					and 'Sprungverbindung' or '') .. ' '
 				)
-		
+
 		end
 	end -- function printAnschluss
-			
+
 	print('')
 	print('Gleise:')
 	for GleissystemID, Gleissystem in pairs(Anlage.Gleise) do
 		for GleisID, Gleis in pairs(Gleissystem) do
-			if type(GleisID) == 'number' then 
-			
+			if type(GleisID) == 'number' then
+
 				print(
 					  Anlage.GleissystemText[GleissystemID], ' '
 					, 'Gleis=', GleisID, ' ', ' '
@@ -154,7 +155,7 @@ local function printGleise(Anlage)
 					printAnschluss('EndeAbzweig', 	Gleis, Gleis.PositionEnde, 	Verbindung.Abzweig, 	Verbindung.EndeAbzweigAnschluss,	Verbindung.Virtuell)
 					printAnschluss('EndeKoAbzweig', Gleis, Gleis.PositionEnde, 	Verbindung.KoAbzweig, 	Verbindung.EndeKoAbzweigAnschluss,	Verbindung.Virtuell)
 				end
-			
+
 			end
 		end
 	end
@@ -165,7 +166,7 @@ local function printKontakte(Anlage)
 	print('Kontakte:')
 	for GleissystemID, Gleissystem in pairs(Anlage.Kontakte) do
 		for GleisID, Gleis in pairs(Gleissystem) do
-			if type(Gleis) == 'table' then 
+			if type(Gleis) == 'table' then
 --[[
 			print('Gleis ', GleisID, ' ', type(Gleis), Gleis)
 			for k, v in pairs(Gleis) do
@@ -175,7 +176,7 @@ local function printKontakte(Anlage)
 			for k, v in pairs(Gleis.Position) do
 				print( 'Gleis.Position.', k, '=', v)
 			end
-			
+
 			print(
 				  Anlage.GleissystemText[GleissystemID], ' '
 				, 'Gleis ', GleisID, ' '
@@ -185,10 +186,10 @@ local function printKontakte(Anlage)
 			)
 		]]
 			for Nr, Kontakt in pairs(Gleis) do
-				if type(Nr) == 'number' then 
+				if type(Nr) == 'number' then
 				print(
 					  Anlage.GleissystemText[Kontakt.Gleis.Gleissystem.GleissystemID]
-					, ' Gleis=', Kontakt.Gleis.GleisID, ' ' 
+					, ' Gleis=', Kontakt.Gleis.GleisID, ' '
 					, ' Kontakt ', 	Nr, ' '
 
 				--	, 'x=' .. string.format('%d', Gleis.Position.x) .. 'm', ' '
@@ -202,7 +203,7 @@ local function printKontakte(Anlage)
 
 					, 'Delay=', 	Kontakt.Delay, ' '
 					, ( Kontakt.Group ~= 0 	and 'Group=' 		.. Kontakt.Group 		.. ' ' or '' )
-					, ( Kontakt.KontaktZiel and 'Kontakt-Ziel=' .. Kontakt.KontaktZiel 	.. ' ' or '' ) 
+					, ( Kontakt.KontaktZiel and 'Kontakt-Ziel=' .. Kontakt.KontaktZiel 	.. ' ' or '' )
 					, ( Kontakt.LuaFn   	and 'LuaFn='  		.. Kontakt.LuaFn  		.. ' ' or '' )
 					, ( Kontakt.TipTxt 		and 'TipTxt=\"' 	.. Kontakt.TipTxt 		.. '\" ' or '' )
 				)
@@ -218,26 +219,26 @@ local function printSignale(Anlage)
 	print('Signale:')
 	for GleissystemID, Signale in pairs(Anlage.Signale) do
 		for SignalID, Signal in pairs(Signale) do
-			if type(SignalID) == 'number' then 
-			
+			if type(SignalID) == 'number' then
+
 			local KontakteString = nil
 			if Signal.KontaktZiel and Anlage.KontaktZiele[Signal.KontaktZiel].Kontakte then
-				for key, Kontakt in pairs(Anlage.KontaktZiele[Signal.KontaktZiel].Kontakte) do 
+				for key, Kontakt in pairs(Anlage.KontaktZiele[Signal.KontaktZiel].Kontakte) do
 					KontakteString =
-						( not KontakteString and ' Kontakte: ' or KontakteString .. ', ' ) .. 
-						Anlage.GleissystemText[Kontakt.Gleis.Gleissystem.GleissystemID]    ..  ' ' .. 
-						Kontakt.Gleis.GleisID 		.. 	'-' .. 
+						( not KontakteString and ' Kontakte: ' or KontakteString .. ', ' ) ..
+						Anlage.GleissystemText[Kontakt.Gleis.Gleissystem.GleissystemID]    ..  ' ' ..
+						Kontakt.Gleis.GleisID 		.. 	'-' ..
 						Kontakt.KontaktID
 				end
 			else
 				-- Optional: die folgende Zeile kann auskommentiert werden
 				KontakteString = '*keine Kontakte*'		-- Weiche bzw. Signal wird nicht von Kontakren angesprochen
 			end
-			
-			
+
+
 			print(
 				  'Signal ', SignalID, ' \"', Signal.name, '\": '
-				, Anlage.GleissystemText[Signal.Gleis.Gleissystem.GleissystemID], ' Gleis=', Signal.Gleis.GleisID, ' ' 
+				, Anlage.GleissystemText[Signal.Gleis.Gleissystem.GleissystemID], ' Gleis=', Signal.Gleis.GleisID, ' '
 			--	, 'x=' .. 			string.format('%d', Signal.Position.x) .. 'm', ' '
 			--	, 'y=' .. 			string.format('%d', Signal.Position.y) .. 'm', ' '
 			--	, ( math.abs(Signal.Position.z) >= 1 and 'z=' .. string.format('%d', Signal.Position.z) .. 'm' or ''), ' '
@@ -248,7 +249,7 @@ local function printSignale(Anlage)
 				, ( Signal.TipTxt 		and 'TipTxt=\"' 	.. Signal.TipTxt 		.. '\" ' or '' )
 			)
 		end
-		
+
 		end
 	end
 end
@@ -258,13 +259,13 @@ local function printFuhrparks(Anlage)
 	--print('Fuhrparks:')
 	for FuhrparkID, Fuhrpark in pairs(Anlage.Fuhrparks) do
 		print('Fuhrpark ',	FuhrparkID, ':')
-		
-		if Fuhrpark.Anzahl.Zugverbaende > 0 then 
+
+		if Fuhrpark.Anzahl.Zugverbaende > 0 then
 			print(
 				'Zugverbaende: ', 		'Anzahl=', Fuhrpark.Anzahl.Zugverbaende
 			)
 		end
-		if Fuhrpark.Anzahl.Rollmaterialien > 0 then 
+		if Fuhrpark.Anzahl.Rollmaterialien > 0 then
 			print(
 				'Rollmaterialien: ', 	'Anzahl=', Fuhrpark.Anzahl.Rollmaterialien
 			)
@@ -276,7 +277,7 @@ local function printImmobilien(Anlage)
 	print('')
 	print('Immobilien:')
 	for GebaeudesammlungID, Gebaeudesammlung in pairs(Anlage.Immobilien) do
-		if Gebaeudesammlung.Anzahl > 0 then 
+		if Gebaeudesammlung.Anzahl > 0 then
 		print(
 	--		  GebaeudesammlungID, ' ',
 			  Anlage.GebaeudesammlungText[GebaeudesammlungID], ' '
@@ -309,7 +310,7 @@ end
 local function printZugverbaende(Anlage)
 	print('')
 	print('Zugverbaende:')
-	-- Die Tabelle der Zugverbände verwendet einen numerischen Schlüssel, daher kann pairs verwendet werden
+	-- Die Tabelle der Zugverbaende verwendet einen numerischen Schluessel, daher kann pairs verwendet werden
 	for ZugID, Zugverband in pairs(Anlage.Zugverbaende) do
 		print('')
 		print(
@@ -323,7 +324,7 @@ local function printZugverbaende(Anlage)
 		)
 		for Nr, Rollmaterial in pairs(Zugverband.Rollmaterialien) do
 			print(
-	--			Nr, ' ', 
+	--			Nr, ' ',
 				  Rollmaterial.name, ' '
 				, ( Rollmaterial.Zugmaschine and 'Zugmaschine' .. ' ' or '' )
 	--			, 'Datei: ', Rollmaterial.typ
@@ -335,8 +336,8 @@ end
 local function printRollmaterialien(Anlage)
 	print('')
 	print('Rollmaterialien:')
-	-- Die Tabelle der Rollmaterialien verwendet den Namen als Schlüssel. 
-	-- Für eine sortierte Anzeige muss die Tabelle erst sortiert werden.
+	-- Die Tabelle der Rollmaterialien verwendet den Namen als Schluessel.
+	-- Fuer eine sortierte Anzeige muss die Tabelle erst sortiert werden.
 	for name, Rollmaterial in sortedTable(Anlage.Rollmaterialien) do
 		print(
 			  name, ' '
@@ -354,29 +355,29 @@ local function printLuaFunktionen(Anlage)
 	print('')
 	print('Lua-Funktionen:')
 	for LuaFN, value in sortedTable(Anlage.LuaFunktionen) do
-		
+
 		-- Hier nur die erste Postion verwendet
 		local PositionenString = ''
-		if value.Positionen[1] then 
+		if value.Positionen[1] then
 			PositionenString =
 				   'x=' .. string.format('%d', value.Positionen[1].x) .. 'm '
-				.. 'y=' .. string.format('%d', value.Positionen[1].y) .. 'm ' 
+				.. 'y=' .. string.format('%d', value.Positionen[1].y) .. 'm '
 				.. ( math.abs(value.Positionen[1].z) >= 1 and 'z=' .. string.format('%d', value.Positionen[1].z) .. 'm ' or '' )
 				.. ( #value.Positionen > 1 and 	'...' or '' )
 		end
-	
-		-- Hier werden alle Kontakte verwendet 
+
+		-- Hier werden alle Kontakte verwendet
 		local KontakteString = nil
 		for key, KontaktIDTab in pairs(value.Kontakte) do
 			KontakteString =
-				( not KontakteString and ' Kontakte: ' or KontakteString .. ', ' ) .. 
-				Anlage.GleissystemText[KontaktIDTab.GleissystemID] 	..  ' ' .. 
-				KontaktIDTab.GleisID 		.. 	'-' .. 
+				( not KontakteString and ' Kontakte: ' or KontakteString .. ', ' ) ..
+				Anlage.GleissystemText[KontaktIDTab.GleissystemID] 	..  ' ' ..
+				KontaktIDTab.GleisID 		.. 	'-' ..
 				KontaktIDTab.KontaktID
 		end
-			
+
 		print(
-			  'Funktion=', LuaFN 
+			  'Funktion=', LuaFN
 			, ' Anzahl=', 	value.Anzahl, ' '
 			, PositionenString
 			, KontakteString
@@ -385,8 +386,8 @@ local function printLuaFunktionen(Anlage)
 end
 
 local function printDateien(Anlage)
-	-- Die Dateitabelle enthält die Unterkategorien 'Gleissystem', 'Rollmaterial' und 'Immobile'
-	-- Daher muss die Dateitabelle zweistufig durchlaufen werden 
+	-- Die Dateitabelle enthaelt die Unterkategorien 'Gleissystem', 'Rollmaterial' und 'Immobile'
+	-- Daher muss die Dateitabelle zweistufig durchlaufen werden
 	print('')
 	print('Dateien:')
 	for Typ, Dateiliste in pairs(Anlage.Dateien) do
@@ -394,9 +395,9 @@ local function printDateien(Anlage)
 		print("Dateien ", Typ, ':')
 		for Dateiname, Datei in sortedTable(Dateiliste) do
 			print(
-				  Dateiname 
+				  Dateiname
 				, ' Anzahl=', 	Datei.Anzahl, ' '
-				, ( Datei.Positionen[1] and 'x=' .. string.format('%d', Datei.Positionen[1].x) .. 'm ' or '' )	-- bis zu 10 Positionen stehen zur Verfügung
+				, ( Datei.Positionen[1] and 'x=' .. string.format('%d', Datei.Positionen[1].x) .. 'm ' or '' )	-- bis zu 10 Positionen stehen zur Verfuegung
 				, ( Datei.Positionen[1] and 'y=' .. string.format('%d', Datei.Positionen[1].y) .. 'm ' or '' )	-- davon zeigen wir hier nur die erste Postion
 				, ( Datei.Positionen[1] and math.abs(Datei.Positionen[1].z) >= 1 and 'z=' .. string.format('%d', Datei.Positionen[1].z) .. 'm' or ''), ' '
 				, ( #Datei.Positionen > 1 and '...' or '' )
@@ -409,14 +410,14 @@ local function printKontaktZiele(Anlage)
 	print('')
 	print('Kontakt-Ziele:')
 	for KontaktZielID, KontaktZiel in pairs(Anlage.KontaktZiele) do
-	
+
 		local KontakteString = nil
 		if KontaktZiel.Kontakte then
-			for key, Kontakt in pairs(KontaktZiel.Kontakte) do 
+			for key, Kontakt in pairs(KontaktZiel.Kontakte) do
 				KontakteString =
-					( not KontakteString and ' Kontakte: ' or KontakteString .. ', ' ) .. 
-					Anlage.GleissystemText[Kontakt.Gleis.Gleissystem.GleissystemID]    ..  ' ' .. 
-					Kontakt.Gleis.GleisID 		.. 	'-' .. 
+					( not KontakteString and ' Kontakte: ' or KontakteString .. ', ' ) ..
+					Anlage.GleissystemText[Kontakt.Gleis.Gleissystem.GleissystemID]    ..  ' ' ..
+					Kontakt.Gleis.GleisID 		.. 	'-' ..
 					Kontakt.KontaktID
 			end
 		else
@@ -426,12 +427,12 @@ local function printKontaktZiele(Anlage)
 
 		print(
 			'Kontakt-Ziel ', KontaktZielID, ': ',
-			(	
-				KontaktZiel.Gleis  
+			(
+				KontaktZiel.Gleis
 				and Anlage.GleissystemText[KontaktZiel.Gleis.Gleissystem.GleissystemID] .. ' Gleis=' .. KontaktZiel.Gleis.GleisID
-				or ( 
-						KontaktZiel.Signal 
-						and Anlage.GleissystemText[KontaktZiel.Signal.Gleis.Gleissystem.GleissystemID] .. ' Signal=' .. KontaktZiel.Signal.SignalID 
+				or (
+						KontaktZiel.Signal
+						and Anlage.GleissystemText[KontaktZiel.Signal.Gleis.Gleissystem.GleissystemID] .. ' Signal=' .. KontaktZiel.Signal.SignalID
 						or '*unbekannt*'			-- Fehler: Kontakt verweist auf unbekanntes Ziel
 					)
 			),
@@ -442,7 +443,7 @@ end
 
 -- EEP-Anlagedatei analysieren ----------------------------------------
 
-if EEPVer then -- Nur möglich und sinnvoll wenn das Skript aus EEP heraus gestartet wird
+if EEPVer then -- Nur moeglich und sinnvoll wenn das Skript aus EEP heraus gestartet wird
 	clearlog()
 	print("EEP Version", " ", string.format('%.1d', EEPVer), " ", "Lua Version", " ", _G._VERSION)
 else
@@ -450,17 +451,17 @@ else
 end
 
 -- Laden und Verarbeiten der EEP-Anlagen-Datei
--- Der optionale Rückgabewert sutrackp enthält die Tabellenstruktur in der Form wie sie xml2lua liefert (die Variable wird in diesem Beispiel-Skript nicht weiter verwendet). 
-local Anlage 				= require('../git/EEP2Lua')
+-- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert (die Variable wird in diesem Beispiel-Skript nicht weiter verwendet).
+local Anlage 				= require('EEP2Lua')
 local sutrackp 				= Anlage.loadFile(input_file)
 
--- statische Texte und Definitionen stehen direkt nach dem require-Befehl zur Verfügung (die Variablen werden in diesem Beispiel-Skript nicht weiter verwendet).
+-- statische Texte und Definitionen stehen direkt nach dem require-Befehl zur Verfuegung (die Variablen werden in diesem Beispiel-Skript nicht weiter verwendet).
 local GleissystemText 		= Anlage.GleissystemText
 local Gleisart				= Anlage.Gleisart
 local KontaktTyp			= Anlage.KontaktTyp
 local GebaeudesammlungText 	= Anlage.GebaeudesammlungText
 
--- Alle anderen Variablen stehen nach Aufruf von loadFile zur Verfügung 
+-- Alle anderen Variablen stehen nach Aufruf von loadFile zur Verfuegung
 print('EEP2Lua Version', ' ', 			Anlage._VERSION)
 
 print('Auswertung der Anlage', ' ', 	Anlage.Datei )
