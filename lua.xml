@@ -1,0 +1,4530 @@
+<?xml version="1.0" encoding="Windows-1252" ?>
+<NotepadPlus>
+    <Environment ignoreCase="yes" paramSeparator="," terminal=";" additionalWordChar = ".:"/>
+    <AutoComplete language="LUA">
+        <KeyWord name="and" func="no" />
+
+        <KeyWord name="assert" func="yes">
+            <Overload retVal="void" descr="
+Issues an error when the value of its argument v is false (i.e., nil or false);
+otherwise, returns all its arguments. message is an error message; when absent, it 
+defaults to 'assertion failed!'">
+                <Param name="Bool:v"/>
+                <Param name="String:[message]"/>
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="break" func="no" />
+        <KeyWord name="collectgarbage" func="yes">
+            <Overload retVal="void" descr="This function is a generic interface to the garbage collector.
+It performs different functions according to its first argument, opt:
+
+    * 'stop': stops the garbage collector.
+    * 'restart': restarts the garbage collector.
+    * 'collect': performs a full garbage-collection cycle.
+    * 'count': returns the total memory in use by Lua (in Kbytes).
+    * 'step': performs a garbage-collection step. The step 'size' is controlled by arg
+        (larger values mean more steps) in a non-specified way. If you want to control
+        the step size you must experimentally tune the value of arg. Returns true if
+        the step finished a collection cycle.
+    * 'setpause': sets arg as the new value for the pause of the collector (see §2.10).
+        Returns the previous value for pause.
+    * 'setstepmul': sets arg as the new value for the step multiplier of the collector
+        (see §2.10). Returns the previous value for step.
+">
+                <Param name="String:opt"/>
+                <Param name="[arg]"/>
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="coroutine.create" func="yes">
+            <Overload retVal="void" descr="
+Creates a new coroutine, with body f. f must be a Lua function. Returns this new
+coroutine, an object with type 'thread'.
+">
+                <Param name="Function:f" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="coroutine.resume" func="yes">
+            <Overload retVal="void" descr="
+Starts or continues the execution of coroutine co. The first time you resume a
+coroutine, it starts running its body. The values val1, ··· are passed as the 
+arguments to the body function. If the coroutine has yielded, resume restarts it; the 
+values val1, ··· are passed as the results from the yield.
+
+If the coroutine runs without any errors, resume returns true plus any values passed 
+to yield (if the coroutine yields) or any values returned by the body function (if the
+coroutine terminates). If there is any error, resume returns false plus the error 
+message.
+">
+                <Param name="co" />
+                <Param name="[, val, ...]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="coroutine.running" func="yes">
+            <Overload retVal="void" descr="
+Returns the running coroutine, or nil when called by the main thread. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="coroutine.status" func="yes">
+            <Overload retVal="void" descr="
+Returns the status of coroutine co, as a string: 'running', if the coroutine is running (that is, it called status); 
+'suspended', if the coroutine is suspended in a call to yield, or if it has not started running yet; 
+'normal' if the coroutine is active but not running (that is, it has resumed another coroutine); and 
+'dead' if the coroutine has finished its body function, or if it has stopped with an error. 
+        ">
+                <Param name="co" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="coroutine.wrap" func="yes">
+            <Overload retVal="void" descr="
+Creates a new coroutine, with body f. f must be a Lua function. Returns a function that resumes 
+the coroutine each time it is called. Any arguments passed to the function behave as the extra 
+arguments to resume. Returns the same values returned by resume, except the first boolean. In 
+case of error, propagates the error. 
+        ">
+                <Param name="f" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="coroutine.yield" func="yes">
+            <Overload retVal="void" descr="
+Suspends the execution of the calling coroutine. The coroutine cannot be running a C function, a 
+metamethod, or an iterator. Any arguments to yield are passed as extra results to resume. 
+        ">
+                <Param name="..." />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.debug" func="yes">
+            <Overload retVal="void" descr="
+Enters an interactive mode with the user, running each string that the user enters. Using 
+simple commands and other debug facilities, the user can inspect global and local variables, 
+change their values, evaluate expressions, and so on. A line containing only the word cont 
+finishes this function, so that the caller continues its execution.
+
+Note that commands for debug.debug are not lexically nested within any function, and so 
+have no direct access to local variables. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.getfenv" func="yes">
+            <Overload retVal="void" descr="
+Returns the environment of object o. 
+        ">
+                <Param name="o" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.gethook" func="yes">
+            <Overload retVal="void" descr="
+Returns the current hook settings of the thread, as three values: the current hook function, the 
+current hook mask, and the current hook count (as set by the debug.sethook function). 
+        ">
+                <Param name="[thread]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.getinfo" func="yes">
+            <Overload retVal="void" descr="
+Returns a table with information about a function. You can give the function directly, or you 
+can give a number as the value of function, which means the function running at level function 
+of the call stack of the given thread: level 0 is the current function (getinfo itself); level 1 
+is the function that called getinfo; and so on. If function is a number larger than the number 
+of active functions, then getinfo returns nil.
+
+The returned table can contain all the fields returned by lua_getinfo, with the string what 
+describing which fields to fill in. The default for what is to get all information available, 
+except the table of valid lines. If present, the option 'f' adds a field named func with the 
+function itself. If present, the option 'L' adds a field named activelines with the table of 
+valid lines.
+
+For instance, the expression debug.getinfo(1,'n').name returns a table with a name for the current 
+function, if a reasonable name can be found, and the expression debug.getinfo(print) returns a table 
+with all available information about the print function. 
+        ">
+                <Param name="[thread,]" />
+                <Param name="function" />
+                <Param name="[, what]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.getlocal" func="yes">
+            <Overload retVal="void" descr="
+This function returns the name and the value of the local variable with index local of the function 
+at level level of the stack. (The first parameter or local variable has index 1, and so on, until the 
+last active local variable.) The function returns nil if there is no local variable with the given index, 
+and raises an error when called with a level out of range. (You can call debug.getinfo to check whether 
+the level is valid.)
+
+Variable names starting with '(' (open parentheses) represent internal variables (loop control variables, 
+temporaries, and C function locals). 
+        ">
+                <Param name="[thread,]" />
+                <Param name="level" />
+                <Param name="local" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.getmetatable" func="yes">
+            <Overload retVal="void" descr="
+Returns the metatable of the given object or nil if it does not have a metatable. 
+        ">
+                <Param name="object" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.getregistry" func="yes">
+            <Overload retVal="void" descr="
+Returns the registry table (see §3.5). 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.getupvalue" func="yes">
+            <Overload retVal="void" descr="
+This function returns the name and the value of the upvalue with index up of the function 
+func. The function returns nil if there is no upvalue with the given index. 
+        ">
+                <Param name="func" />
+                <Param name="up" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.setfenv" func="yes">
+            <Overload retVal="void" descr="
+Sets the environment of the given object to the given table. Returns object. 
+        ">
+                <Param name="object" />
+                <Param name="table" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.sethook" func="yes">
+            <Overload retVal="void" descr="
+Sets the given function as a hook. The string mask and the number count describe when the hook 
+will be called. The string mask may have the following characters, with the given meaning:
+
+    * 'c': the hook is called every time Lua calls a function;
+    * 'r': the hook is called every time Lua returns from a function;
+    * 'l': the hook is called every time Lua enters a new line of code.
+
+With a count different from zero, the hook is called after every count instructions.
+
+When called without arguments, debug.sethook turns off the hook.
+
+When the hook is called, its first parameter is a string describing the event that has triggered 
+its call: 'call', 'return' (or 'tail return', when simulating a return from a tail call), 'line', 
+and 'count'. For line events, the hook also gets the new line number as its second parameter. 
+Inside a hook, you can call getinfo with level 2 to get more information about the running function 
+(level 0 is the getinfo function, and level 1 is the hook function), unless the event is 'tail return'. 
+In this case, Lua is only simulating the return, and a call to getinfo will return invalid data. 
+        ">
+                <Param name="[thread,]" />
+                <Param name="hook" />
+                <Param name="mask" />
+                <Param name="[, count]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.setlocal" func="yes">
+            <Overload retVal="void" descr="
+This function assigns the value value to the local variable with index local of the function at level 
+level of the stack. The function returns nil if there is no local variable with the given index, and 
+raises an error when called with a level out of range. (You can call getinfo to check whether the level 
+is valid.) Otherwise, it returns the name of the local variable. 
+        ">
+                <Param name="[thread,]" />
+                <Param name="level" />
+                <Param name="local" />
+                <Param name="value" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.setmetatable" func="yes">
+            <Overload retVal="void" descr="
+Sets the metatable for the given object to the given table (which can be nil). 
+        ">
+                <Param name="object" />
+                <Param name="table" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.setupvalue" func="yes">
+            <Overload retVal="void" descr="
+This function assigns the value value to the upvalue with index up of the function func. The function 
+returns nil if there is no upvalue with the given index. Otherwise, it returns the name of the upvalue. 
+        ">
+                <Param name="func" />
+                <Param name="up" />
+                <Param name="value" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="debug.traceback" func="yes">
+            <Overload retVal="void" descr="
+Returns a string with a traceback of the call stack. An optional message string is appended at the 
+beginning of the traceback. An optional level number tells at which level to start the traceback 
+(default is 1, the function calling traceback). 
+        ">
+                <Param name="[thread,]" />
+                <Param name="[message]" />
+                <Param name="[, level]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="do" func="no" />
+
+        <KeyWord name="dofile" func="yes">
+            <Overload retVal="void" descr="
+Opens the named file and executes its contents as a Lua chunk. When called without arguments, dofile 
+executes the contents of the standard input (stdin). Returns all values returned by the chunk. In case 
+of errors, dofile propagates the error to its caller (that is, dofile does not run in protected mode). 
+        ">
+                <Param name="filename" />
+            </Overload>
+        </KeyWord>
+
+		<KeyWord name="clearlog" func="yes">
+			<Overload retVal="void" descr="
+Der Inhalt des EEP-Ereignis-Fensters wird gelöscht.
+        ">
+        </Overload>
+		</KeyWord>
+		<KeyWord name="EEPChangeInfoSignal" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Weist einem Tipp-Text einen neuen Text zu 
+
+                                   EEPChangeInfoSignal(1, *Hallo*)
+                                                 *Anführungszeichen 
+Parameter zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 13 
+Bemerkungen 
+* Das erste Argument ist die Signal-ID.
+* Das zweite Argument ist der gewünschte Text. Zeilenumbruch mit \n 
+* Rückgabewert ist true, wenn das Ziel der Funktion gefunden wurde.
+        ">
+                <Param name="ID" />
+                <Param name="TEXT" />
+				 </Overload>
+		</KeyWord>
+		<KeyWord name="EEPChangeInfoStructure" func="yes">
+			<Overload retVal="number" descr="
+Zweck -        Weist einem Tipp-Text einen neuen Text zu 
+
+                                   EEPChangeInfoStructure(*#1*, *Hallo*)
+                                                    * Anführungszeichen
+Parameter      zwei 
+Rückgabewerte  einer 
+Voraussetzung  EEP 13 
+Bemerkungen    * Das erste Argument ist der Lua-Name der Immobilie. Er steht in den
+                 Objekteigenschaften.
+               * Das zweite Argument ist der gewünschte Text. Zeilenumbruch mit \n. 
+               * Rückgabewert ist true, wenn das Ziel der Funktion gefunden wurde.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="TEXT" />
+				 </Overload>
+		</KeyWord>
+		<KeyWord name="EEPChangeInfoSwitch" func="yes">
+			<Overload retVal="number" descr="
+Zweck -  Weist einem Tipp-Text einen neuen Text zu 
+
+                                   EEPChangeInfoSwitch(1, *Hallo*)
+                                                    * Anführungszeichen
+Parameter zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 13 
+Bemerkungen 
+ Das erste Argument ist die Weichen-ID.
+ Das zweite Argument ist der gewünschte Text. Zeilenumbruch mit \n 
+ Rückgabewert ist true, wenn das Ziel der Funktion gefunden wurde.
+        ">
+                <Param name="ID" />
+                <Param name="TEXT" />
+				 </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainFromTrainyard" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schickt einen ausgewählten Zug aus einem ausgewählten virtuellen Zugdepot
+
+                                          EEPGetTrainFromTrainyard(1,*#Rheingold*,1)
+                                                          *Anführungszeichen 
+Parameter drei
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 2
+ Bemerkungen 
+* Das erste Argument ist die ID des Zugdepots. Sie steht in der Kopfzeile des Eigenschaftenfensters.
+* Das zweite Argument ist der Name des Zuges als String. Wird der Name weggelassen,
+   dann bestimmt das dritte Argument den Zug
+* Das dritte Argument ist der Listenplatz des Zuges im Depot. Dieses Argument gilt nur,
+  wenn kein Zugname angegeben ist. Bei vorgegebenem Zugnamen ist diese Zahl beliebig,
+  aber dennoch erforderlich.
+* Rückgabewert ist true, wenn das Depot und der angeforderte Zug existieren, andernfalls false.
+        ">
+                <Param name="Depot" />
+                <Param name="Zugname" />
+                <Param name="Nr" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainLength" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die Gesamtlänge des angegebenen Zuges.
+
+                                          ok, Laenge = EEPGetTrainLength(*#Gueterzug*)
+                                                          *Anführungszeichen 
+Parameter     einer
+Rückgabewerte zwei
+Voraussetzung EEP 15.1 Plug-In 1
+ Bemerkungen 
+* Das Argument ist der komplette Zugname als String.
+* Der erste Rückgabewert ist true, wenn der angesprochene Zug existiert, sonst false.
+* Der zweite Rückgabewert ist die Zuglänge in Metern.
+
+        ">
+                <Param name="*#Name*" />
+
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainRoute" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die Route eines Zugverbandes.
+
+               hResult, hData = EEPGetTrainRoute(*#Personenzug*)
+                                          *Anführungszeichen setzen
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das Argument ist der komplette Zugname als String.
+ * Der erste Rückgabewert ist true, wenn der angesprochene Zug existiert oder false,
+   wenn er nicht existiert.
+ * Der zweite Rückgabewert ist die ermittelte Route.
+        ">
+                <Param name="#Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainSpeed" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die Ist-Geschwindigkeit eines Zugverbandes.
+
+         hResult, hData = EEPGetTrainSpeed(*#VT98;001*) 
+                                * Anführungszeichen setzen
+
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.0
+Bemerkungen
+* Das Argument ist der komplette Zugname als String.
+* Der erste Rückgabewert ist entweder true, wenn der angesprochene Zug existiert oder false,
+  wenn er nicht existiert.
+* Der zweite Rückgabewert ist die ermittelte Geschwindigkeit.
+        ">
+                <Param name="#Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPHideInfoTextTop" func="yes">
+			<Overload retVal="number" descr="
+Zweck                  Blendet den Infotext am oberen Bildrand aus.
+
+                                EEPHideInfoTextTop()
+
+Parameter           keiner
+Rückgabewert        einer
+Voraussetzung       EEP 13 Plugin 1
+Bemerkung           * Diese Funktion benötigt keine Argumente.
+                    * Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+        ">
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPHideInfoTextBottom" func="yes">
+			<Overload retVal="number" descr="
+Zweck                  Blendet den Infotext am unteren Bildrand aus.
+
+                                EEPHideInfoTextBottom()
+
+Parameter           keiner
+Rückgabewert        einer
+Voraussetzung       EEP 13 Plugin 1
+Bemerkung           * Diese Funktion benötigt keine Argumente.
+                    * Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+        ">
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPIsAuxiliaryTrackReserved" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob ein Weg-Element der Kategorie *Sonstige* besetzt ist.
+
+             hResult, hData = EEPIsAuxiliaryTrackReserved(1)
+                            
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID des Weges, welcher auf *besetzt* geprüft werden soll.
+ * Der erste Rückgabewert ist true, wenn der zu prüfende Weg existiert und registriert ist,
+   andernfalls false.
+ * Der zweite Rückgabewert ist true, wenn der Weg besetzt ist, andernfalls false.
+ * Der Weg muss zuvor für Besetztabfragen registriert sein!
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPIsControlTrackReserved" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob ein Steuerstrecken-Element besetzt ist.
+
+             hResult, hData = EEPIsControlTrackReserved(1)
+                            
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID der Steuerstrecke, welche auf *besetzt* geprüft werden soll.
+ * Der erste Rückgabewert ist true, wenn die zu prüfende Steuerstrecke existiert und registriert ist,
+   andernfalls false.
+ * Der zweite Rückgabewert ist true, wenn die Steuerstrecke besetzt ist, andernfalls false. 
+ * Die Steuerstrecke muss zuvor für Besetztabfragen registriert sein!
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPIsRailTrackReserved" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob ein Gleiselement besetzt ist.
+
+             hResult, hData = EEPIsRailTrackReserved(1)
+                            
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID des Gleises, welches auf *besetzt* geprüft werden soll.
+ * Der erste Rückgabewert ist true, wenn das zu prüfende Gleis existiert und registriert ist,
+   andernfalls false.
+ * Der zweite Rückgabewert ist true, wenn das Gleis besetzt ist, andernfalls false.
+ * Das Gleis muss zuvor für Besetztabfragen registriert sein!
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPIsRoadTrackReserved" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob ein Straßenelement besetzt ist.
+
+             hResult, hData = EEPIsRoadTrackReserved(1)
+                            
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID der Straße, welches auf *besetzt* geprüft werden soll.
+ * Der erste Rückgabewert ist true, wenn die zu prüfende Straße existiert und registriert ist,
+   andernfalls false.
+ * Der zweite Rückgabewert ist true, wenn die Straße besetzt ist, andernfalls false.
+ * Die Straße muss zuvor für Besetztabfragen registriert sein!
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPIsTramTrackReserved" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob ein Straßenbahngleis-Element besetzt ist.
+
+             hResult, hData = EEPIsTramTrackReserved(1)
+                            
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID des Gleises, welches auf *besetzt* geprüft werden soll.
+ * Der erste Rückgabewert ist true, wenn das zu prüfende Gleis existiert und registriert ist,
+   andernfalls false.
+ * Der zweite Rückgabewert ist true, wenn das Gleis besetzt ist, andernfalls false.
+ * Das Gleis muss zuvor für Besetztabfragen registriert sein!
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPLoadData" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Lädt etwas aus einem speziellen Speicherbereich.
+        Wird automatisch zusammen mit der Anlage gespeichert und geladen.
+        Ersatz für die klassischen Hilfssignale.
+
+             hResult, hData = EEPLoadData(1)
+             if hResult then
+                print(*Slot 1 enthält: *..hData)
+             else
+                print(*Slot 1 ist leer*)
+             end
+                            
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Es gibt 1000 Speicherplätze, durchnummeriert von 1 bis 1000.
+ * Man kann entweder Zahlen oder Zeichenketten (*Strings*) speichern, wobei letztere
+   keine Formatierungszeichen enthalten dürfen.
+ * Das Argument ist die Nummer des Speicherplatzes.
+ * Der erste Rückgabewert ist true, wenn der betroffene Speicher einen Inhalt hat oder
+   false, wenn er leer ist.
+ * Der zweite Rückgabewert ist der Inhalt des Speichers.
+ * Wenn die Anlage geladen wird, dann holt EEP selbständig alle Inhalte dieser
+   Speicherplätze aus dem Anhang des Skripts. Damit können sie bei Bedarf durch Aufruf
+   von EEPLoadData() abgefragt und Variablen zugewiesen werden.
+        ">
+                <Param name="Slot" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPLoadProject" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Lädt eine Anlage aus dem Ordner *Resourcen\Anlagen*.
+
+             EEPLoadProject(*Tutorials\\Tutorial_54_LUA.anl3*)
+                                      * Anführungszeichen setzen
+Parameter einer
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist der Unterordner (wenn erforderlich) und der Dateiname einschließlich
+   .anl3 Suffix. Trennzeichen zwischen Ordner- und Dateiname ist ein doppelter Backslash.
+ *  Rückgabewert ist true, wenn die Anlage existiert, andernfalls false.
+        ">
+                <Param name="Dateiname" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPMain" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Wird zyklisch alle 200 Millisekunden, also fünf Mal je Sekunde, von EEP aufgerufen.
+        Geeignet für alle Aktionen, die regelmäßig ausgeführt werden sollen. 
+
+                                       function EEPMain()
+                                          return 1
+                                       end 
+
+ Parameter keine 
+ Rückgabewerte einer
+
+ Voraussetzung EEP 10.2 Plugin 2 
+
+
+ Bemerkungen 
+ * Muss im Skript deklariert sein, sonst stellt EEP die Verbindung zu Lua nicht her.  
+ * Der Funktionsaufruf durch EEP erfolgt ohne Parameter.  
+ * Die Funktion muss eine Zahl ungleich Null zurück liefern.  
+ * Liefert die Funktion den Wert 0 zurück, dann wird die Funktion nicht erneut aufgerufen.
+   Alle anderen Funktionsaufrufe funktionieren weiterhin.  
+ * Fehlt der Rückgabewert oder ist er keine Zahl, dann erfolgt eine Fehlermeldung und die
+   Verbindung zu Lua wird beendet.
+        ">
+            </Overload>
+			</KeyWord>
+		<KeyWord name="EEPRegisterAuxiliaryTrack" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Registriert einen Weg-Element der Kategorie *Sonstige* für Besetztabfragen.
+
+                       EEPRegisterAuxiliaryTrack(1)
+
+Parameter einer
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID des zu registrierenden Weges.
+ * Rückgabewert ist true, wenn der Weg existiert, andernfalls false
+ * Registrierung ist zwingende Voraussetzung für Besetztabfragen
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRegisterControlTrack" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Registriert ein Steuerstrecken-Element für Besetztabfragen.
+
+                       EEPRegisterControlTrack(1)
+
+Parameter einer
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID der zu registrierenden Steuerstrecke.
+ * Rückgabewert ist true, wenn die Steuerstrecke existiert, andernfalls false
+ * Registrierung ist zwingende Voraussetzung für Besetztabfragen
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRegisterRailTrack" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Registriert ein Gleiselement für Besetztabfragen.
+
+                       EEPRegisterRailTrack(1)
+
+Parameter einer
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID des zu registrierenden Gleises
+ * Rückgabewert ist true, wenn das Gleis existiert, andernfalls false
+ * Registrierung ist zwingende Voraussetzung für Besetztabfragen
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRegisterRoadTrack" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Registriert ein Straßenelement für Besetztabfragen.
+
+                       EEPRegisterRoadTrack(1)
+
+Parameter einer
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID der zu registrierenden Straße
+ * Rückgabewert ist true, wenn die Straßes existiert, andernfalls false
+ * Registrierung ist zwingende Voraussetzung für Besetztabfragen
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRegisterTramTrack" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Registriert ein Straßenbahngleis-Element für Besetztabfragen.
+
+                       EEPRegisterTramTrack(1)
+
+Parameter einer
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das Argument ist die ID des zu registrierenden Gleises
+ * Rückgabewert ist true, wenn das Gleis existiert, andernfalls false
+ * Registrierung ist zwingende Voraussetzung für Besetztabfragen
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetAxis" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die aktuelle Position einer benannten Achse des benannten Rollmaterials.
+
+                       Name = *Bekohlungskranbrücke 1*
+                       Achse = *Drehung links*
+                       EEPRollingstockGetAxis(Name, Achse)
+                                       * Anführungszeichen setzen
+
+Parameter zwei
+Rückgabewerte zwei
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Das erste Argument ist der komplette Name des Rollmaterials als String.
+ * Das zweite Argument ist der komplette Name der Achse als String.
+ * Der erste Rückgabewert ist true, wenn Rollmaterial und Achse existieren oder false, falls
+   mindestens eins von beidem nicht existiert.
+ * Der zweite Rückgabewert ist die momentane Position der Achse als Zahl.
+        ">
+                <Param name="Name" />
+                <Param name="Achse" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetCouplingFront" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die Stellung der vorderen Kupplung eines Rollmaterials.
+
+                   hResult, hData = EEPRollingstockGetCouplingFront(*Castor 1;001*)
+                                       * Anführungszeichen setzen
+
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Das Argument ist der komplette Name des Rollmaterials als String.
+ * Der erste Rückgabewert ist entweder true, wenn das angesprochene Rollmaterial
+   existiert oder false, wenn es nicht existiert.
+ * Der zweite Rückgabewert ist die Stellung der Kupplung. 1 bedeutet Kupplung scharf
+   2 bedeutet Abstoßen 3 bedeutet Gekuppelt
+        ">
+                <Param name="Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetCouplingRear" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die Stellung der hinteren Kupplung eines Rollmaterials.
+
+                           Name = *fals 175 Kalk*
+                           hResult, hData = EEPRollingstockGetCouplingRear(Name)
+                                       * in Anführungszeichen setzen
+
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Das Argument ist der komplette Name des Rollmaterials als String.
+ * Der erste Rückgabewert ist entweder true, wenn das angesprochene Rollmaterial
+   existiert oder false, wenn es nicht existiert.
+ * Der zweite Rückgabewert ist die Stellung der Kupplung. 1 bedeutet Kupplung scharf
+   2 bedeutet Abstoßen 3 bedeutet Gekuppelt
+        ">
+                <Param name="Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetOrientation" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, welche relative Ausrichtung das angegebene Fahrzeug im Zugverband hat.
+
+                     ok, Richtung = EEPRollingstockGetOrientation(*DB Gbrs*))
+                                       * in Anführungszeichen setzen
+
+Parameter     einer
+Rückgabewerte zwei
+Voraussetzung EEP 15.1 Plug-In 1
+ Bemerkungen
+ * Argument ist der Name des Fahrzeugs.
+ * Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+ * Rückgabewert 2 ist true, wenn das Fahrzeug vorwärts ausgerichtet ist, sonst false
+        ">
+                <Param name="Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockSetAxis" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Bewegt die benannte Achse des benannten Rollmaterials in eine gewünschte Position.
+
+                          Name = *Bekohlungskranbrücke 1*
+                          Achse = *Drehung links*
+                          EEPRollingstockSetAxis(Name, Achse, 50)
+                                       * in Anführungszeichen setzen
+
+Parameter drei
+Rückgabewerte einer
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Das erste Argument ist der komplette Name des Rollmaterials als String.
+ * Das zweite Argument ist der komplette Name der zu bewegenden Achse als String.
+ * Das dritte Argument ist die Position, zu der sich die Achse bewegen soll.
+ * Rückgabewert ist true, wenn Rollmaterial und Achse existieren oder false, falls mindestens eins von beidem nicht existiert.
+        ">
+                <Param name="Name" />
+                <Param name="Achse" />
+                <Param name="Stellung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockSetCouplingFront" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Stellt die vordere Kupplung eines Rollmaterials um.
+
+                         EEPRollingstockSetCouplingFront(*Castor 1;001*, 1)
+                                       * in Anführungszeichen setzen
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Das erste Argument ist der komplette Name des Rollmaterials als String.
+ * Das zweite Argument ist der gewünschte Kupplungszustand. 1 bedeutet Kuppeln
+   2 bedeutet Abstoßen
+ * Der Rückgabewert ist entweder true, wenn das angesprochene Rollmaterial existiert
+   oder false, wenn es nicht existiert.
+        ">
+                <Param name="Name" />
+                <Param name="Kupplung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockSetCouplingRear" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Stellt die hintere Kupplung eines Rollmaterials um.
+
+                         EEPRollingstockSetCouplingRear(*fals 175 Kalk*, 1)
+                                       * in Anführungszeichen setzen
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Das erste Argument ist der komplette Name des Rollmaterials als String.
+ * Das zweite Argument ist der gewünschte Kupplungszustand.
+   1 bedeutet Kuppeln
+   2 bedeutet Abstoßen
+ * Der Rückgabewert ist entweder true, wenn das angesprochene Rollmaterial existiert
+   oder false, wenn es nicht existiert.
+        ">
+                <Param name="Name" />
+                <Param name="Kupplung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockSetSlot" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Bewegt alle Achsen des genannten Rollmaterials zu der im Slot gespeicherten Position
+
+                         EEPRollingstockSetSlot(*Ladekran2 Greifer*, 1)
+                                       * in Anführungszeichen setzen
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Für das Rollmaterial müssen zuvor Kombinationen von Achsstellungen in einem Slot
+   gespeichert werden. Mit Aufruf dieser Funktion bewegen sich dann alle Achsen von ihrer
+   augenblicklichen zur im Slot gespeicherten Position.
+ * Das erste Argument ist der komplette Name des Rollmaterials als String.
+ * Das zweite Argument ist die Nummer des Slots, in dem die gewünschten Achsstellungen
+   gespeichert sind.
+ * Rückgabewert ist true, wenn das Rollmaterial und die Slot-ID existieren oder false, wenn
+   mindestens eins von beidem nicht existiert. Es wird nicht geprüft, ob im Slot tatsächlich
+   etwas gespeichert ist.
+        ">
+                <Param name="Name" />
+                <Param name="Slot" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSaveData" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Speichert etwas in einem speziellen Speicherbereich ab.
+        Wird automatisch zusammen mit der Anlage gespeichert und geladen.
+        Ersatz für die klassischen Hilfssignale.
+
+                         -- speichert *wahr* in Slot 1
+                         EEPSaveData(1, true)
+                         -- speichert die Zahl 42 in Slot 2
+                         EEPSaveData(2, 42)
+                         -- speichert den String *Ich bin Slot 3* in Slot 3
+                         EEPSaveData(3, *Ich bin Slot 3*)
+                         -- löscht den Inhalt von Slot 4
+                         EEPSaveData(4, nil)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Es gibt 1000 Speicherplätze, durchnummeriert von 1 bis 1000.
+ * Man kann entweder Booleans, Zahlen oder Zeichenketten (*Strings*) speichern, wobei
+   letztere keine Formatierungszeichen enthalten dürfen.
+ * Das erste Argument ist die Nummer des Speicherplatzes
+ * Das zweite Argument ist der zu speichernde Inhalt. Mit nil kann der Speicher gelöscht werden.
+ * Rückgabewert ist true bei erfolgreicher Speicherung oder false bei Misserfolg.
+ * Wenn die Anlage gespeichert wird, dann hängt EEP selbständig die Inhalte dieser
+   Speicherplätze an das zugehörige Skript an. Dieser Teil des Skripts hat keinen Einfluss
+   auf die Prüfsumme, welche in der Anlagendatei gespeichert wird. Sie können daher auch
+   mit einem externen Editor bearbeitet werden.
+        ">
+                <Param name="Slot" />
+                <Param name="Boolean|Zahl|String|nil" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetCamera" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Wählt eine der gespeicherten Kameras aus der Liste.
+
+                         EEPSetCamera(0,*Bahnhof*)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das erste Argument ist der Kameratyp: 0=statisch, 1=dynamisch, 2= mobile Kamera
+ * Das zweite Argument ist der Name der Kamera als String
+ * Rückgabewert ist true, wenn die Kamera existiert, andernfalls false
+        ">
+                <Param name="Typ" />
+                <Param name="Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetPerspectiveCamera" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Wählt eine der Verfolger-Kameras für den angegebenen Zug.
+
+                         EEPSetPerspectiveCamera(1,*#Personenzug*)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.3 Plugin 3
+ Bemerkungen
+ * Das erste Argument ist die Kameraposition - entspricht den Tasten 1 bis 9 für Kameraauswahl.
+ * Das zweite Argument ist der Zugname als String
+ * Der Rückgabewert ist true, wenn die gewünschte Kamera existiert, andernfalls false.
+        ">
+                <Param name="ID" />
+                <Param name="Zugname" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainAxis" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Animiert bei einem Zugverband eine ausgewählte Achse.
+
+                         EEPSetTrainAxis(*#Kranzug*, *Ausleger heben/senken*, 100)
+                                       * in Anführungszeichen 
+
+Parameter drei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist der Name der Achse als String.
+ * Das dritte Argument ist die Position, zu der sich die Achse bewegen soll.
+ * Rückgabewert ist true, wenn der angesprochene Zug und die angesprochene Achse
+   existieren. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="Achse" />
+                <Param name="Stellung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainCouplingFront" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet bei einem Zugverband die vordere Kupplung auf Kuppeln oder Abstoßen.
+
+                         EEPSetTrainCouplingFront(*#Gueterzug*, true)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist true (= Kuppeln) oder false (= Abstoßen).
+ * Rückgabewert ist true, wenn der angesprochene Zug existiert. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainCouplingRear" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet bei einem Zugverband die hintere Kupplung auf Kuppeln oder Abstoßen.
+
+                         EEPSetTrainCouplingRear(*#Gueterzug*, true)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist true (= Kuppeln) oder false (= Abstoßen).
+ * Rückgabewert ist true, wenn der angesprochene Zug existiert. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainHook" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet an einem Zugverband den Haken für Güter an oder aus.
+
+                         EEPSetTrainHook(*#Kranzug*, true)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist true (= an) oder false (= aus).
+ * Rückgabewert ist true, wenn der angesprochene Zug existiert. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainHorn" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Lässt bei einem Zugverband den Warnton (Pfeife, Hupe) ertönen.
+
+                         EEPSetTrainHorn(*#Personenzug*, true)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist true um den Warnton ertönen zu lassen oder false um ihn
+   abzustellen bevor er verklungen ist.
+ * Rückgabewert ist true, wenn der angesprochene Zug existiert. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="true" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainLight" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet an einem Zugverband das Licht ein oder aus.
+
+                         EEPSetTrainLight(*#Personenzug*, true)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist entweder true (= Licht ein) oder false (= Licht aus)..
+ * Rückgabewert ist true, wenn der angesprochene Zug existiert. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainRoute" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Weist einem Zugverband eine Route zu.
+
+                         EEPSetTrainRoute(*#Personenzug*, *Route*)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist die Route als String
+ * Rückgabewert ist entweder true, wenn der angesprochene Zug und die gewünschte
+   Route existieren oder false, wenn eins von beidem nicht existiert.
+        ">
+                <Param name="#Name" />
+                <Param name="Route" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainSmoke" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet an einem Zugverband den Rauch an oder aus.
+
+                         EEPSetTrainSmoke(*#Personenzug*, true)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist entweder true (= Rauch an) oder false (= Rauch aus).
+ * Rückgabewert ist true, wenn der angesprochene Zug existiert. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainSpeed" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Weist einem Zugverband eine Soll-Geschwindigkeit zu.
+
+                         EEPSetTrainSpeed(*#Personenzug*, 80)
+                                       * in Anführungszeichen 
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.0
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument ist die Geschwindigkeit. Ein negativer Wert bewirkt Rückwärts-Fahrt.
+ * Die aktuelle Signalbeeinflussung wird aufgehoben.
+ * Rückgabewert ist entweder true, wenn der angesprochene Zug existiert oder false, wenn
+   er nicht existiert.
+        ">
+                <Param name="#Name" />
+                <Param name="Geschwindigkeit" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPShowInfoSignal" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet einen Tipp-Text ein und aus
+
+                         EEPShowInfoSignal(1, true)
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 13
+ Bemerkungen
+ * Das erste Argument ist die Signal-ID
+ * Das zweite Argument ist entweder true (Tipp-Text ein) oder false (Tipp-Text aus).
+ * Rückgabewert ist true, wenn das Ziel der Funktion gefunden wurde.
+        ">
+                <Param name="ID" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPShowInfoSwitch" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet einen Tipp-Text ein und aus
+
+                         EEPShowInfoSwitch(1, true)
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 13
+ Bemerkungen
+ * Das erste Argument ist die Signal-ID
+ * Das zweite Argument ist entweder true (Tipp-Text ein) oder false (Tipp-Text aus).
+ * Rückgabewert ist true, wenn das Ziel der Funktion gefunden wurde.
+        ">
+                <Param name="ID" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureAnimateAxis" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Bewegt die Achse einer Immobilie oder eines Gleisobjekts.
+
+                         EEPStructureAnimateAxis(*#1_Windmühle*, *Muehlrad*, 1000)
+                                                               * Anführungszeichen
+
+Parameter drei
+Rückgabewerte einer
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist der Name der Achse als String
+ * Das dritte Argument ist die (positive oder negative) Schrittzahl, um welche die Achse
+   weiter bewegt werden soll. Der Wert 1000 bzw. -1000 bewirkt eine endlose Bewegung.
+   Der Wert 0 stoppt die Bewegung.
+ * Rückgabewert ist true, wenn Immobilie und Achse existieren oder false, falls mindestens
+   eins von beidem nicht existiert.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="Achse" />
+                <Param name="Stellung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureGetAxis" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die Position einer Achse der benannten Immobilie oder des Gleisobjekts
+
+                         hResult, hData =
+                         EEPStructureGetAxis(*#1_Drehscheibe*, *Brücke*)
+                                                               * Anführungszeichen
+
+Parameter zwei
+Rückgabewerte zwei
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist der Name der Achse als String
+ * Der erste Rückgabewert ist true, wenn Immobilie und Achse existieren oder false, falls
+   mindestens eins von beidem nicht existiert.
+ * Der zweite Rückgabewert ist die momentane Position der Achse als Zahl.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="Achse" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureGetFire" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob das Feuer der benannten Immobilie an- oder ausgeschaltet ist.
+
+                         Name = *#1_Brandhaus_01_SB1*
+                         hResult, hData = EEPStructureGetFire(Name)
+                                                               * Anführungszeichen
+
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Der erste Rückgabewert ist entweder true, wenn die Immobilie existiert und eine
+   Brandfunktion hat oder false, falls mindestens eins von beidem nicht zutrifft.
+ * Der zweite Rückgabewert ist entweder true, wenn das Feuer an- oder false, wenn das
+   Feuer ausgeschaltet ist.
+        ">
+                <Param name="Lua-Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureGetLight" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob das Licht der benannten Immobilie an- oder ausgeschaltet ist.
+
+                         Name = *#1_Betriebsdienstgebaeude*
+                         hResult, hData = EEPStructureGetLight(Name)
+                                                               * Anführungszeichen
+
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Der erste Rückgabewert ist entweder true, wenn die Immobilie existiert und eine
+   Lichtfunktion hat oder false, falls mindestens eins von beidem nicht zutrifft.
+ * Der zweite Rückgabewert ist entweder true, wenn das Licht an- oder false, wenn das
+   Licht ausgeschaltet ist.
+        ">
+                <Param name="Lua-Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureGetSmoke" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt, ob der Rauch der benannten Immobilie an- oder ausgeschaltet ist.
+
+                         Name = *#1_Abfertigung Lauscha*
+                         hResult, hData = EEPStructureGetSmoke(Name)
+                                                               * Anführungszeichen
+
+Parameter einer
+Rückgabewerte zwei
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Der erste Rückgabewert ist entweder true, wenn die Immobilie existiert und eine
+   Rauchfunktion hat oder false, falls mindestens eins von beidem nicht zutrifft.
+ * Der zweite Rückgabewert ist entweder true, wenn der Rauch an- oder false, wenn der
+   Rauch ausgeschaltet ist.
+        ">
+                <Param name="Lua-Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructurePlaySound" func="yes">
+			<Overload retVal="number" descr="
+Zweck       Schaltet den Ton einses Soundmodells aus der Kategorie Landschaftselemente/Klänge ein oder aus. Wenn 
+            dieser Ton ausschließlich über Lua gesteuert werden soll, dann ist es ratsam die Aktivierungsdistanz
+            im Modell auf 0 zu setzen.
+
+                                     EEPStructurePlaySound(*#1*,true)
+                                                       * Anführungszeichen
+Parameter       zwei
+Rückgabewert    einer
+Voraussetzung   EEP 13 Plugin 1
+Bemerkung       * Das erste Argement ist der Lua Name des Soundmodells als String.
+                  (Es genügt die Nummer mit vorangestelltem #)
+                * Das zweite Argument ist true (Einschalten) older false (Ausschalten)*
+                  Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+">
+                <Param name="Lua-Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPPlaySound" func="yes">
+			<Overload retVal="number" descr="
+Zweck                  Spielt ortunabhängig eine Sounddatei ab
+
+                                      EEPPlaySound(*User/Bimmel1.wav*)
+                                                       * Anführungszeichen
+Parameter              einer
+Rückgabewert           einer
+Voraussetzung          EEP 13 Plugin 1
+Bemerkung              * Das Argument ist der Pfad (relativ zum OrdnerResourcen/Sounds/EEXP)
+                         und Dateiname als String
+                       * Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+        ">
+                <Param name="Dateiname" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPShowInfoTextTop" func="yes">
+			<Overload retVal="number" descr="
+Zweck                  Erzeugt einen Infotext am oberen Bildrand
+
+                                r = 1 -- Rot
+                                g = 1 -- Grün 
+                                b = 1 -- Blau 
+                                sz = 1 -- Größe 
+                                t = 10 -- Zeit 
+                                j = 1 -- Ausrichtung 
+                                Text = *Weiß oben mittig 10 Sekunden* 
+                                                       * Anführungszeichen
+Parameter            sieben
+Rückgabewert         einer
+Voraussetzung        EEP 13 Plugin 1
+Bemerkung            * Die ersten drei Argumente bestimmen die Farbe.
+                     * Das vierte Argument definiert die Textgröße (von 0.5 bis 2-fach).
+                     * Das fünfte Argument bestimmt die Anzeigedauer in Sekunden.
+                     * Das sechste Argument bestimmt die Textausrichtung.
+                      (0 =Blocksatz, 1 = zentriert, 2 = linksbündig, 3 = rechtsbündig)
+                     * Das siebte Argument ist der anzuzeigende Text als String.
+                     * Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+        ">
+                <Param name="r" />
+				<Param name="g" />
+				<Param name="b" />
+				<Param name="sz" />
+				<Param name="t" />
+                <Param name="j" />
+                <Param name="Text" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPShowInfoTextBottom" func="yes">
+			<Overload retVal="number" descr="
+Zweck                  Erzeugt einen Infotext am unteren Bildrand
+
+                                r = 1 -- Rot
+                                g = 1 -- Grün 
+                                b = 0 -- Blau 
+                                sz = 1 -- Größe 
+                                t = 10 -- Zeit 
+                                j = 1 -- Ausrichtung 
+                                Text = *Gelb oben mittig 10 Sekunden* 
+                                                       * Anführungszeichen
+Parameter            sieben
+Rückgabewert         einer
+Voraussetzung        EEP 13 Plugin 1
+Bemerkung            * Die ersten drei Argumente bestimmen die Farbe.
+                     * Das vierte Argument definiert die Textgröße (von 0.5 bis 2-fach).
+                     * Das fünfte Argument bestimmt die Anzeigedauer in Sekunden.
+                     * Das sechste Argument bestimmt die Textausrichtung.
+                      (0 =Blocksatz, 1 = zentriert, 2 = linksbündig, 3 = rechtsbündig)
+                     * Das siebte Argument ist der anzuzeigende Text als String.
+                     * Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+        ">
+                <Param name="r" />
+				<Param name="g" />
+				<Param name="b" />
+				<Param name="sz" />
+				<Param name="t" />
+                <Param name="j" />
+                <Param name="Text" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPShowScrollInfoTextTop" func="yes">
+			<Overload retVal="number" descr="
+Zweck                Erzeugt einen durchlaufenden Infotext am oberen Bildrand
+
+                                r = 0     -- Rot 
+                                g = 1     -- Grün 
+                                b = 0.7   -- Blau 
+                                sz = 1    -- Größe 
+                                t = 20    -- Zeit 
+                                j = 0     -- Ausrichtung 
+                                sp = 0.2  -- Geschwindigkeit 
+                                Text = *Laufschrift für 20 Sekunden*
+                                                          * Anführungszeichen
+Parameter            acht
+Rückgabewert         einer
+Voraussetzung        EEP 13 Plugin 1
+Bemerkung            * Die ersten drei Argumente bestimmen die Farbe.
+                     * Das vierte Argument definiert die Textgröße (von 0.5 bis 2-fach).
+                     * Das fünfte Argument bestimmt die Anzeigedauer in Sekunden.
+                     * Das sechste Argument (für die Textausrichtung) ist ohne Wirkung, aber erforderlich
+                       Bitte hier eine Zahl (z.B. 0) eintragen
+                     * Das achte Argument ist der anzuzeigende Text als String. 
+                     * Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+        ">
+                <Param name="r" />
+				<Param name="g" />
+				<Param name="b" />
+				<Param name="sz" />
+				<Param name="t" />
+                <Param name="j" />
+                <Param name="sp" />
+                <Param name="Text" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPShowScrollInfoTextBottom" func="yes">
+			<Overload retVal="number" descr="
+Zweck                Erzeugt einen durchlaufenden Infotext am unteren Bildrand
+
+                                r = 0     -- Rot 
+                                g = 1     -- Grün 
+                                b = 0.7   -- Blau 
+                                sz = 1    -- Größe 
+                                t = 20    -- Zeit 
+                                j = 0     -- Ausrichtung 
+                                sp = 0.2  -- Geschwindigkeit 
+                                Text = *Laufschrift für 20 Sekunden*
+                                                          * Anführungszeichen
+Parameter            acht
+Rückgabewert         einer
+Voraussetzung        EEP 13 Plugin 1
+Bemerkung            * Die ersten drei Argumente bestimmen die Farbe.
+                     * Das vierte Argument definiert die Textgröße (von 0.5 bis 2-fach).
+                     * Das fünfte Argument bestimmt die Anzeigedauer in Sekunden.
+                     * Das sechste Argument (für die Textausrichtung) ist ohne Wirkung, aber erforderlich
+                       Bitte hier eine Zahl (z.B. 0) eintragen
+                     * Das achte Argument ist der anzuzeigende Text als String. 
+                     * Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+        ">
+                <Param name="r" />
+				<Param name="g" />
+				<Param name="b" />
+				<Param name="sz" />
+				<Param name="t" />
+                <Param name="j" />
+                <Param name="sp" />
+                <Param name="Text" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetAxis" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Setzt die Achse einer Immobilie oder eines Gleisobjekts (ohne Animation).
+
+                         EEPStructureSetAxis(*#1_Drehscheibe*, *Brücke*, 50)
+                                                               * Anführungszeichen
+
+Parameter drei
+Rückgabewerte einer
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist der Name der Achse als String
+ * Das dritte Argument ist die Position, zu der die Achse springen soll.
+ * Rückgabewert ist true, wenn Immobilie und Achse existieren oder false, falls mindestens
+   eins von beidem nicht existiert.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="Achse" />
+                <Param name="Stellung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetFire" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet das Feuer der benannten Immobilie an oder aus.
+
+                         EEPStructureSetFire(*#1_Brandhaus_01_SB1*, true)
+                                                               * Anführungszeichen
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist entweder true, wenn man das Feuer anschalten möchte oder
+   false, wenn man das Feuer ausschalten möchte.
+ * Rückgabewert ist entweder true, wenn die Immobilie existiert und eine Brandfunktion hat
+   oder false, falls mindestens eins von beidem nicht zutrifft.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetLight" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet das Licht der benannten Immobilie an oder aus.
+
+                         EEPStructureSetLight(*#1_Betriebsdienstgebaeude*, true)
+                                                               * Anführungszeichen
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist entweder true, wenn man das Licht anschalten möchte oder
+   false, wenn man das Licht ausschalten möchte.
+ * Rückgabewert ist entweder true, wenn die Immobilie existiert und eine Lichtfunktion hat
+   oder false, falls mindestens eins von beidem nicht zutrifft.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetPosition" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Versetzt die benannte Immobilie an eine neue Position.
+
+                         EEPStructureSetPosition(*#1_Strohballen*, 1, 2, 3)
+                                                               * Anführungszeichen
+
+Parameter vier
+Rückgabewerte einer
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist die Position in X-Richtung.
+ * Das dritte Argument ist die Position in Y-Richtung.
+ * Das vierte Argument ist die Position in Z-Richtung.
+ * Eine Positionierung außerhalb des Anlagenbereichs ist nicht möglich
+ * Rückgabewert ist true, wenn die Immobilie existiert oder false, wenn sie nicht existiert
+   oder außerhalb des Anlagenbereichs positioniert werden sollte.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="PosX" />
+                <Param name="PosY" />
+                <Param name="PosZ" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetRotation" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Dreht die benannte Immobilie in eine neue Position.
+
+                         EEPStructureSetRotation(*#1_Strohballen*, 0, 0, 25)
+                                                               * Anführungszeichen
+
+Parameter vier
+Rückgabewerte einer
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist die Drehung in X-Richtung.
+ * Das dritte Argument ist die Drehung in Y-Richtung.
+ * Das vierte Argument ist die Drehung in Z-Richtung.
+ * Eine Positionierung außerhalb des Anlagenbereichs ist nicht möglich
+ * Rückgabewert ist true, wenn die Immobilie existiert oder false, wenn sie nicht existiert
+        ">
+                <Param name="Lua-Name" />
+                <Param name="RotX" />
+                <Param name="RotY" />
+                <Param name="RotZ" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetSmoke" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet den Rauch der benannten Immobilie an oder aus.
+
+                         EEPStructureSetSmoke(*#1_Abfertigung Lauscha*, true)
+                                                               * Anführungszeichen
+
+Parameter zwei
+Rückgabewerte einer
+Voraussetzung EEP 11.1 Plugin 1
+ Bemerkungen
+ * Das erste Argument ist der Lua-Name der Immobilie als String. Dieser unterscheidet sich
+   durch die vorangestellte ID der Immobilie vom Modellnamen.
+ * Das zweite Argument ist entweder true, wenn man den Rauch anschalten möchte oder
+   false, wenn man den Rauch ausschalten möchte.
+ * Rückgabewert ist entweder true, wenn die Immobilie existiert und eine Rauchfunktion hat
+   oder false, falls mindestens eins von beidem nicht zutrifft.
+        ">
+                <Param name="Lua-Name" />
+                <Param name="true|false" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPTrainLooseCoupling" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Trennt einen Zugverband an der angegebenen Stelle.
+
+                         EEPTrainLooseCoupling(*#Gueterzug*, true, 3)
+                                                               * Anführungszeichen
+
+Parameter drei
+Rückgabewerte einer
+Voraussetzung EEP 11.2 Plugin 2
+ Bemerkungen
+ * Das erste Argument ist der komplette Zugname als String.
+ * Das zweite Argument bestimmt, ob von vorne oder hinten gezählt wird.
+   (true = vorne, false = hinten)
+ * Das dritte Argument bestimmt die Position, an der abgekuppelt wird.
+ * Rückgabewert ist true, wenn der angesprochene Zug existiert. Sonst false.
+        ">
+                <Param name="#Name" />
+                <Param name="true|false" />
+                <Param name="Stelle" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPTimeH" func="yes">
+			<Overload retVal="number" descr="
+             Typ Variable  ohne Klammern!
+         EEP schreibt in diese Variable die aktuelle EEP-Stunde.
+        ">
+            </Overload>
+			</KeyWord>
+		<KeyWord name="EEPTimeM" func="yes">
+			<Overload retVal="number" descr="
+              Typ Variable  ohne Klammern!
+         EEP schreibt in diese Variable die aktuelle EEP-Minute.
+        ">
+            </Overload>
+			</KeyWord>
+		<KeyWord name="EEPTimeS" func="yes">
+				 <Overload retVal="number" descr="
+               Typ Variable  ohne Klammern!
+         EEP schreibt in diese Variable die aktuelle EEP-Sekunde.
+        ">
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPTime" func="yes">
+			<Overload retVal="number" descr="
+               Typ Variable  ohne Klammern!
+         EEP schreibt in diese Variable die aktuelle Zeit. Der Wert entspricht
+         den seit Mitternacht (EEP-Zeit) vergangenen Sekunden.
+        ">
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetSignal" func="yes">
+		    <Overload retVal="number" descr="
+Zweck  -   Schaltet ein Signal
+                             -- stell Signal 0023 auf 1 (kann Fahrt oder Halt sein)
+                             EEPSetSignal(23, 1)
+                             -- stell Signal 0045 auf 1 und ruf EEPOnSignal_45() auf
+                             EEPSetSignal(45, 1, 1)
+Parameter     zwei oder drei
+Rückgabewerte einer
+Bemerkungen
+ * Das erste Argument ist die Signal-ID.
+ * Das zweite Argument ist die gewünschte Signalstellung.
+ * Eine 1 als drittes (optionales) Argument bewirkt, dass die für dieses Signal definierte
+   Funktion EEPOnSignal_x() aufgerufen wird. Bitte mit Bedacht einsetzen! Das Signal
+   muss für EEPOnSignal_x() registriert und die Funktion definiert sein. Außerdem besteht
+   die Gefahr, dass man sich bei unbedachtem Einsatz Programmschleifen einhandelt, die
+   EEP und Lua lahm legen.
+ * Rückgabewert ist 1 wenn das Signal und die gewünschte Signalstellung existieren oder
+   0, wenn eins von beidem nicht existiert.
+
+        ">
+                <Param name="ID" />
+                <Param name="Stellung" />
+				<Param name="Callback" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPShowInfoStructure" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Schaltet einen Tipp-Text ein und aus
+
+                             EEPShowInfoStructure(*#1*, true)
+                                                      *Anführungszeichen
+Parameter zwei 
+Rückgabewerte einer
+Voraussetzung EEP 13 
+ Bemerkungen 
+* Das erste Argument ist der Lua-Name der Immobilie. Er steht in den Objekteigenschaften.
+* Das zweite Argument ist entweder true (Tipp-Text ein) oder false (Tipp-Text aus).
+* Rückgabewert ist true, wenn das Ziel der Funktion gefunden wurde.
+        ">
+                <Param name="LuaName" />
+                <Param name="true|false" />
+				 </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetSignal" func="yes">
+			<Overload retVal="number" descr="
+Zweck - Ermittelt die Stellung eines Signals
+                                    Signalbild = EEPGetSignal(1)
+                                    if Signalbild == 0 then
+                                        print(*Signal 1 existiert nicht*)
+                                    elseif Signalbild == 1 then
+                                        print(*Signal 1 steht auf Halt*)
+                                    elseif Signalbild == 2 then
+                                        print(*Signal 1 steht auf Fahrt*)
+                                    end
+                                                             * Anführungszeichen
+ Bemerkungen
+ * Das Argument ist die ID des Signals, dessen Stellung man ermitteln möchte.
+ * Rückgabewert ist die Signalstellung. Die Nummer entspricht der Position dieser 
+   Signalstellung in der Auswahlliste unter den Signaleigenschaften. 
+ * Wenn das abgefragte Signal nicht existiert, ist der Rückgabewert 0.
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetSwitch" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Schaltet eine Weiche
+                                 -- stell Weiche 0067 auf 1 (Fahrt)
+                                 EEPSetSwitch(67, 1)
+                                 -- stell Weiche 0089 auf 1 und ruf EEPOnSwitch_89() auf
+                                 EEPSetSwitch(89, 1, 1)
+Parameter     zwei oder drei 
+Rückgabewerte einer 
+Voraussetzung EEP 10.2 Plugin 2
+Bemerkungen
+ * Das erste Argument ist die Weichen-ID.
+ * Das zweite Argument ist die gewünschte Weichenstellung.
+ * Eine 1 als drittes (optionales) Argument bewirkt, dass die für diese Weiche definierte
+   Funktion EEPOnSwitch_x() aufgerufen wird. Bitte mit Bedacht einsetzen! Die Weiche
+   muss für EEPOnSwitch_x() registriert und die Funktion definiert sein. Außerdem besteht
+   die Gefahr, dass man sich bei unbedachtem Einsatz Programmschleifen einhandelt, die
+   EEP und Lua lahm legen.
+ * Rückgabewert ist 1 wenn die Weiche und die gewünschte Weichenstellung existieren
+   oder 0, wenn eins von beidem nicht existiert.
+        ">
+                <Param name="ID" />
+                <Param name="Stellung" />
+				<Param name="Callback"/>
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetSwitch" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die Stellung einer Weiche.
+                               Weichenstellung = EEPGetSwitch(1)
+                               if Weichenstellung == 0 then
+                                   print(*Weiche 1 existiert nicht*)
+                               elseif Weichenstellung == 1 then
+                                   print(*Weiche 1 steht auf Fahrt*)
+                               elseif Weichenstellung == 2 then
+                                   print(*Weiche 1 steht auf Abzweig*)
+                               end
+Parameter     einer 
+Rückgabewerte einer 
+Voraussetzung EEP 10.2 Plugin 2
+Bemerkungen
+ * Das Argument ist die ID der Weiche, deren Stellung man ermitteln möchte.
+ * Rückgabewert ist die Weichenstellung. Die Nummer entspricht der Position dieser
+   Weichenstellung in der Auswahlliste unter den Eigenschaften.
+ * Wenn die abgefragte Weiche nicht existiert, ist der Rückgabewert 0.
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetSignalTrainsCount" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Gibt die Anzahl Fahrzeugverbände zurück, welche am spezifizierten Signal gehalten werden.
+
+                               EEPGetSignalTrainsCount(3)
+Parameter     einer 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das Argument ist die Signal ID.
+ * Rückgabewert ist die Anzahl haltender Züge (Autos, Straßenbahnen etc.)
+
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetSignalTrainName" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Gibt den Namen eines Fahrzeugverbands zurück, welcher am spezifizierten Signal gehalten wird.
+
+                               EEPGetSignalTrainName(3 , 1)
+Parameter     zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das erste Argument ist die Signal ID.
+ * Das zweite Argument ist die Positionsnummer des Zuges (des Autos, der Straßenbahn ...)
+ * Rückgabewert ist der Name des spezifizierten Verbands.
+
+ ">
+                <Param name="ID" />
+                <Param name="Positionsnummer" />
+				</Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainActive" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt, welcher Zug derzeit im Steuerdialog ausgewählt ist.
+
+                               Name = EEPGetTrainActive()
+Parameter     keiner 
+Rückgabewerte einer 
+Voraussetzung EEP 15.1 Plug-In 1
+Bemerkungen
+ * Rückgabewert ist der Name des im Steuerdialog ausgewählten Zuges.
+ * Befindet sich der Steuerdialog im manuellen Modus, dann wird der Name des
+   Zuges zurückgegeben, welcher das ausgewählte Fahrzeug enthält
+
+ ">
+
+				</Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainyardItemName" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Liefert den Zugnamen eines Fahrzeugverbands im Depot
+
+                               EEPGetTrainyardItemName(1 , 2)
+Parameter     zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das erste Argument ist die ID des Zugdepots.
+ * Das zweite Argument ist die Position in der Depotliste.
+ * Rückgabewert ist der Name des Fahrzeugverbands.
+
+ ">
+                <Param name="Depot_ID" />
+                <Param name="Depot_Platz" />
+				</Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainyardItemsCount" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Liefert die Anzahl der im Depot geführten Fahrzeugverbände
+
+                               EEPGetTrainyardItemsCount(1)
+Parameter     einer 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das Argument ist die ID des Zugdepots.
+ * Rückgabewert ist die Anzahl der Fahrzeugverbände
+
+ ">
+                <Param name="Depot" />
+				</Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetRollingstockItemsCount" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Gibt die Anzahl der Fahrzeuge in einem Fahrzeugverband zurück
+
+                               EEPGetRollingstockItemName(*#Güterzug*,3)
+Parameter     zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das erste Argument ist der komplette Name des Zug-(oder Fahrzeug-)verbands als String.
+ * Das zweite Argument ist die Positionsnummer des Fahrzeugs im Verband, dessen Namen man
+   erfahren möchte.
+ * Rückgabewert ist der Fahrzeugname.
+        ">
+                <Param name="Name" />
+                <Param name="Nummer" />
+				</Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetTrainyardItemStatus" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Liefert den Status eines Fahrzeugverbands im Depot
+
+                               EEPGetTrainyardItemName(1 , *#Güterzug* , 0)
+                               oder
+                               EEPGetTrainyardItemName(1 , ** , 3)
+                                                    * = Anführungszeichen
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das erste Argument ist die ID des Zugdepots.
+ * Das zweite Argument ist der Name des Zugverbands. Wenn er vorgegeben wird, dann
+   ignoriert Lua die Listennummer.
+ * Das dritte Argument ist die Position in der Depotliste. Wenn an zweiter Stelle ein Leerstring als
+   Zugname angegeben wird, dann zählt der Listenplatz. Aber er ist auch dann Pflicht, wenn ein
+   Zugname mitgegeben wird. In dem Fall setzt man ihn am besten auf 0.
+ * Rückgabewert ist der Status des Fahrzeugverbands: 0 = in Fahrt , 1 = warten
+        ">
+                <Param name="Depot_ID" />
+                <Param name="Lua-Name" />
+                <Param name="Listenplatz" />
+				</Overload>
+		</KeyWord>
+		<KeyWord name="EEPGetRollingstockItemName" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Gibt den Namen eines Fahrzeugs im Fahrzeugverband zurück
+
+                               EEPGetRollingstockItemName(*#Güterzug*,3)
+Parameter     zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das erste Argument ist der komplette Name des Zug-(oder Fahrzeug-)verbands als String.
+ * Das zweite Argument ist die Positionsnummer des Fahrzeugs im Verband, dessen Namen man
+   erfahren möchte.
+ * Rückgabewert ist der Fahrzeugname.
+        ">
+                <Param name="Name" />
+                <Param name="Nummer" />
+				</Overload>
+		</KeyWord>
+		<KeyWord name="EEPRegisterSignal" func="yes">
+			<Overload retVal="void" descr="
+Zweck          Registriert ein Signal für die Callback-Funktion EEPOnSignal_x() 
+               Diese notwendige Registrierung soll verhindern, dass Signale die Callback-Funktion
+               aufrufen, für die keine entsprechende Funktion im Skript definiert wurde.
+
+			                               EEPRegisterSignal(1)
+                                           function EEPOnSignal_1(Signalbild)
+                                               print(*Signal 1 auf *, Signalbild, * gestellt*)
+                                           end                                    *Anführungszeichen
+Parameter      einer
+Rückgabewert   einer
+Bemerkung      * Die Registrierung eines Signals ist zwingend erforderlich, damit es bei Schaltvorgängen
+                 selbständig die Funktion EEPOnSignal_x() aufruft.
+               * Das Argument ist die Signal-ID.
+               * Rückgabewert ist 1, wenn das zu registrierende Signal existiert oder 0, wenn es nicht
+                 existiert.
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRegisterSwitch" func="yes">
+			<Overload retVal="void" descr="
+Zweck          Registriert eine Weiche für die Callback-Funktion EEPOnSignal_x() 
+               Diese notwendige Registrierung soll verhindern, dass Weichen die Callback-Funktion
+               aufrufen, für die keine entsprechende Funktion im Skript definiert wurde.
+
+                                                    EEPRegisterSwitch(1)
+                                                    function EEPOnSwitch_1(Stellung)
+                                                        print(*Weiche 1 auf *, Stellung, * gestellt*)
+                                                    end                                  *Anführungszeichen
+Parameter      einer
+Rückgabewert   einer
+Bemerkung      * Die Registrierung einer Weiche ist zwingend erforderlich, damit es bei Schaltvorgängen
+                 selbständig die Funktion EEPOnSwitch_x() aufruft.
+               * Das Argument ist die Weichen-ID.
+               * Rückgabewert ist 1, wenn die zu registrierende Weiche existiert oder 0, wenn es nicht
+                 existiert.
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPOnSignal_ID" func="yes">
+			<Overload retVal="void" descr="
+Zweck           Registrierte Signale rufen selbständig diese Funktion auf, wenn sich
+                ihre Stellung ändert. Im Skript definiert man die zugehörige Funktion 
+                und legt so fest, was bei Änderung der Signalstellung zu tun ist.
+				
+                                EEPRegisterSignal(1)
+                                function EEPOnSignal_1(Signalbild)
+                                    print(*Signal 1 auf *, Signalbild, * gestellt*)
+                                end                                         *Anführungszeichen
+Parameter      einer
+Rückgabewert   keiner
+Bermerkung     * Der Name der Funktion muss mit der Signal-ID enden. Für Signal 0012 muss die Funktion
+                 also EEPOnSignal_12() heißen! Bitte beachten: Die führenden Nullen dürfen nicht im
+                 Funktionsnamen stehen!
+               * Das Argument ist die neue Signalstellung als Zahl, entsprechend der Position dieser
+                 Signalstellung in der Auswahlliste der Signal-Eigenschaften. Eine selbst definierte 
+                 Variable in den Funktionsklammern nimmt diesen Wert für die weitere Verwendung auf.
+               * EEP erwartet bei Aufruf dieser Funktion keinen Rückgabewert.				
+        ">
+                <Param name="Stellung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPOnSwitch_ID" func="yes">
+			<Overload retVal="void" descr="
+Zweck             Registrierte Weichen rufen selbständig diese Funktion auf, wenn sich ihre Stellung ändert.
+                  Im Skript definiert man die zugehörige Funktion und legt so fest, was bei Änderung der 
+                  Weichenstellung zu tun ist.
+                                                     EEPRegisterSwitch(1)
+                                                     function EEPOnSwitch_1(Stellung)
+                                                         print(*Weiche 1 auf *, Stellung, * gestellt*)
+                                                     end                                     *Anführungszeichen
+Parameter     einer
+Rückgabewert  keiner
+Bemerkung     * Der Name der Funktion muss mit der Weichen-ID enden. Für Weiche 0034 muss die Funktion also 
+                EEPOnSwitch_34() heißen! Bitte beachten: Die führenden Nullen dürfen nicht im Funktionsnamen stehen! 
+              * Das Argument ist die neue Weichenstellung als Zahl, entsprechend der Position 
+                dieser Weichenstellung in der Auswahlliste der Eigenschaften. Eine selbst definierte Variable in den
+                Funktionsklammern nimmt diesen Wert für die weitere Verwendung auf.
+              * EEP erwartet bei Aufruf dieser Funktion keinen Rückgabewert.
+        ">
+                <Param name="Stellung" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPAuxiliaryTrackSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPAuxiliaryTrackSetTextureText( 1 , 1 , *Bauzaun*)
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist die ID des Splinestücks.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll. Manche Modelle haben mehrere, individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="ID" />
+                <Param name="Flaeche" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGoodsGetModelType" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die Kategorie, zu welcher das genannte Ladegut gehört.
+
+                               hResult , Typ = EEPGoodsGetModelType( *#1* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Lua-Name des Ladeguts.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist die Kategorie, zu der das Ladegut gehört:
+  20 = Kisten 21 = Zylinder
+
+        ">
+                <Param name="*Lua_Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGoodsGetPosition" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die aktuelle Position eines Ladeguts.
+
+                               hResult,Pos_X,Pos_Y,Pos_Z = EEPGoodsGetPosition( *#1* )
+Parameter     einer 
+Rückgabewerte vier 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Lua-Name des Ladeguts. Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Rückgabewert 1 ist wahr, wenn die Ausführung erfolgreich war, ansonsten false.
+* Rückgabewert 2 ist die X-Position des Objekts.
+* Rückgabewert 3 ist die Y-Position des Objekts.
+* Rückgabewert 4 ist die Z-Position des Objekts.
+
+        ">
+                <Param name="*Lua_Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGoodsSetPosition" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ändert die Position eines Ladeguts auf der Anlage.
+
+                               EEPGoodsSetPosition( *#1* , Pos_X , Pos_Y , Pos_Z )
+Parameter     vier 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Lua-Name des Ladeguts. Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Argument 2 ist die X-Position des Objekts.
+* Argument 3 ist die Y-Position des Objekts.
+* Argument 4 ist die Z-Position des Objekts.
+* Rückgabewert ist wahr, wenn die Ausführung erfolgreich war, ansonsten false.
+
+        ">
+                <Param name="*Lua_Name*" />
+                <Param name="Pos_X" />
+                <Param name="Pos_Y" />
+                <Param name="Pos_Z" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGoodsSetRotation" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ändert die Ausrichtung eines Ladeguts auf der Anlage.
+
+                               EEPGoodsSetRotation( *#1* , Rot_X , Rot_Y , Rot_Z )
+Parameter     vier 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Lua-Name des Ladeguts. Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Argument 2 ist die X-Ausrichtung des Objekts.
+* Argument 3 ist die Y-Ausrichtung des Objekts.
+* Argument 4 ist die Z-Ausrichtung des Objekts.
+* Rückgabewert ist wahr, wenn die Ausführung erfolgreich war, ansonsten false.
+
+        ">
+                <Param name="*Lua_Name*" />
+                <Param name="Rot_X" />
+                <Param name="Rot_Y" />
+                <Param name="Rot_Z" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPGoodsSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPGoodsSetTextureText( *#1* , 1 , *Lua Logistik* )
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Lua-Name des Ladeguts. Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll. Manche Modelle haben mehrere, individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="*Lua_Name*" />
+                <Param name="Flaeche" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPOnTrainCoupling" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Wird immer dann aufgerufen, wenn zwei Fahrzeuge gekoppelt werden.
+
+                               function EEPOnTrainCoupling( Zug_A , Zug_B , Zug_neu )
+                                   print(* Aus *Zug_A..* und *..Zug_B..* wurde *..Zug_neu)
+                               end
+Parameter     drei 
+Rückgabewerte Keiner 
+Voraussetzung EEP 14.1
+Bemerkungen
+* Argument 1 ist der Name des Teilzugs, der in Bewegung war und somit seine ID auf den neuen Zug übertragen hat. Sind beide Zugteile in Bewegung,
+  dann zählt die schnellere von beiden Bewegungen.
+* Argument 2 ist der Name des Teilzugs, der stand und somit seine ID verloren hat.
+* Argument 3 ist der Name des neu gebildeten Zugs.
+
+        ">
+                <Param name="*Zug_A*" />
+                <Param name="*Zug_B*" />
+                <Param name="*Zug_neu*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPOnTrainLooseCoupling" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Wird immer dann aufgerufen, wenn ein Zug geteilt wird.
+
+                               function EEPOnTrainLooseCoupling( Zug_A , Zug_B , Zug_alt )
+                                   print(Zug_alt..* geteilt in *..Zug_A..* und *..Zug_B)
+                               end)
+Parameter     drei 
+Rückgabewerte Keiner 
+Voraussetzung EEP 14.1
+Bemerkungen
+* Argument 1 ist der Name des Teilzugs, dessen Kupplung deaktiviert wurde. 
+  Dieser Zugteil behält die ID des bisherigen Zugs bei.
+* Argument 2 ist der Name des Teilzugs, der abgekuppelt wurde. Dieser Zugteil bekommt eine neue ID.
+* Argument 3 ist der Name des ursprünglichen Zugs.
+
+        ">
+                <Param name="*Zug_A*" />
+                <Param name="*Zug_B*" />
+                <Param name="*Zug_alt*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPOnTrainExitTrainyard" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Wird immer dann aufgerufen, wenn ein Zug oder Fahrzeug ein virtuelles Depot verlässt.
+
+                               function EEPOnTrainExitTrainyard( Depot_ID , Zugname )
+                                   print(Zugname..* hat Depot *..Depot_ID..* verlassen*)
+                               end
+Parameter     zwei 
+Rückgabewerte Keiner 
+Voraussetzung EEP 14.1
+Bemerkungen
+* Argument 1 ist das Depot, aus dem etwas ausgefahren ist
+* Argument 2 ist der Zugname des ausfahrenden Fahrzeugverbands.
+
+        ">
+                <Param name="Depot_ID" />
+                <Param name="*Zugname*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPPause" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Aktiviert und deaktiviert die Pause in EEP.
+
+                               Pause = EEPPause( 1 )
+Parameter     einer 
+Rückgabewerte einer 
+Voraussetzung EEP 14.1
+Bemerkungen
+* Status = 0 bewirkt die Wiederaufnahme des Betriebs von EEP
+* Status = 1 bewirkt, dass der EEP-Betrieb gestoppt wird.
+* Status = 2 bewirkt, dass der EEP-Betrieb gestoppt wird und die LUA-Skriptunterstützung nicht mehr arbeitet. 
+  Die Wiederaufnahme des Betriebs ist danach nur durch Drücken der P-Taste möglich.
+* Rückgabewert is 0, wenn die Pause beendet oder 1, wenn sie aktiviert wurde.
+
+        ">
+                <Param name="Status)" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRailTrackSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPRailTrackSetTextureText( 1 , 1 , *Schiene*)
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist die ID des Gleisstücks.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll. Manche Modelle haben mehrere, individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="ID" />
+                <Param name="Flaeche" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRoadTrackSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPRoadTrackSetTextureText( 1 , 1 , *Straße* ))
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist die ID des Straßenstücks.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll. Manche Modelle haben mehrere, individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="ID" />
+                <Param name="Flaeche" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetActive" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt, welches Fahrzeug derzeit im Steuerdialog ausgewählt ist.
+
+                               Name = EEPRollingstockGetActive()
+Parameter     keiner 
+Rückgabewerte einer 
+Voraussetzung EEP 15.1 Plug-In 1
+Bemerkungen
+* Rückgabewert ist der Name des im Steuerdialog ausgewählten Fahrzeugs
+* Befindet sich der Steuerdialog im Automatikmodus, dann wird ein leerer String zurückgegeben
+
+        ">
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetLength" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die Länge des angegebenen Fahrzeugs.
+
+                               hResult,Laenge = EEPRollingstockGetLength(*Container 0100*)
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Name des Fahrzeugs.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist die Länge des Fahrzeugs von Kupplung zu Kupplung in Metern.
+
+        ">
+                <Param name="*Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetModelType" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die Kategorie, zu welcher das genannte Fahrzeug gehört.
+
+                               hResult , Typ = EEPRollingstockGetModelType( *Castor 1* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Fahrzeugname.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist die Kategorie, welche der Konstrukteur im Modell eingetragen hat:
+   1 = Tenderlok  2 = Schlepptenderlok  3 = Tender  4 = Elektrolok  5 = Diesellok  6 = Triebwagen
+   7 = U- oder S-Bahn  8 = Strassenbahn  9 = Gueterwaggons  10 = Personenwaggons  11 = Luftfahrzeuge
+  12 = Maschinen (z.B. Kraene)  13 = Wasserfahrzeuge  14 = LKW  15 = PKW
+
+        ">
+                <Param name="*Fahrzeugname*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetMotor" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt, ob das angegebene Fahrzeug motorisiert ist.
+
+                               hResult , Motor = EEPRollingstockGetMotor( *DB_360_339* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Name des Fahrzeugs.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist true, wenn das angegebene Fahrzeug einen Antrieb besitzt, sonst false.
+
+        ">
+                <Param name="*Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetTagText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Liest den Tag-Text eines Fahrzeugs aus. Mittels Tag-Texten können Fahrzeuge jetzt kategorisiert
+           werden. Beispielsweise kann man dort Waggontypen speichern oder Bestimmungsorte.
+
+                               hResult , Text = EEPRollingstockGetTagText( *DB Zcs-Eva* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Name des Fahrzeugs.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist der Tag-Text, welcher dem Waggon mitgegeben wurde.
+
+        ">
+                <Param name="*Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetTrack" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die aktuelle Position des angegebenen Fahrzeugs auf der Anlage.
+
+                     hResult , ID , Position , Richtung , System = EEPRollingstockGetTrack( *BR 212 376-8* )
+Parameter     einer 
+Rückgabewerte fünf 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Name des Fahrzeugs.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist die ID des Gleisstücks, auf dem sich das Fahrzeug befindet.
+* Rückgabewert 3 ist der Abstand (in Metern) zum Anfang des Gleisstücks, auf dem sich das Fahrzeug befindet.
+* Rückgabewert 4 ist die Ausrichtung relativ zur Fahrtrichtung des Gleisstücks, auf dem sich das Fahrzeug befindet.
+   1 = in Fahrtrichtung, 0 = entgegen der Fahrtrichtung
+* Rückgabewert 5 ist die Nummer des Gleissystems, auf dem das Fahrzeug unterwegs ist. 1 = Bahngleise 2 = Straßen
+   3 = Tramgleise 4 = sonstige Splines/Wasserwege
+
+        ">
+                <Param name="*Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockGetTrainName" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt den Namen des Zugverbands, in dem das angegebene Fahrzeug mitgeführt wird.
+
+                               hResult , Name = EEPRollingstockGetTrainName( *Castor 1* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Name des Fahrzeugs.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist der Name des Zuges.
+
+        ">
+                <Param name="*Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockSetActive" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Wählt das angegebene Fahrzeug im Steuerdialog aus. Stellt den Steuerdialog auf manuellen Modus um.
+
+                               ok = EEPRollingstockSetActive(*BR 212 376-8*)
+Parameter     einer 
+Rückgabewerte einer 
+Voraussetzung EEP 15.1 Plug-In 1
+Bemerkungen
+* Rückgabewert ist true wenn die Aktion erfolgreich war, sonst false.
+
+        ">
+                <Param name="*Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockSetTagText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ändert den Tag-Text eines Fahrzeugs. Jedes Fahrzeug kann jetzt einen eigenen 
+           String von maximal 1024 Zeichen Länge mitführen. Diese Strings werden mit der Anlage
+           gespeichert und geladen. Da die Texte individuell jedem Fahrzeug zugeordnet sind,
+           gehen sie im Gegensatz zu Routen nicht durch Rangiermanöver etc. verloren.
+
+                               EEPRollingstockSetTagText( *DB Zcs-Eva* , *Tankwagen* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Name des Fahrzeugs.
+* Argument 2 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false.
+
+        ">
+                <Param name="*Name*" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPRollingstockSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPRollingstockSetTextureText(*BR481* , 1 , *Dienstfahrt*)
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Name des Fahrzeugs.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll. Manche Modelle haben mehrere, individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="*Name*" />
+                <Param name="Flaeche" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTime" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ändert die EEPZeit auf die gewünschte Zeit.
+
+                               EEPSetTime( 14 , 35 , 20 )
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist für die Stundenangabe.
+* Argument 2 ist für die Minutenangabe.
+* Argument 3 ist für die Sekundenangabe.
+* Alle drei Argumente sind zwingend erforderlich.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="Stunde" />
+                <Param name="Minute" />
+                <Param name="Sekunde" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainActive" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Wählt den angegebenen Zug im Steuerdialog aus. Stellt den Steuerdialog auf Automatik-Modus um.
+
+                               ok = EEPSetTrainActive(*#Gueterzug*)
+Parameter     einer 
+Rückgabewerte einer 
+Voraussetzung EEP 15.1 Plug-In 1
+Bemerkungen
+ * Rückgabewert ist true wenn die Aktion erfolgreich war, sonst false.
+
+        ">
+                <Param name="#Name" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainHookGlue" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Gibt die Anzahl Fahrzeugverbände zurück, welche am spezifizierten Signal gehalten werden.
+
+                               EEPGetSignalTrainsCount(3)
+Parameter     einer 
+Rückgabewerte einer 
+Voraussetzung EEP 13.2 Plug-In2
+Bemerkungen
+ * Das Argument ist die Signal ID.
+ * Rückgabewert ist die Anzahl haltender Züge (Autos, Straßenbahnen etc.)
+
+        ">
+                <Param name="ID" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSetTrainName" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einem Zug einen neuen Zugnamen zu.
+
+                              hResult = EEPSetTrainName( *#RE 1* , *#RE 5* )
+Parameter     zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 14.1
+Bemerkungen
+* Das erste Argument ist der bisherige Zugname.
+* Das zweite Argument ist der neue Zugname.
+* Rückgabewert ist true, wenn die Funktion erfolgreich ausgeführt wurde.
+
+        ">
+                <Param name="AlterZugname" />
+                <Param name="NeuerZugname" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPSignalSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPSignalSetTextureText( 1 , 1 , *Feuerwehr Ausfahrt* )
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist die Nummer des Signals.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll. Manche Modelle haben mehrere,
+  individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="ID" />
+                <Param name="Flaeche" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureGetModelType" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die Kategorie, zu welcher die genannte Immobilie 
+           oder das genannte Landschaftselement gehört.
+
+                               hResult , Typ = EEPStructureGetModelType( *#1* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Lua-Name der Immobilie oder des LS-Elements.
+  Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist die Kategorie, welche der Konstrukteur im Modell eingetragen hat:
+  16 = Gleise/Gleisobjekte  17 = Schiene/Gleisobjekte  18 = Strassen/Gleisobjekte 
+  19 = Sonstiges/Gleisobjekte  22 = Immobilien  23 = Landschaftselemente/Fauna 
+  24 = Landschaftselemente/Flora  25 = Landschaftselemente/Terra  38 = Landschaftselemente/Instancing
+
+        ">
+                <Param name="*Lua-Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureGetPosition" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt die aktuelle Position einer Immobilie oder eines Landschaftselements.
+
+                               hResult,Pos_X,Pos_Y,Pos_Z = EEPStructureGetPosition(*#1*)
+Parameter     einer 
+Rückgabewerte vier 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument ist der Lua-Name der Immobilie oder des LS-Elements.
+   Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, ansonsten false.
+* Rückgabewert 2 ist die X-Position des Objekts.
+* Rückgabewert 3 ist die Y-Position des Objekts.
+* Rückgabewert 4 ist die Z-Position des Objekts.
+
+        ">
+                <Param name="*Lua-Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureGetTagText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Liest den Tag-Text einer Immobilie aus. Mittels Tag-Texten können Immobilien
+           als permanente Speicher für relevante Informationen genutzt werden.
+
+                               hResult , Text = EEPStructureGetTagText( *#1* )
+Parameter     einer 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Lua-Name der Immobilie oder des LS-Elements. Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist der Tag-Text, welcher der Immobilie mitgegeben wurde.
+
+        ">
+                <Param name="*Name*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureIsAxisAnimate" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ermittelt, ob sich das genannte bewegliche Teil der genannten Immobilie
+           aktuell in Bewegung befindet und ob diese Bewegung endlos ist.
+
+                               hResult , Status = EEPStructureIsAxisAnimate(*#1*,*Buehne*)
+                               if Status > 0 then
+                                   print( *Die Drehscheibe ist in Bewegung* )
+                               end
+Parameter     zwei 
+Rückgabewerte zwei 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Name der Immobilie.
+* Argument 2 ist der Name des beweglichen Teils.
+* Rückgabewert 1 ist true, wenn die Ausführung erfolgreich war, sonst false.
+* Rückgabewert 2 ist 0, wenn das genannte Teil steht, 1 wenn sich das genannte Teil in einer 
+  endlosen Bewegung befindet und 2, wenn das Teil sich um eine endliche Anzahl Schritte bewegt
+
+        ">
+                <Param name="*Lua_Name*" />
+                <Param name="*Achse*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetTagText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Ändert den Tag-Text einer Immobilie. Jede Immobilie kann jetzt einen individuellen String 
+           von maximal 1024 Zeichen Länge mitführen. Diese Strings werden mit der Anlage gespeichert und geladen.
+
+                               EEPStructureSetTagText( *#1* , *besetzt:2,3,5,8* )
+Parameter     zwei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Lua-Name der Immobilie oder des LS-Elements. Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Argument 2 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false.
+
+        ">
+                <Param name="*Lua_Name*" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPStructureSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPStructureSetTextureText( *#1* , 1 , *Neustadt* )
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist der Lua-Name der Immobilie oder des LS-Elements.
+  Es genügt die Nummer mit vorangestelltem #-Zeichen.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll.
+  Manche Modelle haben mehrere, individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="*Lua_Name*" />
+                <Param name="Platz" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPTramTrackSetTextureText" func="yes">
+			<Overload retVal="number" descr="
+Zweck  -   Weist einer beschriftbaren Fläche einen neuen Text zu.
+
+                               EEPTramTrackSetTextureText( 1 , 1 , *Straßenbahngleis* )
+Parameter     drei 
+Rückgabewerte einer 
+Voraussetzung EEP 15
+Bemerkungen
+* Argument 1 ist die ID des Straßenbahngleisstücks.
+* Argument 2 ist die Nummer der Fläche, welche den Text erhalten soll.
+  Manche Modelle haben mehrere, individuell beschriftbare Flächen.
+* Argument 3 ist der gewünschte Text.
+* Rückgabewert ist true, wenn die Ausführung erfolgreich war, sonst false
+
+        ">
+                <Param name="ID" />
+                <Param name="Flaeche" />
+                <Param name="*Text*" />
+            </Overload>
+		</KeyWord>
+		<KeyWord name="EEPVer" func="yes">
+			<Overload retVal="number" descr="
+Typ Variable  ohne Klammern!
+Zweck EEP schreibt in diese Variable die Versionsnummer von EEP.
+                         if EEPVer < 11 then
+                            print(*Zugbeeinflussung per Lua nicht möglich!*)
+                         end
+        ">
+            </Overload>
+			</KeyWord>
+        <KeyWord name="else" func="no" />
+        <KeyWord name="elseif" func="no" />
+        <KeyWord name="end" func="no" />
+
+        <KeyWord name="error" func="yes">
+            <Overload retVal="void" descr="
+Terminates the last protected function called and returns message as the error message. 
+Function error never returns.
+
+Usually, error adds some information about the error position at the beginning of the message. 
+The level argument specifies how to get the error position. With level 1 (the default), the error 
+position is where the error function was called. Level 2 points the error to where the function 
+that called error was called; and so on. Passing a level 0 avoids the addition of error position 
+information to the message. 
+        ">
+                <Param name="message" />
+                <Param name="[, level]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="false" func="no" />
+
+        <KeyWord name="file:close" func="yes">
+            <Overload retVal="void" descr="
+Closes file. Note that files are automatically closed when their handles are garbage collected, 
+but that takes an unpredictable amount of time to happen. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="file:flush" func="yes">
+            <Overload retVal="void" descr="
+Saves any written data to file. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="file:lines" func="yes">
+            <Overload retVal="void" descr="
+Returns an iterator function that, each time it is called, returns a new line from the file. 
+Therefore, the construction
+for line in file:lines() do body end
+will iterate over all lines of the file. (Unlike io.lines, this function does not close the file when the loop ends.) 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="file:read" func="yes">
+            <Overload retVal="void" descr="
+Reads the file file, according to the given formats, which specify what to read. For each format, 
+the function returns a string (or a number) with the characters read, or nil if it cannot read data 
+with the specified format. When called without formats, it uses a default format that reads the entire 
+next line (see below).
+
+The available formats are
+
+    * '*n': reads a number; this is the only format that returns a number instead of a string.
+    * '*a': reads the whole file, starting at the current position. On end of file, it returns the empty string.
+    * '*l': reads the next line (skipping the end of line), returning nil on end of file. This is the default format.
+    * number: reads a string with up to this number of characters, returning nil on end of file. If number is zero, it 
+            reads nothing and returns an empty string, or nil on end of file.
+
+        ">
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="file:seek" func="yes">
+            <Overload retVal="void" descr="
+Sets and gets the file position, measured from the beginning of the file, to the position given by offset 
+plus a base specified by the string whence, as follows:
+
+    * 'set': base is position 0 (beginning of the file);
+    * 'cur': base is current position;
+    * 'end': base is end of file;
+
+In case of success, function seek returns the final file position, measured in bytes from the beginning of the 
+file. If this function fails, it returns nil, plus a string describing the error.
+
+The default value for whence is 'cur', and for offset is 0. Therefore, the call file:seek() returns the 
+current file position, without changing it; the call file:seek('set') sets the position to the beginning 
+of the file (and returns 0); and the call file:seek('end') sets the position to the end of the file, and 
+returns its size. 
+        ">
+                <Param name="[whence]" />
+                <Param name="[, offset]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="file:setvbuf" func="yes">
+            <Overload retVal="void" descr="
+Sets the buffering mode for an output file. There are three available modes:
+
+    * 'no': no buffering; the result of any output operation appears immediately.
+    * 'full': full buffering; output operation is performed only when the buffer is full 
+            (or when you explicitly flush the file (see io.flush)).
+    * 'line': line buffering; output is buffered until a newline is output or there is any input 
+            from some special files (such as a terminal device).
+
+For the last two cases, size specifies the size of the buffer, in bytes. The default is an appropriate size. 
+        ">
+                <Param name="mode" />
+                <Param name="[, size]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="file:write" func="yes">
+            <Overload retVal="void" descr="
+Writes the value of each of its arguments to the file. The arguments must be strings or numbers. To write 
+other values, use tostring or string.format before write. 
+        ">
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="for" func="no" />
+        <KeyWord name="function" func="no" />
+
+        <KeyWord name="getfenv" func="yes">
+            <Overload retVal="void" descr="
+Returns the current environment in use by the function. f can be a Lua function or a number that specifies 
+the function at that stack level: Level 1 is the function calling getfenv. If the given function is not a 
+Lua function, or if f is 0, getfenv returns the global environment. The default for f is 1. 
+        ">
+                <Param name="[f]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="getmetatable" func="yes">
+            <Overload retVal="void" descr="
+If object does not have a metatable, returns nil. Otherwise, if the object's metatable has a '__metatable' 
+field, returns the associated value. Otherwise, returns the metatable of the given object. 
+        ">
+                <Param name="object" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="if" func="no" />
+        <KeyWord name="in" func="no" />
+
+        <KeyWord name="io.close" func="yes">
+            <Overload retVal="void" descr="
+Equivalent to file:close(). Without a file, closes the default output file. 
+        ">
+                <Param name="[file]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.flush" func="yes">
+            <Overload retVal="void" descr="
+Equivalent to file:flush over the default output file. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="io.input" func="yes">
+            <Overload retVal="void" descr="
+When called with a file name, it opens the named file (in text mode), and sets its handle as the default 
+input file. When called with a file handle, it simply sets this file handle as the default input file. When 
+called without parameters, it returns the current default input file.
+
+In case of errors this function raises the error, instead of returning an error code. 
+        ">
+                <Param name="[file]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.lines" func="yes">
+            <Overload retVal="void" descr="
+Opens the given file name in read mode and returns an iterator function that, each time it is called, 
+returns a new line from the file. Therefore, the construction
+
+     for line in io.lines(filename) do body end
+
+will iterate over all lines of the file. When the iterator function detects the end of file, it returns 
+nil (to finish the loop) and automatically closes the file.
+
+The call io.lines() (with no file name) is equivalent to io.input():lines(); that is, it iterates over 
+the lines of the default input file. In this case it does not close the file when the loop ends. 
+        ">
+                <Param name="[filename]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.open" func="yes">
+            <Overload retVal="void" descr="
+This function opens a file, in the mode specified in the string mode. It returns a new file handle, 
+or, in case of errors, nil plus an error message.
+
+The mode string can be any of the following:
+
+    * 'r': read mode (the default);
+    * 'w': write mode;
+    * 'a': append mode;
+    * 'r+': update mode, all previous data is preserved;
+    * 'w+': update mode, all previous data is erased;
+    * 'a+': append update mode, previous data is preserved, writing is only allowed at the end of file.
+
+The mode string can also have a 'b' at the end, which is needed in some systems to open the file in 
+binary mode. This string is exactly what is used in the standard C function fopen. 
+        ">
+                <Param name="filename" />
+                <Param name="[, mode]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.output" func="yes">
+            <Overload retVal="void" descr="
+Similar to io.input, but operates over the default output file. 
+        ">
+                <Param name="[file]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.popen" func="yes">
+            <Overload retVal="void" descr="
+Starts program prog in a separated process and returns a file handle that you can use to read data from 
+this program (if mode is 'r', the default) or to write data to this program (if mode is 'w').
+
+This function is system dependent and is not available on all platforms. 
+        ">
+                <Param name="prog" />
+                <Param name="[, mode]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.read" func="yes">
+            <Overload retVal="void" descr="
+Equivalent to io.input():read. 
+        ">
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.tmpfile" func="yes">
+            <Overload retVal="void" descr="
+Returns a handle for a temporary file. This file is opened in update mode and it is automatically 
+removed when the program ends. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="io.type" func="yes">
+            <Overload retVal="void" descr="
+Checks whether obj is a valid file handle. Returns the string 'file' if obj is an open file handle, 
+'closed file' if obj is a closed file handle, or nil if obj is not a file handle. 
+        ">
+                <Param name="obj" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="io.write" func="yes">
+            <Overload retVal="void" descr="
+Equivalent to io.output():write. 
+        ">
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="ipairs" func="yes">
+            <Overload retVal="void" descr="
+Returns three values: an iterator function, the table t, and 0, so that the construction
+
+     for i,v in ipairs(t) do body end
+
+will iterate over the pairs (1,t[1]), (2,t[2]), ···, up to the first integer key absent from the table. 
+        ">
+                <Param name="t" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="load" func="yes">
+            <Overload retVal="void" descr="
+Loads a chunk using function func to get its pieces. Each call to func must return a string that 
+concatenates with previous results. A return of an empty string, nil, or no value signals the end of 
+the chunk.
+
+If there are no errors, returns the compiled chunk as a function; otherwise, returns nil plus the error 
+message. The environment of the returned function is the global environment.
+
+chunkname is used as the chunk name for error messages and debug information. When absent, 
+it defaults to '=(load)'. 
+        ">
+                <Param name="func" />
+                <Param name="[, chunkname]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="loadfile" func="yes">
+            <Overload retVal="void" descr="
+Similar to load, but gets the chunk from file filename or from the standard input, 
+if no file name is given. 
+        ">
+                <Param name="[filename]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="loadstring" func="yes">
+            <Overload retVal="void" descr="
+Similar to load, but gets the chunk from the given string.
+To load and run a given string, use the idiom
+     assert(loadstring(s))()
+When absent, chunkname defaults to the given string. 
+        ">
+                <Param name="string" />
+                <Param name="[, chunkname]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="local" func="no" />
+
+        <KeyWord name="math.abs" func="yes">
+            <Overload retVal="void" descr="
+Returns the absolute value of x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.acos" func="yes">
+            <Overload retVal="void" descr="
+Returns the arc cosine of x (in radians). 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.asin" func="yes">
+            <Overload retVal="void" descr="
+Returns the arc sine of x (in radians). 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.atan" func="yes">
+            <Overload retVal="void" descr="
+Returns the arc tangent of x (in radians). 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.atan2" func="yes">
+            <Overload retVal="void" descr="
+Returns the arc tangent of y/x (in radians), but uses the signs of both parameters to 
+find the quadrant of the result. (It also handles correctly the case of x being zero.) 
+        ">
+                <Param name="y" />
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.ceil" func="yes">
+            <Overload retVal="void" descr="
+Returns the smallest integer larger than or equal to x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.cos" func="yes">
+            <Overload retVal="void" descr="
+Returns the cosine of x (assumed to be in radians). 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.cosh" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the hyperbolic cosine of x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.deg" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the angle x (given in radians) in degrees. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.exp" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the value ex. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.floor" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the largest integer smaller than or equal to x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.fmod" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the remainder of the division of x by y that rounds the quotient towards zero. 
+        ">
+                <Param name="x" />
+                <Param name="y" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.frexp" func="yes">
+
+            <Overload retVal="void" descr="
+Returns m and e such that x = m2e, e is an integer and the absolute value of m is in 
+the range [0.5, 1) (or zero when x is zero). 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.huge" func="no" />
+
+        <KeyWord name="math.ldexp" func="yes">
+
+            <Overload retVal="void" descr="
+Returns m2e (e should be an integer). 
+        ">
+                <Param name="m" />
+                <Param name="e" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.log" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the natural logarithm of x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.log10" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the base-10 logarithm of x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.max" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the maximum value among its arguments. 
+        ">
+                <Param name="x" />
+                <Param name="..." />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.min" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the minimum value among its arguments. 
+        ">
+                <Param name="x" />
+                <Param name="..." />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.modf" func="yes">
+
+            <Overload retVal="void" descr="
+Returns two numbers, the integral part of x and the fractional part of x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.pi" func="no" />
+
+        <KeyWord name="math.pow" func="yes">
+
+            <Overload retVal="void" descr="
+Returns xy. (You can also use the expression x^y to compute this value.) 
+        ">
+                <Param name="x" />
+                <Param name="y" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.rad" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the angle x (given in degrees) in radians. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.random" func="yes">
+
+            <Overload retVal="void" descr="
+This function is an interface to the simple pseudo-random generator function rand 
+provided by ANSI C. (No guarantees can be given for its statistical properties.)
+
+When called without arguments, returns a uniform pseudo-random real number in the 
+range [0,1). When called with an integer number m, math.random returns a uniform 
+pseudo-random integer in the range [1, m]. When called with two integer numbers m and 
+n, math.random returns a uniform pseudo-random integer in the range [m, n]. 
+        ">
+                <Param name="[m [, n]]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.randomseed" func="yes">
+
+            <Overload retVal="void" descr="
+Sets x as the 'seed' for the pseudo-random generator: equal seeds produce equal 
+sequences of numbers. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.sin" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the sine of x (assumed to be in radians). 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.sinh" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the hyperbolic sine of x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.sqrt" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the square root of x. (You can also use the expression x^0.5 to compute this value.) 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.tan" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the tangent of x (assumed to be in radians). 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="math.tanh" func="yes">
+            <Overload retVal="void" descr="
+Returns the hyperbolic tangent of x. 
+        ">
+                <Param name="x" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="module" func="yes">
+            <Overload retVal="void" descr="
+Creates a module. If there is a table in package.loaded[name], this table is the module. 
+Otherwise, if there is a global table t with the given name, this table is the module. 
+Otherwise creates a new table t and sets it as the value of the global name and the value 
+of package.loaded[name]. This function also initializes t._NAME with the given name, t._M 
+with the module (t itself), and t._PACKAGE with the package name (the full module name 
+minus last component; see below). Finally, module sets t as the new environment of the 
+current function and the new value of package.loaded[name], so that require returns t.
+
+If name is a compound name (that is, one with components separated by dots), module creates 
+(or reuses, if they already exist) tables for each component. For instance, if name is a.b.c, 
+then module stores the module table in field c of field b of global a.
+
+This function can receive optional options after the module name, where each option is a 
+function to be applied over the module. 
+        ">
+                <Param name="name" />
+                <Param name="[, ···]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="next" func="yes">
+
+            <Overload retVal="void" descr="
+Allows a program to traverse all fields of a table. Its first argument is a table and its second 
+argument is an index in this table. next returns the next index of the table and its associated 
+value. When called with nil as its second argument, next returns an initial index and its associated 
+value. When called with the last index, or with nil in an empty table, next returns nil. If the 
+second argument is absent, then it is interpreted as nil. In particular, you can use next(t) to 
+check whether a table is empty.
+
+The order in which the indices are enumerated is not specified, even for numeric indices. (To 
+traverse a table in numeric order, use a numerical for or the ipairs function.)
+
+The behavior of next is undefined if, during the traversal, you assign any value to a non-existent 
+field in the table. You may however modify existing fields. In particular, you may clear existing 
+fields. 
+        ">
+                <Param name="table" />
+                <Param name="[, index]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="nil" func="no" />
+        <KeyWord name="not" func="no" />
+        <KeyWord name="or" func="no" />
+
+        <KeyWord name="os.clock" func="yes">
+            <Overload retVal="void" descr="
+Returns an approximation of the amount in seconds of CPU time used by the program. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="os.date" func="yes">
+
+            <Overload retVal="void" descr="
+Returns a string or a table containing date and time, formatted according to the given string format.
+
+If the time argument is present, this is the time to be formatted (see the os.time function 
+for a description of this value). Otherwise, date formats the current time.
+
+If format starts with '!', then the date is formatted in Coordinated Universal Time. After this 
+optional character, if format is the string '*t', then date returns a table with the following fields: 
+year (four digits), 
+month (1--12), 
+day (1--31), 
+hour (0--23), 
+min (0--59), 
+sec (0--61), 
+wday (weekday, Sunday is 1), 
+yday (day of the year), and 
+isdst (daylight saving flag, a boolean).
+
+If format is not '*t', then date returns the date as a string, formatted according to the same 
+rules as the C function strftime.
+
+When called without arguments, date returns a reasonable date and time representation that 
+depends on the host system and on the current locale (that is, os.date() is equivalent to os.date('%c')). 
+        ">
+                <Param name="[format [, time]]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.difftime" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the number of seconds from time t1 to time t2. In POSIX, Windows, and some other systems, 
+this value is exactly t2-t1. 
+        ">
+                <Param name="t2" />
+                <Param name="t1" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.execute" func="yes">
+
+            <Overload retVal="void" descr="
+This function is equivalent to the C function system. It passes command to be executed by an operating 
+system shell. It returns a status code, which is system-dependent. If command is absent, then it returns 
+nonzero if a shell is available and zero otherwise. 
+        ">
+                <Param name="[command]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.exit" func="yes">
+
+            <Overload retVal="void" descr="
+Calls the C function exit, with an optional code, to terminate the host program. The default 
+value for code is the success code. 
+        ">
+                <Param name="[code]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.getenv" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the value of the process environment variable varname, or nil if the variable is not defined. 
+        ">
+                <Param name="varname" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.remove" func="yes">
+
+            <Overload retVal="void" descr="
+Deletes the file or directory with the given name. Directories must be empty to be removed. If this 
+function fails, it returns nil, plus a string describing the error. 
+        ">
+                <Param name="filename" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.rename" func="yes">
+
+            <Overload retVal="void" descr="
+Renames file or directory named oldname to newname. If this function fails, it returns nil, plus a 
+string describing the error. 
+        ">
+                <Param name="oldname" />
+                <Param name="newname" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.setlocale" func="yes">
+
+            <Overload retVal="void" descr="
+Sets the current locale of the program. locale is a string specifying a locale; category is an optional 
+string describing which category to change: 'all', 'collate', 'ctype', 'monetary', 'numeric', or 'time'; 
+the default category is 'all'. The function returns the name of the new locale, or nil if the request 
+cannot be honored.
+
+If locale is the empty string, the current locale is set to an implementation-defined native locale. If 
+locale is the string 'C', the current locale is set to the standard C locale.
+
+When called with nil as the first argument, this function only returns the name of the current locale 
+for the given category. 
+        ">
+                <Param name="locale" />
+                <Param name="[, category]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.time" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the current time when called without arguments, or a time representing the date and time specified 
+by the given table. This table must have fields year, month, and day, and may have fields hour, min, sec, 
+and isdst (for a description of these fields, see the os.date function).
+
+The returned value is a number, whose meaning depends on your system. In POSIX, Windows, and some other 
+systems, this number counts the number of seconds since some given start time (the 'epoch'). 
+In other systems, the meaning is not specified, and the number returned by time can be used only as an 
+argument to date and difftime. 
+        ">
+                <Param name="[table]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="os.tmpname" func="yes">
+            <Overload retVal="void" descr="
+Returns a string with a file name that can be used for a temporary file. The file must be explicitly 
+opened before its use and explicitly removed when no longer needed.
+
+On some systems (POSIX), this function also creates a file with that name, to avoid security risks. 
+(Someone else might create the file with wrong permissions in the time between getting the name and 
+creating the file.) You still have to open the file to use it and to remove it (even if you do not use it).
+
+When possible, you may prefer to use io.tmpfile, which automatically removes the file when the program ends. 
+        "></Overload>
+        </KeyWord>
+
+        <KeyWord name="package.cpath" func="no" />
+
+        <KeyWord name="package.loaded" func="no" />
+
+        <KeyWord name="package.loaders" func="no" />
+
+        <KeyWord name="package.loadlib" func="yes">
+            (libname, funcname)
+
+            <Overload retVal="void" descr="
+Dynamically links the host program with the C library libname. Inside this library, looks for a function 
+funcname and returns this function as a C function. (So, funcname must follow the protocol (see lua_CFunction)).
+
+This is a low-level function. It completely bypasses the package and module system. Unlike require, it 
+does not perform any path searching and does not automatically adds extensions. libname must be the complete 
+file name of the C library, including if necessary a path and extension. funcname must be the exact name 
+exported by the C library (which may depend on the C compiler and linker used).
+
+This function is not supported by ANSI C. As such, it is only available on some platforms (Windows, 
+Linux, Mac OS X, Solaris, BSD, plus other Unix systems that support the dlfcn standard). 
+        ">
+                <Param name="libname" />
+                <Param name="funcname" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="package.path" func="no" />
+
+        <KeyWord name="package.preload" func="no" />
+
+        <KeyWord name="package.seeall" func="yes">
+            (module)
+
+            <Overload retVal="void" descr="
+Sets a metatable for module with its __index field referring to the global environment, so that this 
+module inherits values from the global environment. To be used as an option to function module. 
+        ">
+                <Param name="module" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="pairs" func="yes">
+
+            <Overload retVal="void" descr="
+Returns three values: the next function, the table t, and nil, so that the construction
+
+     for k,v in pairs(t) do body end
+
+will iterate over all key–value pairs of table t.
+
+See function next for the caveats of modifying the table during its traversal. 
+        ">
+                <Param name="t" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="pcall" func="yes">
+
+            <Overload retVal="void" descr="
+Calls function f with the given arguments in protected mode. This means that any error 
+inside f is not propagated; instead, pcall catches the error and returns a status code. 
+Its first result is the status code (a boolean), which is true if the call succeeds without 
+errors. In such case, pcall also returns all results from the call, after this first result. 
+In case of any error, pcall returns false plus the error message. 
+        ">
+                <Param name="f" />
+                <Param name="arg1" />
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="print" func="yes">
+            <Overload retVal="void" descr="
+Zweck           Gibt das, was in den Klammern steht, im Ereignisfenster als Text aus.
+
+                print(*Es ist jetzt: *, EEPTimeH, *:*, EEPTimeM, * Uhr*)
+                                                          * Anführungszeichen
+Parameter       mehrere
+Rückgabewert    einer
+Bemerkung       * Alle Typen werden automatisch in Text umgewandelt
+                * Es können mehrere Parameter mitgegeben werden. Sie müssen durch ein Komma
+                  getrennt sein.
+                * Rückgabewert ist der komplette, ausgegebene String.
+        ">
+                <Param name="TEXT" />
+            </Overload>
+        </KeyWord>
+		 <KeyWord name="print(TEXT)" func="yes">
+            <Overload retVal="void" descr="
+Receives any number of arguments, and prints their values to stdout, using the tostring 
+function to convert them to strings. print is not intended for formatted output, but only 
+as a quick way to show a value, typically for debugging. For formatted output, use string.format. 
+        ">
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="rawequal" func="yes">
+            <Overload retVal="void" descr="
+Checks whether v1 is equal to v2, without invoking any metamethod. Returns a boolean. 
+        ">
+                <Param name="v1" />
+                <Param name="v2" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="rawget" func="yes">
+            <Overload retVal="void" descr="
+Gets the real value of table[index], without invoking any metamethod. table must be a 
+table; index may be any value. 
+        ">
+                <Param name="table" />
+                <Param name="index" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="rawset" func="yes">
+            <Overload retVal="void" descr="
+Sets the real value of table[index] to value, without invoking any metamethod. table must 
+be a table, index any value different from nil, and value any Lua value.
+
+This function returns table. 
+        ">
+                <Param name="table" />
+                <Param name="index" />
+                <Param name="value" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="repeat" func="no" />
+
+        <KeyWord name="require" func="yes">
+
+            <Overload retVal="void" descr="
+Loads the given module. The function starts by looking into the package.loaded table to 
+determine whether modname is already loaded. If it is, then require returns the value stored 
+at package.loaded[modname]. Otherwise, it tries to find a loader for the module.
+
+To find a loader, require is guided by the package.loaders array. By changing this array, 
+we can change how require looks for a module. The following explanation is based on the 
+default configuration for package.loaders.
+
+First require queries package.preload[modname]. If it has a value, this value (which should 
+be a function) is the loader. Otherwise require searches for a Lua loader using the path 
+stored in package.path. If that also fails, it searches for a C loader using the path stored 
+in package.cpath. If that also fails, it tries an all-in-one loader (see package.loaders).
+
+Once a loader is found, require calls the loader with a single argument, modname. If the 
+loader returns any value, require assigns the returned value to package.loaded[modname]. 
+If the loader returns no value and has not assigned any value to package.loaded[modname], 
+then require assigns true to this entry. In any case, require returns the final value of 
+package.loaded[modname].
+
+If there is any error loading or running the module, or if it cannot find any loader for 
+the module, then require signals an error. 
+        ">
+                <Param name="modname" />
+            </Overload>
+        </KeyWord>
+
+
+        <KeyWord name="return" func="no" />
+
+        <KeyWord name="select" func="yes">
+
+            <Overload retVal="void" descr="
+If index is a number, returns all arguments after argument number index. Otherwise, index 
+must be the string '#', and select returns the total number of extra arguments it received. 
+        ">
+                <Param name="index" />
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="setfenv" func="yes">
+
+            <Overload retVal="void" descr="
+Sets the environment to be used by the given function. f can be a Lua function or a number 
+that specifies the function at that stack level: Level 1 is the function calling setfenv. 
+setfenv returns the given function.
+
+As a special case, when f is 0 setfenv changes the environment of the running thread. 
+In this case, setfenv returns no values. 
+        ">
+                <Param name="f" />
+                <Param name="table" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="setmetatable" func="yes">
+
+            <Overload retVal="void" descr="
+Sets the metatable for the given table. (You cannot change the metatable of other types 
+from Lua, only from C.) If metatable is nil, removes the metatable of the given table. 
+If the original metatable has a '__metatable' field, raises an error.
+
+This function returns table. 
+        ">
+                <Param name="table" />
+                <Param name="metatable" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.byte" func="yes">
+            <Overload retVal="void" descr="
+Returns the internal numerical codes of the characters s[i], s[i+1], ···, s[j]. The default 
+value for i is 1; the default value for j is i.
+
+Note that numerical codes are not necessarily portable across platforms. 
+        ">
+                <Param name="s [, i [, j]]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.char" func="yes">
+            <Overload retVal="void" descr="
+Receives zero or more integers. Returns a string with length equal to the number of arguments, 
+in which each character has the internal numerical code equal to its corresponding argument.
+
+Note that numerical codes are not necessarily portable across platforms. 
+        ">
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.dump" func="yes">
+
+            <Overload retVal="void" descr="
+Returns a string containing a binary representation of the given function, so that a later 
+loadstring on this string returns a copy of the function. function must be a Lua function 
+without upvalues. 
+        ">
+                <Param name="function" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.find" func="yes">
+            <Overload retVal="void" descr="
+Looks for the first match of pattern in the string s. If it finds a match, then find returns 
+the indices of s where this occurrence starts and ends; otherwise, it returns nil. A third, 
+optional numerical argument init specifies where to start the search; its default value is 1 
+and can be negative. A value of true as a fourth, optional argument plain turns off the 
+pattern matching facilities, so the function does a plain 'find substring' operation, with 
+no characters in pattern being considered 'magic'. Note that if plain is given, then init 
+must be given as well.
+
+If the pattern has captures, then in a successful match the captured values are also returned, 
+after the two indices. 
+        ">
+                <Param name="s" />
+                <Param name="pattern" />
+                <Param name="[, init [, plain]]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.format" func="yes">
+            <Overload retVal="void" descr="
+Returns a formatted version of its variable number of arguments following the description 
+given in its first argument (which must be a string). The format string follows the same 
+rules as the printf family of standard C functions. The only differences are that the options/modifiers 
+*, l, L, n, p, and h are not supported and that there is an extra option, q. The q option formats 
+a string in a form suitable to be safely read back by the Lua interpreter: the string is 
+written between double quotes, and all double quotes, newlines, embedded zeros, and backslashes 
+in the string are correctly escaped when written. For instance, the call
+
+     string.format('%q', 'a string with ''quotes'' and \n new line')
+
+will produce the string:
+
+     'a string with \''quotes\'' and \
+      new line'
+
+The options c, d, E, e, f, g, G, i, o, u, X, and x all expect a number as argument, whereas 
+q and s expect a string.
+
+This function does not accept string values containing embedded zeros, except as arguments 
+to the q option. 
+        ">
+                <Param name="formatstring" />
+                <Param name="···" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.gmatch" func="yes">
+            <Overload retVal="void" descr="
+Returns an iterator function that, each time it is called, returns the next captures from 
+pattern over string s. If pattern specifies no captures, then the whole match is produced 
+in each call.
+
+As an example, the following loop
+
+     s = 'hello world from Lua'
+     for w in string.gmatch(s, '%a+') do
+       print(w)
+     end
+
+will iterate over all the words from string s, printing one per line. The next example collects 
+all pairs key=value from the given string into a table:
+
+     t = {}
+     s = 'from=world, to=Lua'
+     for k, v in string.gmatch(s, '(%w+)=(%w+)') do
+       t[k] = v
+     end
+
+For this function, a '^' at the start of a pattern does not work as an anchor, as this would 
+prevent the iteration. 
+        ">
+                <Param name="s" />
+                <Param name="pattern" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.gsub" func="yes">
+            <Overload retVal="void" descr="
+Returns a copy of s in which all (or the first n, if given) occurrences of the pattern have 
+been replaced by a replacement string specified by repl, which can be a string, a table, or 
+a function. gsub also returns, as its second value, the total number of matches that occurred.
+
+Look at the online documentation for this function.
+">
+                <Param name="s" />
+                <Param name="pattern" />
+                <Param name="repl" />
+                <Param name="[, n]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.len" func="yes">
+            <Overload retVal="void" descr="
+Receives a string and returns its length. The empty string '' has length 0. Embedded zeros are 
+counted, so 'a\000bc\000' has length 5. 
+        ">
+                <Param name="s" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.lower" func="yes">
+            <Overload retVal="void" descr="
+Receives a string and returns a copy of this string with all uppercase letters changed to 
+lowercase. All other characters are left unchanged. The definition of what an uppercase 
+letter is depends on the current locale. 
+        ">
+                <Param name="s" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.match" func="yes">
+            <Overload retVal="void" descr="
+Looks for the first match of pattern in the string s. If it finds one, then match returns the 
+captures from the pattern; otherwise it returns nil. If pattern specifies no captures, then 
+the whole match is returned. A third, optional numerical argument init specifies where to 
+start the search; its default value is 1 and can be negative. 
+        ">
+                <Param name="s" />
+                <Param name="pattern" />
+                <Param name="[, init]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.rep" func="yes">
+            <Overload retVal="void" descr="
+Returns a string that is the concatenation of n copies of the string s. 
+        ">
+                <Param name="s" />
+                <Param name="n" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.reverse" func="yes">
+            <Overload retVal="void" descr="
+Returns a string that is the string s reversed. 
+        ">
+                <Param name="s" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.sub" func="yes">
+            <Overload retVal="void" descr="
+Returns the substring of s that starts at i and continues until j; i and j can be negative. 
+If j is absent, then it is assumed to be equal to -1 (which is the same as the string length). 
+In particular, the call string.sub(s,1,j) returns a prefix of s with length j, and string.sub(s, -i) 
+returns a suffix of s with length i. 
+        ">
+                <Param name="s" />
+                <Param name="i" />
+                <Param name="[, j]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="string.upper" func="yes">
+            <Overload retVal="void" descr="
+Receives a string and returns a copy of this string with all lowercase letters changed to 
+uppercase. All other characters are left unchanged. The definition of what a lowercase letter 
+is depends on the current locale. 
+        ">
+                <Param name="s" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="table.concat" func="yes">
+            <Overload retVal="void" descr="
+Given an array where all elements are strings or numbers, returns table[i]..sep..table[i+1] ··· sep..table[j]. 
+The default value for sep is the empty string, the default for i is 1, and the default for j is the length 
+of the table. If i is greater than j, returns the empty string. 
+        ">
+                <Param name="table" />
+                <Param name="[, sep [, i [, j]]]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="table.insert" func="yes">
+
+            <Overload retVal="void" descr="
+Inserts element value at position pos in table, shifting up other elements to open space, 
+if necessary. The default value for pos is n+1, where n is the length of the table (see §2.5.5), 
+so that a call table.insert(t,x) inserts x at the end of table t. 
+        ">
+                <Param name="table" />
+                <Param name="[pos,]" />
+                <Param name="value" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="table.maxn" func="yes">
+
+            <Overload retVal="void" descr="
+Returns the largest positive numerical index of the given table, or zero if the table has no 
+positive numerical indices. (To do its job this function does a linear traversal of the whole table.) 
+        ">
+                <Param name="table" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="table.remove" func="yes">
+
+            <Overload retVal="void" descr="
+Removes from table the element at position pos, shifting down other elements to close the space, 
+if necessary. Returns the value of the removed element. The default value for pos is n, where n 
+is the length of the table, so that a call table.remove(t) removes the last element of table t. 
+        ">
+                <Param name="table" />
+                <Param name="[, pos]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="table.sort" func="yes">
+            <Overload retVal="void" descr="
+Sorts table elements in a given order, in-place, from table[1] to table[n], where n is the length 
+of the table. If comp is given, then it must be a function that receives two table elements, and 
+returns true when the first is less than the second (so that not comp(a[i+1],a[i]) will be true 
+after the sort). If comp is not given, then the standard Lua operator lessthan is used instead.
+
+The sort algorithm is not stable; that is, elements considered equal by the given order may have 
+their relative positions changed by the sort. 
+        ">
+                <Param name="table" />
+                <Param name="[, comp]" />
+            </Overload>
+        </KeyWord>
+        <KeyWord name="then" func="no" />
+        <KeyWord name="tonumber" func="yes">
+            <Overload retVal="void" descr="
+Tries to convert its argument to a number. If the argument is already a number or a string 
+convertible to a number, then tonumber returns this number; otherwise, it returns nil.
+
+An optional argument specifies the base to interpret the numeral. The base may be any integer 
+between 2 and 36, inclusive. In bases above 10, the letter 'A' (in either upper or lower case) 
+represents 10, 'B' represents 11, and so forth, with 'Z' representing 35. In base 10 (the default), 
+the number can have a decimal part, as well as an optional exponent part (see §2.1). In other 
+bases, only unsigned integers are accepted. 
+        ">
+                <Param name="e" />
+                <Param name="[, base]" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="tostring" func="yes">
+            <Overload retVal="void" descr="
+Receives an argument of any type and converts it to a string in a reasonable format. For complete 
+control of how numbers are converted, use string.format.
+
+If the metatable of e has a '__tostring' field, then tostring calls the corresponding value with 
+e as argument, and uses the result of the call as its result. 
+        ">
+                <Param name="e" />
+            </Overload>
+        </KeyWord>
+        <KeyWord name="true" func="no" />
+        <KeyWord name="type" func="yes">
+            <Overload retVal="void" descr="
+Returns the type of its only argument, coded as a string. The possible results of this function 
+are 'nil' (a string, not the value nil), 'number', 'string', 'boolean', 'table', 'function', 'thread', and 'userdata'. 
+        ">
+                <Param name="v" />
+            </Overload>
+        </KeyWord>
+
+        <KeyWord name="unpack" func="yes">
+            <Overload retVal="void" descr="
+Returns the elements from the given table. This function is equivalent to
+
+     return list[i], list[i+1], ···, list[j]
+
+except that the above code can be written only for a fixed number of elements. By default, i is 1 and 
+j is the length of the list, as defined by the length operator (see §2.5.5). 
+        ">
+                <Param name="list" />
+                <Param name="[, i [, j]]" />
+            </Overload>
+        </KeyWord>
+        <KeyWord name="until" func="no" />
+        <KeyWord name="while" func="no" />
+        <KeyWord name="xpcall" func="yes">
+
+            <Overload retVal="void" descr="
+This function is similar to pcall, except that you can set a new error handler.
+
+xpcall calls function f in protected mode, using err as the error handler. Any error inside f is 
+not propagated; instead, xpcall catches the error, calls the err function with the original error 
+object, and returns a status code. Its first result is the status code (a boolean), which is true 
+if the call succeeds without errors. In this case, xpcall also returns all results from the call, 
+after this first result. In case of any error, xpcall returns false plus the result from err. 
+        ">
+                <Param name="f" />
+                <Param name="err" />
+            </Overload>
+        </KeyWord>
+        <KeyWord name="Bitmap Masks for tableViews and scrollViews" />
+        <KeyWord name="SQLite3" />
+        <KeyWord name="Scene Template" />
+        <KeyWord name="Slider ()" />
+        <KeyWord name="_G" />
+        <KeyWord name="ads.hide()" />
+        <KeyWord name="ads.init()" />
+        <KeyWord name="ads.show()" />
+        <KeyWord name="analytics.init()" />
+        <KeyWord name="analytics.logEvent()" />
+        <KeyWord name="assert()" />
+        <KeyWord name="audio.dispose()" />
+        <KeyWord name="audio.fade()" />
+        <KeyWord name="audio.fadeOut()" />
+        <KeyWord name="audio.findFreeChannel()" />
+        <KeyWord name="audio.freeChannels" />
+        <KeyWord name="audio.getDuration()" />
+        <KeyWord name="audio.getMaxVolume()" />
+        <KeyWord name="audio.getMinVolume()" />
+        <KeyWord name="audio.getVolume()" />
+        <KeyWord name="audio.isChannelActive()" />
+        <KeyWord name="audio.isChannelPaused()" />
+        <KeyWord name="audio.isChannelPlaying()" />
+        <KeyWord name="audio.loadSound()" />
+        <KeyWord name="audio.loadStream()" />
+        <KeyWord name="audio.pause()" />
+        <KeyWord name="audio.play()" />
+        <KeyWord name="audio.reserveChannels()" />
+        <KeyWord name="audio.reservedChannels" />
+        <KeyWord name="audio.resume()" />
+        <KeyWord name="audio.rewind()" />
+        <KeyWord name="audio.seek()" />
+        <KeyWord name="audio.setMaxVolume()" />
+        <KeyWord name="audio.setMinVolume()" />
+        <KeyWord name="audio.setVolume()" />
+        <KeyWord name="audio.stop()" />
+        <KeyWord name="audio.stopWithDelay()" />
+        <KeyWord name="audio.totalChannels" />
+        <KeyWord name="audio.unreservedFreeChannels" />
+        <KeyWord name="audio.unreservedUsedChannels" />
+        <KeyWord name="audio.usedChannels" />
+        <KeyWord name="body.angularDamping" />
+        <KeyWord name="body.angularVelocity" />
+        <KeyWord name="body.bodyType" />
+        <KeyWord name="body.isAwake" />
+        <KeyWord name="body.isBodyActive" />
+        <KeyWord name="body.isBullet" />
+        <KeyWord name="body.isFixedRotation" />
+        <KeyWord name="body.isSensor" />
+        <KeyWord name="body.isSleepingAllowed" />
+        <KeyWord name="body.linearDamping" />
+        <KeyWord name="body:applyAngularImpulse()" />
+        <KeyWord name="body:applyForce()" />
+        <KeyWord name="body:applyLinearImpulse()" />
+        <KeyWord name="body:applyTorque()" />
+        <KeyWord name="body:getLinearVelocity()" />
+        <KeyWord name="body:resetMassData()" />
+        <KeyWord name="body:setLinearVelocity" />
+        <KeyWord name="credits.init()" />
+        <KeyWord name="credits.requestUpdate()" />
+        <KeyWord name="credits.showOffers()" />
+        <KeyWord name="crypto.digest()" />
+        <KeyWord name="crypto.hmac()" />
+        <KeyWord name="crypto.md4" />
+        <KeyWord name="crypto.md5" />
+        <KeyWord name="crypto.sha1" />
+        <KeyWord name="crypto.sha224" />
+        <KeyWord name="crypto.sha256" />
+        <KeyWord name="crypto.sha384" />
+        <KeyWord name="crypto.sha512" />
+        <KeyWord name="display.captureScreen()" />
+        <KeyWord name="display.contentCenterX" />
+        <KeyWord name="display.contentCenterY" />
+        <KeyWord name="display.contentHeight" />
+        <KeyWord name="display.contentScaleX" />
+        <KeyWord name="display.contentScaleY" />
+        <KeyWord name="display.contentWidth" />
+        <KeyWord name="display.getCurrentStage()" />
+        <KeyWord name="display.loadRemoteImage()" />
+        <KeyWord name="display.newCircle()" />
+        <KeyWord name="display.newEmbossedText()" />
+        <KeyWord name="display.newGroup()" />
+        <KeyWord name="display.newImage()" />
+        <KeyWord name="display.newImageRect()" />
+        <KeyWord name="display.newLine()" />
+        <KeyWord name="display.newRect()" />
+        <KeyWord name="display.newRetinaText()" />
+        <KeyWord name="display.newRoundedRect()" />
+        <KeyWord name="display.newText()" />
+        <KeyWord name="display.remove()" />
+        <KeyWord name="display.save()" />
+        <KeyWord name="display.screenOriginX" />
+        <KeyWord name="display.screenOriginY" />
+        <KeyWord name="display.setDefault()" />
+        <KeyWord name="display.setStatusBar()" />
+        <KeyWord name="display.statusBarHeight" />
+        <KeyWord name="display.viewableContentHeight" />
+        <KeyWord name="display.viewableContentWidth" />
+        <KeyWord name="easing.inExpo()" />
+        <KeyWord name="easing.inOutExpo()" />
+        <KeyWord name="easing.inOutQuad()" />
+        <KeyWord name="easing.inQuad()" />
+        <KeyWord name="easing.linear()" />
+        <KeyWord name="easing.outExpo()" />
+        <KeyWord name="easing.outQuad()" />
+        <KeyWord name="error()" />
+        <KeyWord name="event.accuracy" />
+        <KeyWord name="event.action" />
+        <KeyWord name="event.address" />
+        <KeyWord name="event.altitude" />
+        <KeyWord name="event.blob" />
+        <KeyWord name="event.channel" />
+        <KeyWord name="event.city" />
+        <KeyWord name="event.cityDetail" />
+        <KeyWord name="event.completed" />
+        <KeyWord name="event.count" />
+        <KeyWord name="event.country" />
+        <KeyWord name="event.countryCode" />
+        <KeyWord name="event.custom" />
+        <KeyWord name="event.data" />
+        <KeyWord name="event.delta" />
+        <KeyWord name="event.deltaTime" />
+        <KeyWord name="event.deltaTime" />
+        <KeyWord name="event.direction" />
+        <KeyWord name="event.errorCode" />
+        <KeyWord name="event.errorCode" />
+        <KeyWord name="event.errorCode" />
+        <KeyWord name="event.errorMessage" />
+        <KeyWord name="event.errorMessage" />
+        <KeyWord name="event.errorMessage" />
+        <KeyWord name="event.errorMessage" />
+        <KeyWord name="event.force" />
+        <KeyWord name="event.friction" />
+        <KeyWord name="event.geographic" />
+        <KeyWord name="event.handle" />
+        <KeyWord name="event.id" />
+        <KeyWord name="event.index" />
+        <KeyWord name="event.invalidProducts" />
+        <KeyWord name="event.isConnectionOnDemand" />
+        <KeyWord name="event.isConnectionRequired" />
+        <KeyWord name="event.isError" />
+        <KeyWord name="event.isInteractionRequired" />
+        <KeyWord name="event.isReachable" />
+        <KeyWord name="event.isReachableViaCellular" />
+        <KeyWord name="event.isReachableViaWiFi" />
+        <KeyWord name="event.isShake" />
+        <KeyWord name="event.keyName" />
+        <KeyWord name="event.latitude" />
+        <KeyWord name="event.localPlayerScore" />
+        <KeyWord name="event.longitude" />
+        <KeyWord name="event.magnetic" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.name" />
+        <KeyWord name="event.newCredits" />
+        <KeyWord name="event.numTaps" />
+        <KeyWord name="event.object1" />
+        <KeyWord name="event.object2" />
+        <KeyWord name="event.other" />
+        <KeyWord name="event.other" />
+        <KeyWord name="event.phase" />
+        <KeyWord name="event.phase" />
+        <KeyWord name="event.phase" />
+        <KeyWord name="event.phase" />
+        <KeyWord name="event.postalCode" />
+        <KeyWord name="event.products" />
+        <KeyWord name="event.provider" />
+        <KeyWord name="event.region" />
+        <KeyWord name="event.regionDetail" />
+        <KeyWord name="event.source" />
+        <KeyWord name="event.speed" />
+        <KeyWord name="event.sprite" />
+        <KeyWord name="event.street" />
+        <KeyWord name="event.streetDetail" />
+        <KeyWord name="event.target" />
+        <KeyWord name="event.target" />
+        <KeyWord name="event.time" />
+        <KeyWord name="event.time" />
+        <KeyWord name="event.time" />
+        <KeyWord name="event.time" />
+        <KeyWord name="event.totalCredits" />
+        <KeyWord name="event.transaction" />
+        <KeyWord name="event.type" />
+        <KeyWord name="event.type" />
+        <KeyWord name="event.type" />
+        <KeyWord name="event.type" />
+        <KeyWord name="event.url" />
+        <KeyWord name="event.x" />
+        <KeyWord name="event.x" />
+        <KeyWord name="event.xGravity" />
+        <KeyWord name="event.xInstant" />
+        <KeyWord name="event.xRotation" />
+        <KeyWord name="event.xStart" />
+        <KeyWord name="event.y" />
+        <KeyWord name="event.y" />
+        <KeyWord name="event.yGravity" />
+        <KeyWord name="event.yInstant" />
+        <KeyWord name="event.yRotation" />
+        <KeyWord name="event.yStart" />
+        <KeyWord name="event.zGravity" />
+        <KeyWord name="event.zInstant" />
+        <KeyWord name="event.zRotation" />
+        <KeyWord name="facebook.login()" />
+        <KeyWord name="facebook.logout()" />
+        <KeyWord name="facebook.request()" />
+        <KeyWord name="facebook.showDialog()" />
+        <KeyWord name="file:close()" />
+        <KeyWord name="file:flush()" />
+        <KeyWord name="file:lines()" />
+        <KeyWord name="file:read()" />
+        <KeyWord name="file:seek()" />
+        <KeyWord name="file:setvbuf()" />
+        <KeyWord name="file:write()" />
+        <KeyWord name="gameNetwork.init()" />
+        <KeyWord name="gameNetwork.request()" />
+        <KeyWord name="gameNetwork.show()" />
+        <KeyWord name="getfenv()" />
+        <KeyWord name="getmetatable()" />
+        <KeyWord name="graphics.newGradient()" />
+        <KeyWord name="graphics.newMask()" />
+        <KeyWord name="group.numChildren" />
+        <KeyWord name="group:insert()" />
+        <KeyWord name="group:remove()" />
+        <KeyWord name="io.close()" />
+        <KeyWord name="io.flush()" />
+        <KeyWord name="io.input()" />
+        <KeyWord name="io.lines()" />
+        <KeyWord name="io.open()" />
+        <KeyWord name="io.output()" />
+        <KeyWord name="io.read()" />
+        <KeyWord name="io.tmpfile()" />
+        <KeyWord name="io.type()" />
+        <KeyWord name="io.write()" />
+        <KeyWord name="ipairs()" />
+        <KeyWord name="joint.dampingRatio" />
+        <KeyWord name="joint.frequency" />
+        <KeyWord name="joint.isLimitEnabled" />
+        <KeyWord name="joint.isMotorEnabled" />
+        <KeyWord name="joint.jointAngle" />
+        <KeyWord name="joint.jointSpeed" />
+        <KeyWord name="joint.jointTranslation" />
+        <KeyWord name="joint.length" />
+        <KeyWord name="joint.length1" />
+        <KeyWord name="joint.length2" />
+        <KeyWord name="joint.maxForce" />
+        <KeyWord name="joint.maxMotorForce" />
+        <KeyWord name="joint.maxMotorTorque" />
+        <KeyWord name="joint.maxTorque" />
+        <KeyWord name="joint.motorForce" />
+        <KeyWord name="joint.motorSpeed" />
+        <KeyWord name="joint.motorTorque" />
+        <KeyWord name="joint.ratio" />
+        <KeyWord name="joint.reactionTorque" />
+        <KeyWord name="joint:getAnchorA()" />
+        <KeyWord name="joint:getAnchorB()" />
+        <KeyWord name="joint:getLimits()" />
+        <KeyWord name="joint:getReactionForce()" />
+        <KeyWord name="joint:getRotationLimits()" />
+        <KeyWord name="joint:setLimits()" />
+        <KeyWord name="joint:setRotationLimits()" />
+        <KeyWord name="json.decode()" />
+        <KeyWord name="json.encode()" />
+        <KeyWord name="json.null()" />
+        <KeyWord name="math.abs()" />
+        <KeyWord name="math.acos()" />
+        <KeyWord name="math.asin()" />
+        <KeyWord name="math.atan()" />
+        <KeyWord name="math.atan2()" />
+        <KeyWord name="math.ceil()" />
+        <KeyWord name="math.cos()" />
+        <KeyWord name="math.cosh()" />
+        <KeyWord name="math.deg()" />
+        <KeyWord name="math.exp()" />
+        <KeyWord name="math.floor()" />
+        <KeyWord name="math.fmod()" />
+        <KeyWord name="math.frexp()" />
+        <KeyWord name="math.inf" />
+        <KeyWord name="math.ldexp()" />
+        <KeyWord name="math.log()" />
+        <KeyWord name="math.log10()" />
+        <KeyWord name="math.max()" />
+        <KeyWord name="math.min()" />
+        <KeyWord name="math.modf()" />
+        <KeyWord name="math.pi" />
+        <KeyWord name="math.pow()" />
+        <KeyWord name="math.rad()" />
+        <KeyWord name="math.random()" />
+        <KeyWord name="math.randomseed()" />
+        <KeyWord name="math.round()" />
+        <KeyWord name="math.sin()" />
+        <KeyWord name="math.sinh()" />
+        <KeyWord name="math.sqrt()" />
+        <KeyWord name="math.tan()" />
+        <KeyWord name="math.tanh()" />
+        <KeyWord name="media.getSoundVolume" />
+        <KeyWord name="media.newEventSound()" />
+        <KeyWord name="media.newRecording()" />
+        <KeyWord name="media.pauseSound()" />
+        <KeyWord name="media.playEventSound()" />
+        <KeyWord name="media.playSound()" />
+        <KeyWord name="media.playVideo()" />
+        <KeyWord name="media.setSoundVolume()" />
+        <KeyWord name="media.show()" />
+        <KeyWord name="media.stopSound()" />
+        <KeyWord name="memoryWarning *iOS only*" />
+        <KeyWord name="module()" />
+        <KeyWord name="movieclip.newAnim()" />
+        <KeyWord name="myMap.isLocationVisible" />
+        <KeyWord name="myMap.isScrollEnabled" />
+        <KeyWord name="myMap.isZoomEnabled" />
+        <KeyWord name="myMap.mapType" />
+        <KeyWord name="myMap:addMarker()" />
+        <KeyWord name="myMap:getAddressLocation()" />
+        <KeyWord name="myMap:getUserLocation()" />
+        <KeyWord name="myMap:nearestAddress()" />
+        <KeyWord name="myMap:removeAllMarkers()" />
+        <KeyWord name="myMap:setCenter()" />
+        <KeyWord name="myMap:setRegion()" />
+        <KeyWord name="native.cancelAlert()" />
+        <KeyWord name="native.cancelWebPopup()" />
+        <KeyWord name="native.getFontNames()" />
+        <KeyWord name="native.getSync()" />
+        <KeyWord name="native.newFont()" />
+        <KeyWord name="native.newMapView()" />
+        <KeyWord name="native.newTextBox()" />
+        <KeyWord name="native.newTextField()" />
+        <KeyWord name="native.newVideo()" />
+        <KeyWord name="native.newWebView()" />
+        <KeyWord name="native.setActivityIndicator()" />
+        <KeyWord name="native.setKeyboardFocus()" />
+        <KeyWord name="native.setSync()" />
+        <KeyWord name="native.showAlert()" />
+        <KeyWord name="native.showPopup()" />
+        <KeyWord name="native.showWebPopup()" />
+        <KeyWord name="native.systemFont" />
+        <KeyWord name="network.canDetectNetworkStatusChanges" />
+        <KeyWord name="network.download()" />
+        <KeyWord name="network.request()" />
+        <KeyWord name="network.setStatusListener" />
+        <KeyWord name="next()" />
+        <KeyWord name="object.align" />
+        <KeyWord name="object.align" />
+        <KeyWord name="object.alpha" />
+        <KeyWord name="object.contentBounds" />
+        <KeyWord name="object.contentHeight" />
+        <KeyWord name="object.contentWidth" />
+        <KeyWord name="object.font" />
+        <KeyWord name="object.font" />
+        <KeyWord name="object.hasBackground" />
+        <KeyWord name="object.height" />
+        <KeyWord name="object.inputType" />
+        <KeyWord name="object.isEditable" />
+        <KeyWord name="object.isHitTestMasked" />
+        <KeyWord name="object.isHitTestable" />
+        <KeyWord name="object.isSecure" />
+        <KeyWord name="object.isVisible" />
+        <KeyWord name="object.length **old**" />
+        <KeyWord name="object.maskRotation" />
+        <KeyWord name="object.maskScaleX" />
+        <KeyWord name="object.maskScaleY" />
+        <KeyWord name="object.maskX" />
+        <KeyWord name="object.maskY" />
+        <KeyWord name="object.parent" />
+        <KeyWord name="object.rotation" />
+        <KeyWord name="object.size" />
+        <KeyWord name="object.size" />
+        <KeyWord name="object.size" />
+        <KeyWord name="object.stageBounds **old**" />
+        <KeyWord name="object.stageHeight **old**" />
+        <KeyWord name="object.stageWidth **old**" />
+        <KeyWord name="object.strokeWidth" />
+        <KeyWord name="object.text" />
+        <KeyWord name="object.text" />
+        <KeyWord name="object.text" />
+        <KeyWord name="object.width" />
+        <KeyWord name="object.x" />
+        <KeyWord name="object.xOrigin" />
+        <KeyWord name="object.xReference" />
+        <KeyWord name="object.xScale" />
+        <KeyWord name="object.y" />
+        <KeyWord name="object.yOrigin" />
+        <KeyWord name="object.yReference" />
+        <KeyWord name="object.yScale" />
+        <KeyWord name="object:addEventListener" />
+        <KeyWord name="object:append()" />
+        <KeyWord name="object:contentToLocal()" />
+        <KeyWord name="object:dispatchEvent()" />
+        <KeyWord name="object:getParent() **old**" />
+        <KeyWord name="object:getSampleRate()" />
+        <KeyWord name="object:getTunerFrequency()" />
+        <KeyWord name="object:getTunerVolume()" />
+        <KeyWord name="object:isRecording()" />
+        <KeyWord name="object:localToContent()" />
+        <KeyWord name="object:nextFrame()" />
+        <KeyWord name="object:play()" />
+        <KeyWord name="object:previousFrame()" />
+        <KeyWord name="object:removeEventListener()" />
+        <KeyWord name="object:removeSelf()" />
+        <KeyWord name="object:reverse()" />
+        <KeyWord name="object:rotate()" />
+        <KeyWord name="object:scale()" />
+        <KeyWord name="object:setColor()" />
+        <KeyWord name="object:setDrag()" />
+        <KeyWord name="object:setFillColor()" />
+        <KeyWord name="object:setLabels()" />
+        <KeyWord name="object:setMask()" />
+        <KeyWord name="object:setReferencePoint()" />
+        <KeyWord name="object:setSampleRate()" />
+        <KeyWord name="object:setStrokeColor()" />
+        <KeyWord name="object:setTextColor()" />
+        <KeyWord name="object:setTextColor()" />
+        <KeyWord name="object:setTextColor()" />
+        <KeyWord name="object:startRecording()" />
+        <KeyWord name="object:startTuner()" />
+        <KeyWord name="object:stop()" />
+        <KeyWord name="object:stopAtFrame()" />
+        <KeyWord name="object:stopRecording()" />
+        <KeyWord name="object:stopTuner()" />
+        <KeyWord name="object:toBack()" />
+        <KeyWord name="object:toFront()" />
+        <KeyWord name="object:translate()" />
+        <KeyWord name="openfeint.downloadBlob()" />
+        <KeyWord name="openfeint.init()" />
+        <KeyWord name="openfeint.launchDashboard()" />
+        <KeyWord name="openfeint.setHighScore()" />
+        <KeyWord name="openfeint.unlockAchievement()" />
+        <KeyWord name="openfeint.uploadBlob()" />
+        <KeyWord name="os.clock()" />
+        <KeyWord name="os.date()" />
+        <KeyWord name="os.difftime()" />
+        <KeyWord name="os.execute()" />
+        <KeyWord name="os.exit()" />
+        <KeyWord name="os.remove()" />
+        <KeyWord name="os.rename()" />
+        <KeyWord name="os.time()" />
+        <KeyWord name="package.loaded" />
+        <KeyWord name="package.loaders" />
+        <KeyWord name="package.seeall" />
+        <KeyWord name="pairs()" />
+        <KeyWord name="pcall()" />
+        <KeyWord name="physics.addBody()" />
+        <KeyWord name="physics.getGravity()" />
+        <KeyWord name="physics.newJoint()" />
+        <KeyWord name="physics.pause()" />
+        <KeyWord name="physics.removeBody()" />
+        <KeyWord name="physics.setDrawMode()" />
+        <KeyWord name="physics.setGravity()" />
+        <KeyWord name="physics.setPositionIterations()" />
+        <KeyWord name="physics.setScale()" />
+        <KeyWord name="physics.setVelocityIterations()" />
+        <KeyWord name="physics.start()" />
+        <KeyWord name="physics.stop()" />
+        <KeyWord name="print()" />
+        <KeyWord name="rawequal()" />
+        <KeyWord name="rawget()" />
+        <KeyWord name="rawset()" />
+        <KeyWord name="require()" />
+        <KeyWord name="Runtime:addEventListener()" />
+        <KeyWord name="Runtime:hasEventSource()" />
+        <KeyWord name="Runtime:removeEventListener()" />
+        <KeyWord name="scrollView ()" />
+        <KeyWord name="select()" />
+        <KeyWord name="setfenv()" />
+        <KeyWord name="setmetatable()" />
+        <KeyWord name="sprite.add()" />
+        <KeyWord name="sprite.newSprite()" />
+        <KeyWord name="sprite.newSpriteMultiSet()" />
+        <KeyWord name="sprite.newSpriteSet()" />
+        <KeyWord name="sprite.newSpriteSheet()" />
+        <KeyWord name="sprite.newSpriteSheetFromData()" />
+        <KeyWord name="spriteInstance.animating" />
+        <KeyWord name="spriteInstance.currentFrame" />
+        <KeyWord name="spriteInstance.sequence" />
+        <KeyWord name="spriteInstance.timeScale" />
+        <KeyWord name="spriteInstance:addEventListener()" />
+        <KeyWord name="spriteInstance:pause()" />
+        <KeyWord name="spriteInstance:play()" />
+        <KeyWord name="spriteInstance:prepare()" />
+        <KeyWord name="spriteSheet:dispose()" />
+        <KeyWord name="stage:setFocus()" />
+        <KeyWord name="store.canMakePurchases" />
+        <KeyWord name="store.finishTransaction()" />
+        <KeyWord name="store.init()" />
+        <KeyWord name="store.loadProducts()" />
+        <KeyWord name="store.purchase()" />
+        <KeyWord name="store.restore()" />
+        <KeyWord name="storyboard.disableAutoPurge" />
+        <KeyWord name="storyboard.getCurrentSceneName()" />
+        <KeyWord name="storyboard.getPrevious()" />
+        <KeyWord name="storyboard.getScene()" />
+        <KeyWord name="storyboard.gotoScene()" />
+        <KeyWord name="storyboard.hideOverlay()" />
+        <KeyWord name="storyboard.isDebug" />
+        <KeyWord name="storyboard.loadScene()" />
+        <KeyWord name="storyboard.newScene()" />
+        <KeyWord name="storyboard.printMemUsage()" />
+        <KeyWord name="storyboard.purgeAll()" />
+        <KeyWord name="storyboard.purgeOnSceneChange" />
+        <KeyWord name="storyboard.purgeScene()" />
+        <KeyWord name="storyboard.reloadScene()" />
+        <KeyWord name="storyboard.removeAll()" />
+        <KeyWord name="storyboard.removeScene()" />
+        <KeyWord name="storyboard.showOverlay()" />
+        <KeyWord name="storyboard.stage" />
+        <KeyWord name="string.byte()" />
+        <KeyWord name="string.char()" />
+        <KeyWord name="string.find()" />
+        <KeyWord name="string.format()" />
+        <KeyWord name="string.gmatch()" />
+        <KeyWord name="string.gsub()" />
+        <KeyWord name="string.len()" />
+        <KeyWord name="string.lower()" />
+        <KeyWord name="string.match()" />
+        <KeyWord name="string.rep()" />
+        <KeyWord name="string.reverse()" />
+        <KeyWord name="string.sub()" />
+        <KeyWord name="string.upper()" />
+        <KeyWord name="system.DocumentsDirectory" />
+        <KeyWord name="system.ResourceDirectory" />
+        <KeyWord name="system.TemporaryDirectory" />
+        <KeyWord name="system.activate()" />
+        <KeyWord name="system.cancelNotification()" />
+        <KeyWord name="system.deactivate()" />
+        <KeyWord name="system.getInfo()" />
+        <KeyWord name="system.getPreference()" />
+        <KeyWord name="system.getTimer()" />
+        <KeyWord name="system.openURL()" />
+        <KeyWord name="system.orientation" />
+        <KeyWord name="system.pathForFile()" />
+        <KeyWord name="system.scheduleNotification()" />
+        <KeyWord name="system.setAccelerometerInterval()" />
+        <KeyWord name="system.setGyroscopeInterval()" />
+        <KeyWord name="system.setIdleTimer()" />
+        <KeyWord name="system.setLocationAccuracy()" />
+        <KeyWord name="system.setLocationThreshold()" />
+        <KeyWord name="system.vibrate()" />
+        <KeyWord name="table.concat()" />
+        <KeyWord name="table.copy()" />
+        <KeyWord name="table.indexOf()" />
+        <KeyWord name="table.insert()" />
+        <KeyWord name="table.maxn()" />
+        <KeyWord name="table.remove()" />
+        <KeyWord name="table.sort()" />
+        <KeyWord name="timer.cancel()" />
+        <KeyWord name="timer.pause()" />
+        <KeyWord name="timer.performWithDelay()" />
+        <KeyWord name="timer.resume()" />
+        <KeyWord name="tonumber()" />
+        <KeyWord name="tostring()" />
+        <KeyWord name="transition.cancel()" />
+        <KeyWord name="transition.dissolve()" />
+        <KeyWord name="transition.from()" />
+        <KeyWord name="transition.to()" />
+        <KeyWord name="type()" />
+        <KeyWord name="unpack()" />
+        <KeyWord name="widget.newButton()" />
+        <KeyWord name="widget.newPickerWheel()" />
+        <KeyWord name="widget.newTabBar()" />
+        <KeyWord name="widget.newTableView()" />
+        <KeyWord name="widget.setTheme()" />
+    </AutoComplete>
+</NotepadPlus>
+
