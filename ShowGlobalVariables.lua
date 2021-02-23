@@ -3,20 +3,20 @@
 Module ShowGlobalVariables.lua
 
 Bei der Entwicklung von Modulen passiert es leicht, dass Variablen oder Funktionen global definiert werden obwohl sie lokal sein sollten.
-Zumeist funktioniert das Skript dann trotzdem wie erwartet, so dass dieser Fehler nur schlecht auff�llt.
+Zumeist funktioniert das Skript dann trotzdem wie erwartet, so dass dieser Fehler nur schlecht auffällt.
 
 Das Modul ShowGlobalVariables zeigt globale Variablen und globale Funktionen.
-Die bekannten Namen aus EEP bzw. von Lua k�nnen unterdr�ckt werden, so dass man nur die selbst definierten Namen erh�lt.
+Die bekannten Namen aus EEP bzw. von Lua können unterdrückt werden, so dass man nur die selbst definierten Namen erhält.
 
 Verwendung: 
 local ShowGlobalVariables = require('ShowGlobalVariables')
-ShowGlobalVariables()		-- Unterdr�cke bekannte Namen
+ShowGlobalVariables()		-- Unterdrücke bekannte Namen
 ShowGlobalVariables(true)	-- Zeige alle Namen
 
 Frank Buchholz, 2019
 ]]
 
-local _VERSION = 'v2019-04-30'
+local _VERSION = 'v2020-02-18'
 
 -- Die Funktion reicht bis an das Ende des Moduls
 local function ShowGlobalVariables(all)
@@ -24,12 +24,15 @@ local function ShowGlobalVariables(all)
 -- bekannte Namen, die nicht gezeigt werden sollen
 local NamesTable = {
 	-- EEP 13 variables
+
 	'EEPTime',
 	'EEPTimeH',
 	'EEPTimeM',
 	'EEPTimeS',
 	'EEPVer',
+
 	-- EEP 13 functions
+
 	'clearlog',
 	'EEPMain',
 	'EEPChangeInfoSignal',
@@ -98,12 +101,27 @@ local NamesTable = {
 	'EEPStructureSetRotation',
 	'EEPStructureSetSmoke',
 	'EEPTrainLooseCoupling',
-	-- EEP 15 functions
-	'EEPAuxiliaryTrackSetTextureText',
+	'EEPOnSignal_1',	-- Registrierte Signale rufen selbständig diese Funktion auf, wenn sich ihre Stellung ändert
+	'EEPOnSwitch_1',	-- Registrierte Weichen rufen selbständig diese Funktion auf, wenn sich ihre Stellung ändert
+
+	-- EEP 13.2 functions
+
 	'EEPGetRollingstockItemName',
 	'EEPGetRollingstockItemsCount',
 	'EEPGetSignalTrainName',
 	'EEPGetSignalTrainsCount',
+
+	-- EEP 14.2 functions
+
+	'EEPRollingstockGetLength',
+	'EEPRollingstockGetMotor',
+	'EEPRollingstockGetTrack',
+	'EEPRollingstockGetModelType',
+	'EEPRollingstockGetTagText',
+
+	-- EEP 15 functions (or not assiged to correct release yet)
+
+	'EEPAuxiliaryTrackSetTextureText',
 	'EEPGetTrainyardItemName',
 	'EEPGetTrainyardItemsCount',
 	'EEPGetTrainyardItemStatus',
@@ -115,11 +133,6 @@ local NamesTable = {
 	'EEPPause',
 	'EEPRailTrackSetTextureText',
 	'EEPRoadTrackSetTextureText',
-	'EEPRollingstockGetLength',
-	'EEPRollingstockGetModelType',
-	'EEPRollingstockGetMotor',
-	'EEPRollingstockGetTagText',
-	'EEPRollingstockGetTrack',
 	'EEPRollingstockGetTrainName',
 	'EEPRollingstockSetTagText',
 	'EEPRollingstockSetTextureText',
@@ -134,6 +147,62 @@ local NamesTable = {
 	'EEPStructureSetTagText',
 	'EEPStructureSetTextureText',
 	'EEPTramTrackSetTextureText',
+
+	-- EEP 15.1 functions
+
+	'EEPRollingstockGetActive', -- Ermittelt, welches Fahrzeug derzeit im Steuerdialog ausgewählt ist.
+	'EEPRollingstockSetActive', -- Wählt das angegebene Fahrzeug im Steuerdialog aus.
+	'EEPRollingstockGetOrientation', -- Ermittelt, welche relative Ausrichtung das angegebene Fahrzeug im Zugverband hat.	
+
+	'EEPGetTrainActive', -- Ermittelt, welcher Zug derzeit im Steuerdialog ausgewählt ist.
+	'EEPSetTrainActive', -- Wählt den angegebenen Zug im Steuerdialog aus.
+	'EEPGetTrainLength', -- Ermittelt die Gesamtlänge des angegebenen Zuges.
+
+	-- EEP 16.1 functions
+
+	'EEPActivateCtrlDesk',	-- Ruft das Stellpult im Radarfenster auf
+	
+	'EEPGetCameraPosition',
+	'EEPSetCameraPosition',
+
+	'EEPGetCameraRotation',
+	'EEPSetCameraRotation',
+
+	'EEPStructureGetRotation',
+	'EEPGoodsGetRotation',
+
+	'EEPOnSaveAnl',
+
+	'EEPOnTrainExitTrainyard',
+	
+	'EEPOnTrainCoupling',
+	'EEPOnTrainLooseCoupling',
+	
+	'EEPRollingstockGetHook',
+	'EEPRollingstockGetHookGlue',
+	'EEPRollingstockGetMileage',
+	'EEPRollingstockGetPosition',
+	'EEPRollingstockGetSmoke',
+	'EEPRollingstockSetHook',
+	'EEPRollingstockSetHookGlue',
+	'EEPRollingstockSetHorn',	-- Lässt bei einem bestimmten Rollmaterial den Warnton (Pfeife, Hupe) ertönen
+	'EEPRollingstockSetSmoke',
+	'EEPRollingstockSetUserCamera',
+	
+	'EEPGetCloudIntensity',
+	'EEPGetFogIntensity',
+	'EEPGetHailIntensity',
+	'EEPGetRainIntensity',
+	'EEPGetSnowIntensity',
+	'EEPGetWindIntensity',
+
+	'EEPSetCloudIntensity',
+	'EEPSetFogIntensity',
+	'EEPSetHailIntensity',
+	'EEPSetRainIntensity',
+	'EEPSetSnowIntensity',
+	'EEPSetWindIntensity',
+	
 	-- Lua standard variables
 	'_G',
 	'_VERSION',
@@ -173,7 +242,7 @@ local NamesTable = {
 	'xpcall',
 }
  
--- Tabelle (mit impliziten numerischen Schl�ssel) in Tabelle mit explizites Schl�sseln �bertragen
+-- Tabelle (mit impliziten numerischen Schlüssel) in Tabelle mit explizites Schlüsseln übertragen
 local NamesSet = {}
 for key, name in pairs(NamesTable) do 
 	NamesSet[name] = true
