@@ -13,10 +13,10 @@ local ShowGlobalVariables = require('ShowGlobalVariables')
 ShowGlobalVariables()		-- Unterdrücke bekannte Namen
 ShowGlobalVariables(true)	-- Zeige alle Namen
 
-Frank Buchholz, 2019
+Frank Buchholz, 2019-2021
 ]]
 
-local _VERSION = 'v2020-02-18'
+local _VERSION = 'v2021-11-14'
 
 -- Die Funktion reicht bis an das Ende des Moduls
 local function ShowGlobalVariables(all)
@@ -189,19 +189,35 @@ local NamesTable = {
 	'EEPRollingstockSetSmoke',
 	'EEPRollingstockSetUserCamera',
 	
-	'EEPGetCloudIntensity',
+	'EEPGetCloudsIntensity',
 	'EEPGetFogIntensity',
 	'EEPGetHailIntensity',
 	'EEPGetRainIntensity',
 	'EEPGetSnowIntensity',
 	'EEPGetWindIntensity',
 
-	'EEPSetCloudIntensity',
+	'EEPSetCloudsIntensity',
+	'EEPSetDarkCloudsIntensity',
 	'EEPSetFogIntensity',
 	'EEPSetHailIntensity',
 	'EEPSetRainIntensity',
 	'EEPSetSnowIntensity',
 	'EEPSetWindIntensity',
+
+	-- EEP 16.2 functions
+
+	-- EEP 16.3 functions
+	'EEPRollingstockGetTextureText',	-- Liest den Text einer beschreibbaren Fläche eines Rollmaterials aus
+
+	-- EEP 16.4 functions
+
+	-- EEP 17 variables and functions
+	'EEPLng',						-- Zeige Sprache GER, ENG, FRA der installierten EEP-Version
+	'EEPOnBeforeSaveAnl',
+	'EEPGetAnlVer',					-- EEP-Versionsnummer, mit der die Anlage vor dem Öffnen zuletzt gespeichert wurde
+	'EEPGetAnlLng',					-- liefert die auf Achsnamen bezogene "Anlagensprache" (als GER, ENG oder FRA)
+	'EEPRollingstockGetUserCamera',	-- related to EEPRollingstockSetUserCamera
+	
 	
 	-- Lua standard variables
 	'_G',
