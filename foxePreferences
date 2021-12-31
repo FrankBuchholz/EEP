@@ -1,0 +1,16 @@
+* @id @name
+script @src
+link @href
+Version @EEP @Language @No3DMs
+Gleissystem @GleissystemID
+Gleis @GleisID @gleisID @stil
+Gleisverbindung @GleisID1 @Anschluss1 @GleisID2 @Anschluss2 @Flags
+Kollektor @id Gleis/@gleissystemID Gleis/@gleisID
+Zugverband @ZugID @name Gleisort/@gleissystemID Gleisort@gleisID
+Gleisort @gleissystemID @gleisID
+Rollmaterial @name
+Gebaeudesammlung @GebaudesammlungID
+Immobile @ImmoIdx @kollektorID Dreibein/Vektor/@x Dreibein/Vektor/@y GBSObject/@Name
+GBSObject @GleissystemID GBSObject/@Name
+GBSElement @x @y Modell/Table/@e0 @Kammera
+Crowd @Name Dreibein/Vektor/@x Dreibein/Vektor/@y
