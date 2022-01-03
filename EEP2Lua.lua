@@ -7,7 +7,8 @@ Achtung: Wenn man dieses Modul in EEP fuer die aktuellen Anlage nutzen will, z.B
 Man muss also selber sicherstellen, dass die EEP-Anlage vor Aufruf dieses Moduls gespeichert wurde!
 
 Aufruf:
-local Anlage 	= require("EEP2Lua")
+--local Anlage 	= require("EEP2Lua"){ debug = true } -- mit erweiterter Protokollausgabe
+local Anlage 	= require("EEP2Lua"){}
 local sutrackp 	= Anlage.loadFile(input_file)
 
 Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert.
@@ -91,7 +92,7 @@ Die Mitte der Anlage hat die Koordinaten x = 0 und y = 0.
 -- Lokale Daten und Funktionen ----------------------------------------
 
 -- Ausfuehrliche Protokollierung zur Fehleranalyse (true/false)
-local log = false
+local debug = false
 
 -- Maximale Anzahl der gespeicherten Positionen von Dateien
 -- (Das wird begrenzt, da dies bei Landschaftselementen eine sehr grosse Zahl sein koennte)
@@ -214,7 +215,7 @@ end
 -- Funktionen zur Verarbeitung einzelner Tokens
 
 local function processSutrackp(xmlsutrackp, Parameters)
-	if log == true then print('processSutrackp') end
+	if debug then print('processSutrackp') end
 
 	-- hier gibt es nichts zu tun
 
@@ -223,7 +224,7 @@ end
 
 
 local function processGleissystem(xmlGleissystem, Parameters)
-	if log == true then print('processGleissystem') end
+	if debug then print('processGleissystem') end
 
 	local GleissystemID = tonumber(xmlGleissystem._attr.GleissystemID)
 
@@ -257,7 +258,7 @@ local function processGleissystem(xmlGleissystem, Parameters)
 end
 
 local function processGleis(xmlGleis, Gleissystem)
-	if log == true then print('processGleis') end
+	if debug then print('processGleis') end
 
 --[[
 
@@ -452,7 +453,7 @@ Fuer die Umrechnung der Steigung gilt:
 	Gleissystem.Laenge 			= Gleissystem.Laenge + L
 	Gleissystem.Anzahl.Gleise 	= Gleissystem.Anzahl.Gleise + 1
 
-	if log == true then
+	if debug then
 		print(
 			'Gleis = ', GleisID, ' ',
 			'x = ',  x,  ' ',
@@ -524,7 +525,7 @@ Fuer die Umrechnung der Steigung gilt:
 end
 
 local function processKontakt(xmlKontakt, Gleis)
-	if log == true then print('processKontakt') end
+	if debug then print('processKontakt') end
 
 	local KontaktID				= 0						-- keine KontaktID vorhanden (wird spaeter bestimmt)
 
@@ -604,7 +605,7 @@ local function processKontakt(xmlKontakt, Gleis)
 end
 
 local function processMeldung(xmlMeldung, Gleis)
-	if log == true then print('processMeldung') end
+	if debug then print('processMeldung') end
 
 	local SignalID 		= tonumber(xmlMeldung._attr.Key_Id)
 
@@ -661,7 +662,7 @@ end
 
 
 local function processFuhrpark(xmlFuhrpark, Parameters)
-	if log == true then print('processFuhrpark') end
+	if debug then print('processFuhrpark') end
 
 	local FuhrparkID = tonumber(xmlFuhrpark._attr.FuhrparkID)
 
@@ -682,7 +683,7 @@ local function processFuhrpark(xmlFuhrpark, Parameters)
 end
 
 local function processZugverband(xmlZugverband, Fuhrpark)
-	if log == true then print('processZugverband') end
+	if debug then print('processZugverband') end
 
 	local ZugID 		= tonumber(xmlZugverband._attr.ZugID)
 
@@ -716,7 +717,7 @@ local function processZugverband(xmlZugverband, Fuhrpark)
 end
 
 local function processRollmaterial(xmlRollmaterial, Zugverband)
-	if log == true then print('processRollmaterial') end
+	if debug then print('processRollmaterial') end
 
 	local name = xmlRollmaterial._attr.name
 
@@ -754,7 +755,7 @@ end
 
 
 local function processGebaeudesammlung(xmlGebaeudesammlung, Parameters)
-	if log == true then print('processGebaeudesammlung') end
+	if debug then print('processGebaeudesammlung') end
 
 	local GebaeudesammlungID = tonumber(xmlGebaeudesammlung._attr.GebaudesammlungID)
 
@@ -772,7 +773,7 @@ local function processGebaeudesammlung(xmlGebaeudesammlung, Parameters)
 end
 
 local function processImmobile(xmlImmobile, Gebaeudesammlung)
-	if log == true then print('processImmobile') end
+	if debug then print('processImmobile') end
 
 	local ImmoIdx = tonumber(xmlImmobile._attr.ImmoIdx)
 
@@ -805,7 +806,7 @@ end
 
 
 local function processOptions(xmlOptions, Parameters)
-	if log == true then print('processOptions') end
+	if debug then print('processOptions') end
 
 	local I
 	local Route = {}
@@ -864,7 +865,7 @@ local function processOptions(xmlOptions, Parameters)
 end
 
 local function processGleisverbindung(xmlGleisverbindung, Gleissystem)
-	if log == true then print('processGleisverbindung') end
+	if debug then print('processGleisverbindung') end
 
 	-- Attribute: GleisID1, Anschluss1, GleisID2, Anschluss2
 	-- Werte fuer Anschluss: Anfang, Ende, EndeAbzweig, EndeKoAbzweig
@@ -941,13 +942,13 @@ local function verbindeGleise()
 		end
 	end -- function verbindeGleis
 
-	if log == true then print('verbindeGleise') end
+	if debug then print('verbindeGleise') end
 
 	for GleissystemID, Gleissystem in pairs(Gleisverbindungen) do
 
 		for key, Gleisverbindung in pairs(Gleissystem) do
 
-			if log == true then
+			if debug then
 				print(
 					  'GleissystemID=',	GleissystemID, 	' '
 					, 'key=', 			key, 		' '
@@ -1018,7 +1019,7 @@ local function processToken(
 		return nil
 	end
 
-	if log == true then
+	if debug then
 		print('')
 		print('Name=', Name, ' ', type(Token))
 		print('  Call=', type(xmlHierarchy._Call))
@@ -1031,9 +1032,8 @@ local function processToken(
 
 	-- mehrfaches Token (mit numerischen Schluessel) auf gleicher Ebene verarbeiten
 	local multiple_token = false
-	-- Problem: Das Gleissystem muss vor dem Fuhrpark verarbeitet werden
 	for key, value in ipairs(Token) do
-		if log == true then print('= ', Name, '[', key, ']') end
+		if debug then print('= ', Name, '[', key, ']') end
 
 		multiple_token = true
 		processToken(Name, value, xmlHierarchy, Parameters)
@@ -1043,7 +1043,7 @@ local function processToken(
 		-- einzelnes Token verarbeiten
 		local Results = Parameters
 		if xmlHierarchy._Call and type(xmlHierarchy._Call) == 'function' then
-			if log == true then
+			if debug then
 				print('= ', Name, ' Call')
 				for key, value in pairs(Token) do
 					print('  Sub=', key)
@@ -1054,11 +1054,26 @@ local function processToken(
 		end
 
 		-- Token der naechsten Ebene verarbeiten
-		for NextName, value in pairs(Token) do
+		-- Problem: Das Gleissystem muss vor dem Fuhrpark verarbeitet werden
+		local key_Gleissystem = "Gleissystem"
+		if Token[key_Gleissystem] then -- Gleissystem vorab verarbeiten
+			if debug then print('Token.Gleissystem gefunden') end
+			
+			local NextName = key_Gleissystem
+			local value = Token[key_Gleissystem] 
 			if xmlHierarchy[NextName] then -- passt das Token?
-				if log == true then print('> ', NextName, ' ', xmlHierarchy[NextName]) end
+				if debug then print('> ', NextName, ' ', type(xmlHierarchy[NextName])) end
 
 				processToken(NextName, value, xmlHierarchy[NextName], Results)
+			end
+		end
+		for NextName, value in pairs(Token) do
+			if NextName ~= key_Gleissystem then -- Gleissystem wurde vorab verarbeitet
+				if xmlHierarchy[NextName] then -- passt das Token?
+					if debug then print('> ', NextName, ' ', type(xmlHierarchy[NextName])) end
+
+					processToken(NextName, value, xmlHierarchy[NextName], Results)
+				end
 			end
 		end
 
@@ -1135,7 +1150,10 @@ end
 
 -- Oeffentliche Schnittstelle des Moduls -------------------------------
 
-EEP2Lua._VERSION 				= "2019-07-27"
+EEP2Lua._VERSION 				= "2022-01-03"
+
+-- Extended log
+EEP2Lua.debug					= debug
 
 -- Laufzeit in Sekunden fuer { LoadFile, Parser, Process, Total }
 EEP2Lua.Statistics				= Statistics
@@ -1168,4 +1186,9 @@ EEP2Lua.Gleisart				= Gleisart
 EEP2Lua.KontaktTyp 				= KontaktTyp 				-- {Typ, Farbe}
 EEP2Lua.GebaeudesammlungText 	= GebaeudesammlungText
 
-return EEP2Lua
+return function (options)
+		-- Erweiterte Protokollausgabe
+		debug = options and options.debug or false
+
+		return EEP2Lua
+	end

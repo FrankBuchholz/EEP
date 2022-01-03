@@ -3,50 +3,43 @@ Datei: EEP_Inventar.lua
 
 Analyse einer EEP-Anlage-Datei
 
-Frank Buchholz, 2019
-]]
+Frank Buchholz, 2019-2022
 
-local _VERSION = 'v2019-07-27'
+Beispiel:
 
--- In Variable input_file wird der Pfad zur Anlagen-Datei eingetragen
--- Hier einige Varianten unter der Annahme, dass dieses Script im LUA-Ordner der EEP-Installation liegt:
-local input_files = {
-	-- relativer Pfad beim Start aus dem Lua Ordner von EEP heraus
-	[1] = "../Resourcen/Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3", 		-- Laufzeit ca 0.5 Sekunden
-	[2] = "../Resourcen/Anlagen/Demo.anl3",											-- Laufzeit ca 12 Sekunden
-	[3] = "../Resourcen/Anlagen/Wasser Demo.anl3",
-	[4] = "../Resourcen/Anlagen/01 Weichen.anl3",
-	[5] = "../Resourcen/Anlagen/b_maik_DEMO_T-Kreuzung_rechts_vor_links/b_maik_DEMO_T-Kreuzung_rechts_vor_links.anl3",
-	-- relativer Pfad bei standalone-Ausfuehrung im Editor SciTE
-	[11] = "../Resourcen/Anlagen/Tutorials/Tutorial_57_sanftes_Ankuppeln.anl3",
-	[12] = "../Resourcen/Anlagen/Demo.anl3"
-
-}
--- Welche Datei soll es sein?
-local input_file = input_files[ 5 ]
-
--- Hier den Pfad zur zusaezlichen Ausgabe-Datei angeben (siehe printtofile)
+-- PrintToFile (optional) https://emaps-eep.de/lua/printtofile
 local output_file = "C:/temp/output.txt"
+require("PrintToFile_BH2"){ file = output_file, output = 1 }
+clearlog()
 
--- require('EEP_Inventar')--{file = '02 Kontakte.anl3'}
+-- Modul laden, ggf 
+--local EEP_Inventar = require('EEP_Inventar'){ debug = true } -- mit erweiterter Protokollausgabe
+local EEP_Inventar = require('EEP_Inventar'){}
 
---[[------ printtofile (optional)--------------------------------------
-Quelle:
-https://emaps-eep.de/lua/printtofile
+-- EEP-Anlagedatei verarbeiten
+local input_file = "C:\\EEP17\\Resourcen\\Anlagen\\Tutorials\\Tutorial_57_sanftes_Ankuppeln.anl3"
+-- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert 
+local sutrackp = EEP_Inventar.loadFile(input_file)
 
-Benoetigte Dateien im LUA-Ordner:
-PrintToFile_BH2.lua
+-- Alles anzeigen
+EEP_Inventar.printInventar()
 
-output:
-0: keine Ausgabe (kann Sinn machen, wenn direkt die Ausgabedatei ueberwacht wird)
-1: normale Ausgabe (Standardwert)
-2: Ausgabe wie in Datei (diese kann sich von der normalen Ausgabe leicht unterscheiden)
---]]
-if EEPVer then -- Nur notwendig wenn das Skript aus EEP heraus gestartet wird
-	require("PrintToFile_BH2"){file = output_file, output = 1}
+function EEPMain()
+    return 0
 end
 
+]]
 
+local _VERSION = '2022-01-03'
+
+local debug = false
+
+local Anlage = {}
+
+local function loadFile(inputFile)
+	-- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert 
+	local sutrackp = Anlage.loadFile(inputFile)
+end
 
 local function sortedTable(tab, func)
 	-- Hilfsfunktion zur Sortierung einer Tabelle
@@ -64,9 +57,13 @@ local function sortedTable(tab, func)
 	return iter
 end
 
-local function printUebersicht(Anlage)
-	print('')
+local function printVersion()
+	print('EEP_Inventar Version', ' ',	_VERSION)
+	print('EEP2Lua Version', ' ',		Anlage._VERSION)
+end
 
+local function printUebersicht()
+	print('Auswertung der Anlage', ' ',	Anlage.Datei )
 	print('Dateigroessee: ', 				math.floor(Anlage.Statistics.FileSize / 1000), ' kB')
 	print('Laufzeit:')
 	print('Datei laden: ', 					string.format("%.3f", Anlage.Statistics.LoadFileTime), ' sek')
@@ -85,7 +82,7 @@ local function printUebersicht(Anlage)
 	end
 end
 
-local function printGleisUebersicht(Anlage)
+local function printGleisUebersicht()
 	-- Ausgabe der Informationen zur Anlage
 	-- Das Komma am Anfang der Zeilen innerhalb von print erleichtert es, einzelne Zeilen auszukommentieren.
 
@@ -95,7 +92,7 @@ local function printGleisUebersicht(Anlage)
 		if Gleissystem.Anzahl.Gleise > 0 then
 		print(
 			  Anlage.GleissystemText[GleissystemID], ' '
-			, 'Laenge=', 			string.format('%d', Gleissystem.Laenge), 'm '
+			, 'Laenge=', 			string.format('%.2f', Gleissystem.Laenge), 'm '
 			, 'Gleise=', 			Gleissystem.Anzahl.Gleise, ' '
 			, 'Kontakte=', 			Gleissystem.Anzahl.Kontakte, ' '
 			, 'Signale=', 			Gleissystem.Anzahl.Signale, ' '
@@ -106,7 +103,7 @@ local function printGleisUebersicht(Anlage)
 	end
 end
 
-local function printGleise(Anlage)
+local function printGleise()
 
 	local function printAnschluss(Text, GleisA, PositionA, GleisB, AnschlussB, Virtuell)
 		if GleisB then
@@ -116,15 +113,15 @@ local function printGleise(Anlage)
 			print( '  '
 				, 'Gleis=', GleisA.GleisID, ' '
 				, Text, ' '
-				, 'x=' .. string.format('%d', PositionA.x) .. 'm' .. ' '
-				, 'y=' .. string.format('%d', PositionA.y) .. 'm' .. ' '
-				, ( math.abs(PositionA.z) >= 1 and 'z=' .. string.format('%d', PositionA.z) .. 'm' or '') .. ' '
+				, 'x=' .. string.format('%.2f', PositionA.x) .. 'm' .. ' '
+				, 'y=' .. string.format('%.2f', PositionA.y) .. 'm' .. ' '
+				, ( math.abs(PositionA.z) >= 1 and 'z=' .. string.format('%.2f', PositionA.z) .. 'm' or '') .. ' '
 
 				, 'Gleis=', GleisB.GleisID, ' '
 				, AnschlussB, ' '
-				, 'x=' .. string.format('%d', PositionB.x) .. 'm' .. ' '
-				, 'y=' .. string.format('%d', PositionB.y) .. 'm' .. ' '
-				, ( math.abs(PositionB.z) >= 1 and 'z=' .. string.format('%d', PositionB.z) .. 'm' or '') .. ' '
+				, 'x=' .. string.format('%.2f', PositionB.x) .. 'm' .. ' '
+				, 'y=' .. string.format('%.2f', PositionB.y) .. 'm' .. ' '
+				, ( math.abs(PositionB.z) >= 1 and 'z=' .. string.format('%.2f', PositionB.z) .. 'm' or '') .. ' '
 
 				, ( Virtuell and 'virtuell' or '') .. ' '
 
@@ -144,9 +141,9 @@ local function printGleise(Anlage)
 				print(
 					  Anlage.GleissystemText[GleissystemID], ' '
 					, 'Gleis=', GleisID, ' ', ' '
-					, 'x=' .. string.format('%d', Gleis.Position.x) .. 'm' .. ' '
-					, 'y=' .. string.format('%d', Gleis.Position.y) .. 'm' .. ' '
-					, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Gleis.Position.z) .. 'm' or '') .. ' '
+					, 'x=' .. string.format('%.2f', Gleis.Position.x) .. 'm' .. ' '
+					, 'y=' .. string.format('%.2f', Gleis.Position.y) .. 'm' .. ' '
+					, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%.2f', Gleis.Position.z) .. 'm' or '') .. ' '
 				)
 
 				for key, Verbindung in pairs(Gleis.Verbindung) do
@@ -161,7 +158,7 @@ local function printGleise(Anlage)
 	end
 end
 
-local function printKontakte(Anlage)
+local function printKontakte()
 	print('')
 	print('Kontakte:')
 	for GleissystemID, Gleissystem in pairs(Anlage.Kontakte) do
@@ -180,9 +177,9 @@ local function printKontakte(Anlage)
 			print(
 				  Anlage.GleissystemText[GleissystemID], ' '
 				, 'Gleis ', GleisID, ' '
-				, 'x=' .. string.format('%d', Gleis.Position.x) .. 'm', ' '
-				, 'y=' .. string.format('%d', Gleis.Position.y) .. 'm', ' '
-					, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Gleis.Position.z) .. 'm' or ''), ' '
+				, 'x=' .. string.format('%.2f', Gleis.Position.x) .. 'm', ' '
+				, 'y=' .. string.format('%.2f', Gleis.Position.y) .. 'm', ' '
+					, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%.2f', Gleis.Position.z) .. 'm' or ''), ' '
 			)
 		]]
 			for Nr, Kontakt in pairs(Gleis) do
@@ -192,10 +189,10 @@ local function printKontakte(Anlage)
 					, ' Gleis=', Kontakt.Gleis.GleisID, ' '
 					, ' Kontakt ', 	Nr, ' '
 
-				--	, 'x=' .. string.format('%d', Gleis.Position.x) .. 'm', ' '
-				--	, 'y=' .. string.format('%d', Gleis.Position.y) .. 'm', ' '
-				--	, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Gleis.Position.z) .. 'm' or ''), ' '
-					, '+', 			string.format('%d', Kontakt.relPosition), 'm', ' '
+				--	, 'x=' .. string.format('%.2f', Gleis.Position.x) .. 'm', ' '
+				--	, 'y=' .. string.format('%.2f', Gleis.Position.y) .. 'm', ' '
+				--	, ( math.abs(Gleis.Position.z) >= 1 and 'z=' .. string.format('%.2f', Gleis.Position.z) .. 'm' or ''), ' '
+					, '+', 			string.format('%.2f', Kontakt.relPosition), 'm', ' '
 
 					, 'Typ=', 		Kontakt.SetType, ' '
 					, ( Anlage.KontaktTyp[Kontakt.SetType] and Anlage.KontaktTyp[Kontakt.SetType].Typ .. ' ' or '' )
@@ -214,7 +211,7 @@ local function printKontakte(Anlage)
 	end
 end
 
-local function printSignale(Anlage)
+local function printSignale()
 	print('')
 	print('Signale:')
 	for GleissystemID, Signale in pairs(Anlage.Signale) do
@@ -239,10 +236,10 @@ local function printSignale(Anlage)
 			print(
 				  'Signal ', SignalID, ' \"', Signal.name, '\": '
 				, Anlage.GleissystemText[Signal.Gleis.Gleissystem.GleissystemID], ' Gleis=', Signal.Gleis.GleisID, ' '
-			--	, 'x=' .. 			string.format('%d', Signal.Position.x) .. 'm', ' '
-			--	, 'y=' .. 			string.format('%d', Signal.Position.y) .. 'm', ' '
-			--	, ( math.abs(Signal.Position.z) >= 1 and 'z=' .. string.format('%d', Signal.Position.z) .. 'm' or ''), ' '
-				, '+', 				string.format('%d', Signal.relPosition), 'm, '
+			--	, 'x=' .. 			string.format('%.2f', Signal.Position.x) .. 'm', ' '
+			--	, 'y=' .. 			string.format('%.2f', Signal.Position.y) .. 'm', ' '
+			--	, ( math.abs(Signal.Position.z) >= 1 and 'z=' .. string.format('%.2f', Signal.Position.z) .. 'm' or ''), ' '
+				, '+', 				string.format('%.2f', Signal.relPosition), 'm, '
 
 				, 'Stellung: ', 	Signal.Stellung, ' '
 				, 'Kontakt-Ziel: ', Signal.KontaktZiel, ' ', KontakteString, ' '
@@ -254,7 +251,7 @@ local function printSignale(Anlage)
 	end
 end
 
-local function printFuhrparks(Anlage)
+local function printFuhrparks()
 	print('')
 	--print('Fuhrparks:')
 	for FuhrparkID, Fuhrpark in pairs(Anlage.Fuhrparks) do
@@ -273,7 +270,7 @@ local function printFuhrparks(Anlage)
 	end
 end
 
-local function printImmobilien(Anlage)
+local function printImmobilien()
 	print('')
 	print('Immobilien:')
 	for GebaeudesammlungID, Gebaeudesammlung in pairs(Anlage.Immobilien) do
@@ -287,7 +284,7 @@ local function printImmobilien(Anlage)
 	end
 end
 
-local function printRouten(Anlage)
+local function printRouten()
 	print('')
 	print('Routen:')
 	for RoutenID, Route in sortedTable(Anlage.Routen) do
@@ -297,7 +294,7 @@ local function printRouten(Anlage)
 	end
 end
 
-local function printSounds(Anlage)
+local function printSounds()
 	print('')
 	print('Sounds:')
 	for SoundID, Sound in pairs(Anlage.Sounds) do
@@ -307,7 +304,7 @@ local function printSounds(Anlage)
 	end
 end
 
-local function printZugverbaende(Anlage)
+local function printZugverbaende()
 	print('')
 	print('Zugverbaende:')
 	-- Die Tabelle der Zugverbaende verwendet einen numerischen Schluessel, daher kann pairs verwendet werden
@@ -317,10 +314,10 @@ local function printZugverbaende(Anlage)
 			  'Zugverband ', 	ZugID, ': ', Zugverband.name, ' '
 			, 'Gleisort: ', 	Anlage.GleissystemText[Zugverband.GleissystemID], ' '
 			, 'Gleis: ', 		Zugverband.Gleis.GleisID,  ' '
-			, 'x=' ..			string.format('%d', Zugverband.Gleis.Position.x) .. 'm', ' '
-			, 'y=' .. 			string.format('%d', Zugverband.Gleis.Position.y) .. 'm', ' '
-			, ( math.abs(Zugverband.Gleis.Position.z) >= 1 and 'z=' .. string.format('%d', Zugverband.Gleis.Position.z) .. 'm' or ''), ' '
-			, ( math.abs(Zugverband.Geschwindigkeit) >= 1 and 'v=' .. string.format('%.1d', Zugverband.Geschwindigkeit) .. 'km/h' or ''), ' '
+			, 'x=' ..			string.format('%.2f', Zugverband.Gleis.Position.x) .. 'm', ' '
+			, 'y=' .. 			string.format('%.2f', Zugverband.Gleis.Position.y) .. 'm', ' '
+			, ( math.abs(Zugverband.Gleis.Position.z) >= 1 and 'z=' .. string.format('%.2f', Zugverband.Gleis.Position.z) .. 'm' or ''), ' '
+			, ( math.abs(Zugverband.Geschwindigkeit) >= 1 and 'v=' .. string.format('%.1f', Zugverband.Geschwindigkeit) .. 'km/h' or ''), ' '
 		)
 		for Nr, Rollmaterial in pairs(Zugverband.Rollmaterialien) do
 			print(
@@ -333,7 +330,7 @@ local function printZugverbaende(Anlage)
 	end
 end
 
-local function printRollmaterialien(Anlage)
+local function printRollmaterialien()
 	print('')
 	print('Rollmaterialien:')
 	-- Die Tabelle der Rollmaterialien verwendet den Namen als Schluessel.
@@ -343,15 +340,15 @@ local function printRollmaterialien(Anlage)
 			  name, ' '
 			, ( Rollmaterial.Zugmaschine and 'Zugmaschine' or 'Rollmaterial' ), ' '
 			, 'Zugverband: ', 	Rollmaterial.ZugID, ' ', Rollmaterial.Zugverband.name, ' '
-			, 'x=' .. 			string.format('%d', Rollmaterial.Zugverband.Position.x) .. 'm', ' '
-			, 'y=' .. 			string.format('%d', Rollmaterial.Zugverband.Position.y) .. 'm', ' '
-			, ( math.abs(Rollmaterial.Zugverband.Position.z) >= 1 and 'z=' .. string.format('%d', Rollmaterial.Zugverband.Position.z) .. 'm' or ''), ' '
+			, 'x=' .. 			string.format('%.2f', Rollmaterial.Zugverband.Position.x) .. 'm', ' '
+			, 'y=' .. 			string.format('%.2f', Rollmaterial.Zugverband.Position.y) .. 'm', ' '
+			, ( math.abs(Rollmaterial.Zugverband.Position.z) >= 1 and 'z=' .. string.format('%.2f', Rollmaterial.Zugverband.Position.z) .. 'm' or ''), ' '
 			, 'Datei: ', 		Rollmaterial.typ
 		)
 	end
 end
 
-local function printLuaFunktionen(Anlage)
+local function printLuaFunktionen()
 	print('')
 	print('Lua-Funktionen:')
 	for LuaFN, value in sortedTable(Anlage.LuaFunktionen) do
@@ -360,9 +357,9 @@ local function printLuaFunktionen(Anlage)
 		local PositionenString = ''
 		if value.Positionen[1] then
 			PositionenString =
-				   'x=' .. string.format('%d', value.Positionen[1].x) .. 'm '
-				.. 'y=' .. string.format('%d', value.Positionen[1].y) .. 'm '
-				.. ( math.abs(value.Positionen[1].z) >= 1 and 'z=' .. string.format('%d', value.Positionen[1].z) .. 'm ' or '' )
+				   'x=' .. string.format('%.2f', value.Positionen[1].x) .. 'm '
+				.. 'y=' .. string.format('%.2f', value.Positionen[1].y) .. 'm '
+				.. ( math.abs(value.Positionen[1].z) >= 1 and 'z=' .. string.format('%.2f', value.Positionen[1].z) .. 'm ' or '' )
 				.. ( #value.Positionen > 1 and 	'...' or '' )
 		end
 
@@ -385,7 +382,7 @@ local function printLuaFunktionen(Anlage)
 	end
 end
 
-local function printDateien(Anlage)
+local function printDateien()
 	-- Die Dateitabelle enthaelt die Unterkategorien 'Gleissystem', 'Rollmaterial' und 'Immobile'
 	-- Daher muss die Dateitabelle zweistufig durchlaufen werden
 	print('')
@@ -397,16 +394,16 @@ local function printDateien(Anlage)
 			print(
 				  Dateiname
 				, ' Anzahl=', 	Datei.Anzahl, ' '
-				, ( Datei.Positionen[1] and 'x=' .. string.format('%d', Datei.Positionen[1].x) .. 'm ' or '' )	-- bis zu 10 Positionen stehen zur Verfuegung
-				, ( Datei.Positionen[1] and 'y=' .. string.format('%d', Datei.Positionen[1].y) .. 'm ' or '' )	-- davon zeigen wir hier nur die erste Postion
-				, ( Datei.Positionen[1] and math.abs(Datei.Positionen[1].z) >= 1 and 'z=' .. string.format('%d', Datei.Positionen[1].z) .. 'm' or ''), ' '
+				, ( Datei.Positionen[1] and 'x=' .. string.format('%.2f', Datei.Positionen[1].x) .. 'm ' or '' )	-- bis zu 10 Positionen stehen zur Verfuegung
+				, ( Datei.Positionen[1] and 'y=' .. string.format('%.2f', Datei.Positionen[1].y) .. 'm ' or '' )	-- davon zeigen wir hier nur die erste Postion
+				, ( Datei.Positionen[1] and math.abs(Datei.Positionen[1].z) >= 1 and 'z=' .. string.format('%.2f', Datei.Positionen[1].z) .. 'm' or ''), ' '
 				, ( #Datei.Positionen > 1 and '...' or '' )
 		)
 		end
 	end
 end
 
-local function printKontaktZiele(Anlage)
+local function printKontaktZiele()
 	print('')
 	print('Kontakt-Ziele:')
 	for KontaktZielID, KontaktZiel in pairs(Anlage.KontaktZiele) do
@@ -441,47 +438,64 @@ local function printKontaktZiele(Anlage)
 	end
 end
 
--- EEP-Anlagedatei analysieren ----------------------------------------
-
-if EEPVer then -- Nur moeglich und sinnvoll wenn das Skript aus EEP heraus gestartet wird
-	clearlog()
-	print("EEP Version", " ", string.format('%.1d', EEPVer), " ", "Lua Version", " ", _G._VERSION)
-else
-	print("Lua Version", " ", _G._VERSION)
+local function printInventar()
+	-- Zeige alles
+	printVersion()
+	printUebersicht()
+	printGleisUebersicht()
+	printKontakte()
+	printSignale()
+	printKontaktZiele()
+	printFuhrparks()
+	printImmobilien()
+	printRouten()
+	printSounds()
+	printZugverbaende()
+	printRollmaterialien()
+	printLuaFunktionen()
+	printDateien()
+	printGleise()
 end
 
--- Laden und Verarbeiten der EEP-Anlagen-Datei
--- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert (die Variable wird in diesem Beispiel-Skript nicht weiter verwendet).
-local Anlage 				= require('EEP2Lua')
-local sutrackp 				= Anlage.loadFile(input_file)
+-- Öffentliche Schnittstelle des Moduls
+local EEP_Inventar = {
+	_VERSION				= _VERSION,
 
--- statische Texte und Definitionen stehen direkt nach dem require-Befehl zur Verfuegung (die Variablen werden in diesem Beispiel-Skript nicht weiter verwendet).
-local GleissystemText 		= Anlage.GleissystemText
-local Gleisart				= Anlage.Gleisart
-local KontaktTyp			= Anlage.KontaktTyp
-local GebaeudesammlungText 	= Anlage.GebaeudesammlungText
+	-- statische Texte und Definitionen stehen direkt nach dem require-Befehl zur Verfuegung (die Variablen werden in diesem Beispiel-Skript nicht weiter verwendet).
+	GleissystemText 		= Anlage.GleissystemText,
+	Gleisart				= Anlage.Gleisart,
+	KontaktTyp				= Anlage.KontaktTyp,
+	GebaeudesammlungText 	= Anlage.GebaeudesammlungText,
 
--- Alle anderen Variablen stehen nach Aufruf von loadFile zur Verfuegung
-print('EEP2Lua Version', ' ', 			Anlage._VERSION)
+	-- EEP-Datei laden
+	loadFile				= loadFile,
 
-print('Auswertung der Anlage', ' ', 	Anlage.Datei )
+	-- Alles anzeigen
+	printInventar 			= printInventar,
 
-	printUebersicht(Anlage)
-	printGleisUebersicht(Anlage)
-	printKontakte(Anlage)
-	printSignale(Anlage)
-	printKontaktZiele(Anlage)
-	printFuhrparks(Anlage)
-	printImmobilien(Anlage)
-	printRouten(Anlage)
-	printSounds(Anlage)
-	printZugverbaende(Anlage)
-	printRollmaterialien(Anlage)
-	printLuaFunktionen(Anlage)
-	printDateien(Anlage)
-	printGleise(Anlage)
+	-- Einzelne Teile anzeigen
+	printVersion			= printVersion,
+	printUebersicht			= printUebersicht,
+	printGleisUebersicht	= printGleisUebersicht, 
+	printKontakte			= printKontakte,
+	printSignale			= printSignale,
+	printKontaktZiele		= printKontaktZiele,
+	printFuhrparks			= printFuhrparks,
+	printImmobilien			= printImmobilien,
+	printRouten				= printRouten,
+	printSounds				= printSounds,
+	printZugverbaende		= printZugverbaende,
+	printRollmaterialien	= printRollmaterialien,
+	printLuaFunktionen		= printLuaFunktionen,
+	printDateien			= printDateien,
+	printGleise				= printGleise,
+}
 
--- EEPMain --------------------------------------------------------------
-function EEPMain()
-	return 0
-end
+return function (options)
+		-- Erweiterte Protokollausgabe
+		debug = options and options.debug or false
+
+		Anlage = require('EEP2Lua'){ debug = debug, }
+
+		return EEP_Inventar
+	end
