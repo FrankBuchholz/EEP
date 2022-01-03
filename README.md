@@ -25,13 +25,18 @@ ShowGlobalVariables(true) -- Zeige alle Namen
 
 Es ist mit Lua möglich, eine EEP-Anlagedatei zu lesen und zu analysieren. Dazu dient das Modul `EEP2Lua`, das die xml-Datenstruktur einer Anlagedatei in Lua-Tabellen umwandelt. Das Modul `EEP_Inventar` ist ein Beispiel, wie man diese Lua-Tabellen nutzen kann.  Beide Module können sowohl in einem EEP-Skipt wie auch standalone genutzt werden.
 
+_Achtung: Das neue Gleissystem ab EEP 16 wird nicht unterstützt!_
+
 ### Installation von `EEP2Lua`
 
-Das Modul benötigt Teile des Paketes `xml2lua` von <https://github.com/manoelcampos/xml2lua>
-Benötigte Dateien im LUA-Ordner:
+Die Datei `EEP2Lua.lua` wird in das Lua-Verzeichnis kopiert.
+Weiterhin benötigt das Modul Teile des Paketes `xml2lua` von <https://github.com/manoelcampos/xml2lua>.
+Dazu legt man im Lua-Verzeichnis einen Ordner `xml2lua` an und kopiert dort zumindest folgende Dateien hinein:
 `xml2lua.lua`
 `XmlParser.lua`
 `xmlhandler/tree.lua`
+
+Alternativ kann man mit dem `cmd`-Befehl `mklink /d` eine symbolische Verzeichnisverknüfung auf den entspechenden Github-Ordner anlegen.
 
 ### Aufruf von `EEP2Lua`
 
@@ -62,14 +67,20 @@ local output_file = "C:/temp/output.txt"
 require("PrintToFile_BH2"){ file = output_file, output = 1 }
 clearlog()
 
--- Modul laden
---local EEP_Inventar = require('EEP_Inventar'){ debug = true } -- mit erweiterter Protokollausgabe
-local EEP_Inventar = require('EEP_Inventar'){}
+-- EEP-Anlagedatei
+local inputFile = ".\\Resourcen\\Anlagen\\Tutorials\\Tutorial_57_sanftes_Ankuppeln.anl3"
 
--- EEP-Anlagedatei verarbeiten
-local input_file = "C:\\EEP17\\Resourcen\\Anlagen\\Tutorials\\Tutorial_57_sanftes_Ankuppeln.anl3"
--- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert 
-local sutrackp = EEP_Inventar.loadFile(input_file)
+-- Modul laden und EEP-Anlagedatei verarbeiten
+
+-- Option A
+local EEP_Inventar = require('EEP_Inventar'){ inputFile = inputFile }
+
+-- Option B in zwei Schritten 
+--local EEP_Inventar = require('EEP_Inventar'){}
+--local sutrackp = EEP_Inventar.loadFile(input_file) -- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert
+
+-- Option C wie A oder B jedoch mit erweiterter Protokollausgabe
+--local EEP_Inventar = require('EEP_Inventar'){ inputFile = inputFile, debug = true }
 
 -- Alles anzeigen
 EEP_Inventar.printInventar()

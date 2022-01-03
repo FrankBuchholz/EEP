@@ -89,6 +89,11 @@ sutrackp
 Die Mitte der Anlage hat die Koordinaten x = 0 und y = 0.
 --]]
 
+-- Extend path to search files in folder xml2lua, too
+if string.find(package.path, "xml2lua" , 1 , true) ~= true then 
+	package.path = package.path .. ";.\\lua\\xml2lua\\?.lua"
+end
+
 -- Lokale Daten und Funktionen ----------------------------------------
 
 -- Ausfuehrliche Protokollierung zur Fehleranalyse (true/false)
@@ -386,64 +391,89 @@ Fuer die Umrechnung der Steigung gilt:
 --]]
 
 -- Gleisattribute, linke Seite (in Klammern die Einheit)
+	
+	local x, y, z, zr, wc, w, f, L, al, a, r, sc, s, sm, dx, dy, d, b, xe, ye, we 
+	if xmlGleis.Dreibein then -- EEP up to version 15
 
 	--	  Position des Gleisanfangs auf der Ebene [m]
-	local x		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.x ) / 100
-	local y		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.y ) / 100
+	x		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.x ) / 100
+	y		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.y ) / 100
 
 	--	  absolute Hoehe des Gleisanfangs [m]
-	local z		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.z ) / 100
+	z		= tonumber( xmlGleis.Dreibein.Vektor[1]._attr.z ) / 100
 
 	--	  relative Hoehe [m]
-	local zr	= nil
+	zr	= nil
 
 	--	  Winkel der Drehung des Gleisanfangs um die Z-Achse gegen den Uhrzeigersinn [rad] (vereinfacht!!!)
-	local wc 	= tonumber( xmlGleis.Dreibein.Vektor[3]._attr.y )	-- cos(w)
-	local w		= math.acos( wc ) 									-- [rad]
+	wc 	= tonumber( xmlGleis.Dreibein.Vektor[3]._attr.y )	-- cos(w)
+	w		= math.acos( wc ) 									-- [rad]
 				  * ( tonumber( xmlGleis.Dreibein.Vektor[2]._attr.y ) < 0 and -1 or 1 )
 
 	--	  Skalierung, Faktor bezueglich der Laenge [dimensionslos]
-	local f		= tonumber( xmlGleis._attr.scale )
+	f		= tonumber( xmlGleis._attr.scale )
 
 -- Gleisattribute, rechte Seite
 
 	--	  Laenge des Gleises [m]
-	local L		= tonumber( xmlGleis.Charakteristik._attr.Laenge )	/ 100
+	L		= tonumber( xmlGleis.Charakteristik._attr.Laenge )	/ 100
 
 	--	  Winkel der Kruemmung auf der Ebene gegen den Uhrzeigersinn [rad]
-	local al	= tonumber( xmlGleis.Charakteristik._attr.Kruemmung ) * 100	-- normalisiert
-	local a		= L * al											-- [rad]		-- a = 0 fuer gerade Gleise
+	al	= tonumber( xmlGleis.Charakteristik._attr.Kruemmung ) * 100	-- normalisiert
+	a		= L * al											-- [rad]		-- a = 0 fuer gerade Gleise
 
 	--	  Radius der Kruemmung auf der Ebene [m]
-	local r		= (a ~= 0 and L / a or 0)	-- oder r = 1 / al						-- r = 0 fuer gerade Gleise
+	r		= (a ~= 0 and L / a or 0)	-- oder r = 1 / al						-- r = 0 fuer gerade Gleise
 
 	--	  Steigung [rad] (vereinfacht!!!)
-	local sc 	= tonumber( xmlGleis.Dreibein.Vektor[4]._attr.z ) 	-- cos(s)
-	local s 	= math.acos( sc )									-- [rad]
+	sc 	= tonumber( xmlGleis.Dreibein.Vektor[4]._attr.z ) 	-- cos(s)
+	s 	= math.acos( sc )									-- [rad]
 				  * ( tonumber( xmlGleis.Dreibein.Vektor[2]._attr.z ) < 0 and -1 or 1 )
 
 	--	  Steigung [m]
-	local sm 	= L * math.asin( s )
+	sm 	= L * math.asin( s )
 
 -- vereinfachte 2D-Berechnung fuer das Gleisende
 
 	--	  Abstand zwischen Anfangs- und Endpunkt eines gekruemmtes Gleises [m]
-	local dx	= (a ~= 0 and r * math.sin( a )			or 0 )
-	local dy	= (a ~= 0 and r * ( 1 - math.cos( a ))	or 0 )
+	dx	= (a ~= 0 and r * math.sin( a )			or 0 )
+	dy	= (a ~= 0 and r * ( 1 - math.cos( a ))	or 0 )
 
 	--	  effektive Laenge eines Gleises
-	local d		= (a ~= 0 and math.sqrt( dx * dx + dy * dy ) or L)				-- d = L fuer gerade Gleise
+	d		= (a ~= 0 and math.sqrt( dx * dx + dy * dy ) or L)				-- d = L fuer gerade Gleise
 
 	--	  Winkel zwischen Anfangs- und Endpunkt [m]								-- a = 0 fuer gerade Gleise
-	local b		= a / 2 		-- bzw. asin( dy / d ) oder acos( dx / d )
+	b		= a / 2 		-- bzw. asin( dy / d ) oder acos( dx / d )
 
 	--	  Position des Gleisendes auf der Ebene unter Beruecksichtigung von Drehung und Kruemmung [m]
-	local xe	= x + d * math.cos( w + b )
-	local ye	= y + d * math.sin( w + b )
+	xe	= x + d * math.cos( w + b )
+	ye	= y + d * math.sin( w + b )
 
 	--	  Winkel der Drehung des Gleisendes um die Z-Achse gegen den Uhrzeigersinn [rad]
-	local we	= w + a
+	we	= w + a
 
+	else -- EEP as of version 16
+		x	= 0
+		y 	= 0
+		z 	= 0
+		zr 	= 0
+		wc 	= 0
+		w 	= 0
+		f 	= 0
+		L 	= 0
+		al 	= 0
+		a 	= 0
+		r	= 0
+		sc 	= 0
+		sm 	= 0
+		dx 	= 0
+		dy 	= 0
+		d 	= 0
+		b 	= 0
+		xe 	= 0
+		ye 	= 0
+		we	= 0
+	end -- if xmlGleis.Dreibein
 
 	local GleisID = tonumber(xmlGleis._attr.GleisID)
 
@@ -1127,8 +1157,8 @@ local function loadFile(input_file)
 	-- Informationen zur EEP-Anlage bereitstellen
 	EEP2Lua.Datei 					= input_file
 	EEP2Lua.Beschreibung			= sutrackp.Beschreibung
-	EEP2Lua.EEP						= sutrackp.Version._attr.EEP
-	EEP2Lua.No3DMs					= sutrackp.Version._attr.No3DMs
+	EEP2Lua.EEP						= sutrackp.Version and sutrackp.Version._attr.EEP or nil
+	EEP2Lua.No3DMs					= sutrackp.Version and sutrackp.Version._attr.No3DMs or nil
 
 	EEP2Lua.Fuhrparks				= Fuhrparks
 	EEP2Lua.Zugverbaende			= Zugverbaende
@@ -1190,5 +1220,14 @@ return function (options)
 		-- Erweiterte Protokollausgabe
 		debug = options and options.debug or false
 
+		-- Load file if filename is provided
+		if options and options.inputFile then
+			assert(type(options.inputFile) == "string", "EEP2Lua: options.inputFile is not a string") 
+			
+			if debug then print("EEP2Lua: options.inputFile = ", options.inputFile) end
+
+			loadFile( options.inputFile )
+		end	
+		
 		return EEP2Lua
 	end

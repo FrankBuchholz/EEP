@@ -12,14 +12,20 @@ local output_file = "C:/temp/output.txt"
 require("PrintToFile_BH2"){ file = output_file, output = 1 }
 clearlog()
 
--- Modul laden, ggf 
---local EEP_Inventar = require('EEP_Inventar'){ debug = true } -- mit erweiterter Protokollausgabe
-local EEP_Inventar = require('EEP_Inventar'){}
+-- EEP-Anlagedatei
+local inputFile = ".\\Resourcen\\Anlagen\\Tutorials\\Tutorial_57_sanftes_Ankuppeln.anl3"
 
--- EEP-Anlagedatei verarbeiten
-local input_file = "C:\\EEP17\\Resourcen\\Anlagen\\Tutorials\\Tutorial_57_sanftes_Ankuppeln.anl3"
--- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert 
-local sutrackp = EEP_Inventar.loadFile(input_file)
+-- Modul laden und EEP-Anlagedatei verarbeiten
+
+-- Option A
+local EEP_Inventar = require('EEP_Inventar'){ inputFile = inputFile }
+
+-- Option B in zwei Schritten 
+--local EEP_Inventar = require('EEP_Inventar'){}
+--local sutrackp = EEP_Inventar.loadFile(input_file) -- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert
+
+-- Option C wie A oder B jedoch mit erweiterter Protokollausgabe
+--local EEP_Inventar = require('EEP_Inventar'){ inputFile = inputFile, debug = true }
 
 -- Alles anzeigen
 EEP_Inventar.printInventar()
@@ -495,7 +501,17 @@ return function (options)
 		-- Erweiterte Protokollausgabe
 		debug = options and options.debug or false
 
-		Anlage = require('EEP2Lua'){ debug = debug, }
+		-- Store filename if provided
+		local inputFile
+		if options and options.inputFile then
+			assert( (type(options.inputFile) == "string"), "EEP2Lua: options.inputFile is not a string") 
+		
+			if debug then print("EEP_inventar: option inputFile = ", options.inputFile) end
+
+			inputFile = options.inputFile
+		end	
+
+		Anlage = require('EEP2Lua'){ inputFile = inputFile, debug = debug }
 
 		return EEP_Inventar
 	end
