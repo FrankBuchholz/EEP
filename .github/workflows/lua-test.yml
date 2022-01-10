@@ -23,5 +23,5 @@ jobs:
           luarocks install luacov-coveralls
       - name: test
         run: |
-          luacheck --std max+busted lua/LUA
+          luacheck --std max+busted .
           busted --verbose --coverage --
