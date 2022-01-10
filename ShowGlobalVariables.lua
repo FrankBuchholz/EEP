@@ -1,4 +1,4 @@
--- Module 
+-- Module
 --[[
 Module ShowGlobalVariables.lua
 
@@ -8,7 +8,7 @@ Zumeist funktioniert das Skript dann trotzdem wie erwartet, so dass dieser Fehle
 Das Modul ShowGlobalVariables zeigt globale Variablen und globale Funktionen.
 Die bekannten Namen aus EEP bzw. von Lua können unterdrückt werden, so dass man nur die selbst definierten Namen erhält.
 
-Verwendung: 
+Verwendung:
 local ShowGlobalVariables = require('ShowGlobalVariables')
 ShowGlobalVariables()		-- Unterdrücke bekannte Namen
 ShowGlobalVariables(true)	-- Zeige alle Namen
@@ -152,7 +152,7 @@ local NamesTable = {
 
 	'EEPRollingstockGetActive', -- Ermittelt, welches Fahrzeug derzeit im Steuerdialog ausgewählt ist.
 	'EEPRollingstockSetActive', -- Wählt das angegebene Fahrzeug im Steuerdialog aus.
-	'EEPRollingstockGetOrientation', -- Ermittelt, welche relative Ausrichtung das angegebene Fahrzeug im Zugverband hat.	
+	'EEPRollingstockGetOrientation', -- Ermittelt, welche relative Ausrichtung das angegebene Fahrzeug im Zugverband hat.
 
 	'EEPGetTrainActive', -- Ermittelt, welcher Zug derzeit im Steuerdialog ausgewählt ist.
 	'EEPSetTrainActive', -- Wählt den angegebenen Zug im Steuerdialog aus.
@@ -161,7 +161,7 @@ local NamesTable = {
 	-- EEP 16.1 functions
 
 	'EEPActivateCtrlDesk',	-- Ruft das Stellpult im Radarfenster auf
-	
+
 	'EEPGetCameraPosition',
 	'EEPSetCameraPosition',
 
@@ -174,10 +174,10 @@ local NamesTable = {
 	'EEPOnSaveAnl',
 
 	'EEPOnTrainExitTrainyard',
-	
+
 	'EEPOnTrainCoupling',
 	'EEPOnTrainLooseCoupling',
-	
+
 	'EEPRollingstockGetHook',
 	'EEPRollingstockGetHookGlue',
 	'EEPRollingstockGetMileage',
@@ -188,7 +188,7 @@ local NamesTable = {
 	'EEPRollingstockSetHorn',	-- Lässt bei einem bestimmten Rollmaterial den Warnton (Pfeife, Hupe) ertönen
 	'EEPRollingstockSetSmoke',
 	'EEPRollingstockSetUserCamera',
-	
+
 	'EEPGetCloudsIntensity',
 	'EEPGetFogIntensity',
 	'EEPGetHailIntensity',
@@ -217,8 +217,8 @@ local NamesTable = {
 	'EEPGetAnlVer',					-- EEP-Versionsnummer, mit der die Anlage vor dem Öffnen zuletzt gespeichert wurde
 	'EEPGetAnlLng',					-- liefert die auf Achsnamen bezogene "Anlagensprache" (als GER, ENG oder FRA)
 	'EEPRollingstockGetUserCamera',	-- related to EEPRollingstockSetUserCamera
-	
-	
+
+
 	-- Lua standard variables
 	'_G',
 	'_VERSION',
@@ -257,10 +257,10 @@ local NamesTable = {
 	'type',
 	'xpcall',
 }
- 
+
 -- Tabelle (mit impliziten numerischen Schlüssel) in Tabelle mit explizites Schlüsseln übertragen
 local NamesSet = {}
-for key, name in pairs(NamesTable) do 
+for key, name in pairs(NamesTable) do
 	NamesSet[name] = true
 end
 
@@ -269,15 +269,15 @@ print("Global Variables:")
 print("")
 
 -- Show EEP global variables
-for key, value in pairs(_G) do 
+for key, value in pairs(_G) do
 	if all == true or not NamesSet[key] then
 	if  string.sub(key, 1, 3) == "EEP" then
-	if type(value) == "string" or type(value) == "number" then 
-		print(key, " [", type(value), "] = ", value) 
+	if type(value) == "string" or type(value) == "number" then
+		print(key, " [", type(value), "] = ", value)
 	elseif type(value) == "table" then
 		local size = 0
 		for k,v in pairs(value) do size = size + 1 end
-		print(key, " [", type(value), "] ", size, " entries") 
+		print(key, " [", type(value), "] ", size, " entries")
 	end
 	end
 	end
@@ -286,15 +286,15 @@ end
 print("")
 
 -- Show other global variables
-for key, value in pairs(_G) do 
+for key, value in pairs(_G) do
 	if all == true or not NamesSet[key] then
 	if  string.sub(key, 1, 3) ~= "EEP" then
-	if type(value) == "string" or type(value) == "number" then 
-		print(key, " [", type(value), "] = ", value) 
+	if type(value) == "string" or type(value) == "number" then
+		print(key, " [", type(value), "] = ", value)
 	elseif type(value) == "table" then
 		local size = 0
 		for k,v in pairs(value) do size = size + 1 end
-		print(key, " [", type(value), "] ", size, " entries") 
+		print(key, " [", type(value), "] ", size, " entries")
 	end
 	end
 	end
@@ -305,10 +305,10 @@ print("Functions:")
 print("")
 
 -- Show EEP functions
-for key, value in pairs(_G) do 
+for key, value in pairs(_G) do
 	if all == true or not NamesSet[key] then
-	if type(value) == "function" and string.sub(key, 1, 3) == "EEP" then 
-		print(key) 
+	if type(value) == "function" and string.sub(key, 1, 3) == "EEP" then
+		print(key)
 	end
 	end
 end
@@ -316,10 +316,10 @@ end
 print("")
 
 -- Show other functions
-for key, value in pairs(_G) do 
+for key, value in pairs(_G) do
 	if all == true or not NamesSet[key] then
-	if type(value) == "function" and string.sub(key, 1, 3) ~= "EEP" then 
-		print(key) 
+	if type(value) == "function" and string.sub(key, 1, 3) ~= "EEP" then
+		print(key)
 	end
 	end
 end

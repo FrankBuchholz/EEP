@@ -3,7 +3,8 @@ Datei: EEP2Lua.lua
 
 Das Modul EEP2Lua liest und konvertiert eine EEP-Anlage-Datei in Lua-Tabellen.
 
-Achtung: Wenn man dieses Modul in EEP fuer die aktuellen Anlage nutzen will, z.B. weil man die Zugliste ermitteln will, dann muss man aufpassen: Es kann nicht der aktuelle Zustand der aktuellen EEP-Anlage gelesen werden sondern nur der zuletzt gespeicherte Zustand!
+Achtung: Wenn man dieses Modul in EEP fuer die aktuellen Anlage nutzen will, z.B. weil man die Zugliste ermitteln will, dann muss man aufpassen:
+Es kann nicht der aktuelle Zustand der aktuellen EEP-Anlage gelesen werden sondern nur der zuletzt gespeicherte Zustand!
 Man muss also selber sicherstellen, dass die EEP-Anlage vor Aufruf dieses Moduls gespeichert wurde!
 
 Aufruf:
@@ -20,9 +21,11 @@ Anlage.Zugverbaende
 Anlage.Rollmaterialien
 usw.
 
-Die Feldlisten entnimmt man am Besten den unten markierten Programmstellen oder dem Beispiel-Skript EEP_Inventar.lua . (Die Feldlisten hier aufzufuehren waere mir bei Änderungen zu fehlertraechtig.)
+Die Feldlisten entnimmt man am Besten den unten markierten Programmstellen oder dem Beispiel-Skript EEP_Inventar.lua .
+(Die Feldlisten hier aufzufuehren waere mir bei Änderungen zu fehlertraechtig.)
 
-Die Lua-Datei EEP_Inventar.lua sollte im LUA-Ordner der EEP-Programminstallation angelegt werden und kann sowohl aus EEP heraus mit require('EEP_Inventar') wie auch standalone z.B. in SciTE in gestartet werden.
+Die Lua-Datei EEP_Inventar.lua sollte im LUA-Ordner der EEP-Programminstallation angelegt werden und kann sowohl
+aus EEP heraus mit require('EEP_Inventar') wie auch standalone z.B. in SciTE in gestartet werden.
 
 Das Modul benoetigt Teile des Paketes xml2lua
 Quelle:
@@ -90,7 +93,7 @@ Die Mitte der Anlage hat die Koordinaten x = 0 und y = 0.
 --]]
 
 -- Extend path to search files in folder xml2lua, too
-if string.find(package.path, "xml2lua" , 1 , true) ~= true then 
+if string.find(package.path, "xml2lua" , 1 , true) ~= true then
 	package.path = package.path .. ";.\\lua\\xml2lua\\?.lua"
 end
 
@@ -391,8 +394,8 @@ Fuer die Umrechnung der Steigung gilt:
 --]]
 
 -- Gleisattribute, linke Seite (in Klammern die Einheit)
-	
-	local x, y, z, zr, wc, w, f, L, al, a, r, sc, s, sm, dx, dy, d, b, xe, ye, we 
+
+	local x, y, z, zr, wc, w, f, L, al, a, r, sc, s, sm, dx, dy, d, b, xe, ye, we
 	if xmlGleis.Dreibein then -- EEP up to version 15
 
 	--	  Position des Gleisanfangs auf der Ebene [m]
@@ -1088,9 +1091,9 @@ local function processToken(
 		local key_Gleissystem = "Gleissystem"
 		if Token[key_Gleissystem] then -- Gleissystem vorab verarbeiten
 			if debug then print('Token.Gleissystem gefunden') end
-			
+
 			local NextName = key_Gleissystem
-			local value = Token[key_Gleissystem] 
+			local value = Token[key_Gleissystem]
 			if xmlHierarchy[NextName] then -- passt das Token?
 				if debug then print('> ', NextName, ' ', type(xmlHierarchy[NextName])) end
 
@@ -1222,12 +1225,12 @@ return function (options)
 
 		-- Load file if filename is provided
 		if options and options.inputFile then
-			assert(type(options.inputFile) == "string", "EEP2Lua: options.inputFile is not a string") 
-			
+			assert(type(options.inputFile) == "string", "EEP2Lua: options.inputFile is not a string")
+
 			if debug then print("EEP2Lua: options.inputFile = ", options.inputFile) end
 
 			loadFile( options.inputFile )
-		end	
-		
+		end
+
 		return EEP2Lua
 	end

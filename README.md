@@ -21,9 +21,9 @@ ShowGlobalVariables()  -- Unterdrücke bekannte Namen
 ShowGlobalVariables(true) -- Zeige alle Namen
 ```
 
-## Module `EEP2Lua` / `EEP_Inventar`
+## Module `EEP2Lua`
 
-Es ist mit Lua möglich, eine EEP-Anlagedatei zu lesen und zu analysieren. Dazu dient das Modul `EEP2Lua`, das die xml-Datenstruktur einer Anlagedatei in Lua-Tabellen umwandelt. Das Modul `EEP_Inventar` ist ein Beispiel, wie man diese Lua-Tabellen nutzen kann.  Beide Module können sowohl in einem EEP-Skipt wie auch standalone genutzt werden.
+Es ist mit Lua möglich, eine EEP-Anlagedatei zu lesen und zu analysieren. Dazu dient das Modul `EEP2Lua`, das die xml-Datenstruktur einer Anlagedatei in Lua-Tabellen umwandelt. Das Modul `EEP_Inventar` ist ein Beispiel, wie man diese Lua-Tabellen nutzen kann. Beide Module können sowohl in einem EEP-Skript wie auch standalone genutzt werden.
 
 _Achtung: Das neue Gleissystem ab EEP 16 wird nicht unterstützt!_
 
@@ -92,6 +92,36 @@ end
 
 Die Funktionsliste neben `printInventar` entnimmt man am Besten dem Modul selber.
 
+Wenn man diese Module für die aktuell in EEP geladene Anlage nutzen will, dann benötigt man einen Trick, um den Namen der Datei zu erhalten. Das kann dann z.B. so aussehen:
+
+``` lua
+function EEPOnSaveAnl(Anlagenpfad)
+    print("Die Anlage wurde unter "..Anlagenpfad.." gespeichert!")
+
+    -- Zeige das Inventar dieser Anlage nachdem sie gesichert wurde
+    if printInventarAfterSave == true then
+        printInventar(Anlagenpfad)
+        printInventarAfterSave = false
+    end
+end
+
+function printInventar(inputFile, debug)
+    -- Die Laufzeit des EEP-Inventar-Programmes kann recht lang sein, daher wird EEP währenddessen pausiert
+    print(EEPPause(1) == 1 and "EEP pausiert" or "EEP läuft")
+
+    EEP_Inventar = require('EEP_Inventar'){ inputFile = inputFile }
+
+    -- Alles anzeigen
+    EEP_Inventar.printInventar()
+
+    -- EEP wieder starten
+    print(EEPPause(0) == 1 and "EEP pausiert" or "EEP läuft")
+end
+
+print("Zeige das Inventar dieser Anlage sobald sie gesichert wird")
+printInventarAfterSave = true
+```
+
 ## Notepad++ - Text-Editor (für Lua)
 
 ### User defined language EEP_Lua
@@ -133,3 +163,52 @@ Einschränkung: Es ist so nicht möglich, zu sehen wann welche Module mehrfach g
 Der Stack-Trace wird mit folgender Funktion angezeigt:
 
 `print(debug.traceback("Stack trace", 1)) -- starting with level 1`
+
+## Lua-Tipps
+
+### Zeige Info-Texte für Signale oder Weichen
+
+Zur Anzeige von Info-Texten dient der Aufruf von showInfoTexts(true/false) in EEPMain.
+
+``` lua
+Signale = {} -- Liste der Signal-Nummern
+Weichen = {} -- Liste der Weichen-Nummern 
+function showInfoTexts(status)
+  -- Performanceoptimierung: Speichere existierenede Signal- und Weichennummern, um genau diese später ansprechen zu können
+  if #Signale == 0 or #Weichen == 0 then -- Wurden bereits Signale oder Weichen gefunden?
+    -- Initialisierung  (einmalig)
+    for nr = 1, 9999 do 
+      if EEPGetSignal(nr) > 0 then
+        table.insert(Signale, nr) -- Signal gefunden
+      end  
+      if EEPGetSwitch(nr) > 0 then
+        table.insert(Weichen, nr) -- Weiche gefunden
+      end  
+    end  
+  end
+
+  -- Aktualisierung (regelmäßig in EEPMain)
+    if status == true then
+        for nr in pairs(Signale) do
+          -- Verwendung von string.format um eine Zahl ohne Nachkommastellen anzuzeigen
+          EEPChangeInfoSignal(nr, "<b><bgrgb=0,190,190>Signal "..nr..": "..string.format("%d", EEPGetSignal(nr)) )
+          EEPShowInfoSignal(nr, true) 
+        end
+        for nr in pairs(Weichen) do
+          -- Alternative Verwendung von string.format um den gesamten Text mit mehreren Variablen zu formatieren
+          EEPChangeInfoSwitch(nr, string.format( "<b><bgrgb=200,150,230>Weiche %d: %d",
+            nr, -- Erste Variable, die mit dem ersten %d formatiert wird
+            EEPGetSwitch(nr) -- Zweite Variable, die mit dem zweiten %d formatiert wird
+          ))
+          EEPShowInfoSwitch(nr, true) 
+        end
+    else
+        for nr in pairs(Signale) do
+          EEPShowInfoSignal(nr, false)
+    end  
+        for nr in pairs(Weichen) do
+          EEPShowInfoSwitch(nr, false)
+        end
+    end
+end
+```

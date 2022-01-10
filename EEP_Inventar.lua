@@ -20,7 +20,7 @@ local inputFile = ".\\Resourcen\\Anlagen\\Tutorials\\Tutorial_57_sanftes_Ankuppe
 -- Option A
 local EEP_Inventar = require('EEP_Inventar'){ inputFile = inputFile }
 
--- Option B in zwei Schritten 
+-- Option B in zwei Schritten
 --local EEP_Inventar = require('EEP_Inventar'){}
 --local sutrackp = EEP_Inventar.loadFile(input_file) -- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert
 
@@ -43,7 +43,7 @@ local debug = false
 local Anlage = {}
 
 local function loadFile(inputFile)
-	-- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert 
+	-- Der optionale Rueckgabewert sutrackp enthaelt die Tabellenstruktur in der Form wie sie xml2lua liefert
 	local sutrackp = Anlage.loadFile(inputFile)
 end
 
@@ -325,7 +325,7 @@ local function printZugverbaende()
 			, ( math.abs(Zugverband.Gleis.Position.z) >= 1 and 'z=' .. string.format('%.2f', Zugverband.Gleis.Position.z) .. 'm' or ''), ' '
 			, ( math.abs(Zugverband.Geschwindigkeit) >= 1 and 'v=' .. string.format('%.1f', Zugverband.Geschwindigkeit) .. 'km/h' or ''), ' '
 		)
-		for Nr, Rollmaterial in pairs(Zugverband.Rollmaterialien) do
+		for key, Rollmaterial in pairs(Zugverband.Rollmaterialien) do
 			print(
 	--			Nr, ' ',
 				  Rollmaterial.name, ' '
@@ -482,7 +482,7 @@ local EEP_Inventar = {
 	-- Einzelne Teile anzeigen
 	printVersion			= printVersion,
 	printUebersicht			= printUebersicht,
-	printGleisUebersicht	= printGleisUebersicht, 
+	printGleisUebersicht	= printGleisUebersicht,
 	printKontakte			= printKontakte,
 	printSignale			= printSignale,
 	printKontaktZiele		= printKontaktZiele,
@@ -504,12 +504,12 @@ return function (options)
 		-- Store filename if provided
 		local inputFile
 		if options and options.inputFile then
-			assert( (type(options.inputFile) == "string"), "EEP2Lua: options.inputFile is not a string") 
-		
+			assert( (type(options.inputFile) == "string"), "EEP2Lua: options.inputFile is not a string")
+
 			if debug then print("EEP_inventar: option inputFile = ", options.inputFile) end
 
 			inputFile = options.inputFile
-		end	
+		end
 
 		Anlage = require('EEP2Lua'){ inputFile = inputFile, debug = debug }
 
