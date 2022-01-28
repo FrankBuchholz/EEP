@@ -1,4 +1,4 @@
--- Module 
+-- Module
 --[[
 Module ShowGlobalVariables.lua
 
@@ -253,10 +253,10 @@ local NamesTable = {
 	'type',
 	'xpcall',
 }
- 
+
 -- Tabelle (mit impliziten numerischen Schlüssel) in Tabelle mit explizites Schlüsseln übertragen
 local NamesSet = {}
-for key, name in pairs(NamesTable) do 
+for key, name in pairs(NamesTable) do
 	NamesSet[name] = true
 end
 
@@ -289,9 +289,9 @@ local function showVariable(key, value)
 	if type(value) == "table" then
 		local size = 0
 		for k,v in pairs(value) do size = size + 1 end
-		print(key, " [", type(value), "] ", size, " entries") 
-	else -- if type(value) == "string" or type(value) == "number" then 
-		print(key, " [", type(value), "] = ", value) 
+		print(key, " [", type(value), "] ", size, " entries")
+	else -- if type(value) == "string" or type(value) == "number" then
+		print(key, " [", type(value), "] = ", value)
 	end
 end
 
@@ -300,7 +300,7 @@ local function ShowGlobalVariables(all)
 	print("\nGlobal Variables:")
 
 	-- Show EEP global variables
-	for key, value in pairsByKeys(_G) do 
+	for key, value in pairsByKeys(_G) do
 		if all == true or not NamesSet[key] then
 			if type(value) ~= "function" and string.sub(key, 1, 3) == "EEP" then
 				showVariable(key, value)
@@ -311,7 +311,7 @@ local function ShowGlobalVariables(all)
 	print("")
 
 	-- Show other global variables
-	for key, value in pairsByKeys(_G) do 
+	for key, value in pairsByKeys(_G) do
 		if all == true or not NamesSet[key] then
 			if type(value) ~= "function" and string.sub(key, 1, 3) ~= "EEP" then
 				showVariable(key, value)
@@ -322,10 +322,10 @@ local function ShowGlobalVariables(all)
 	print("\nGlobal Functions:")
 
 	-- Show EEP functions
-	for key, value in pairsByKeys(_G) do 
+	for key, value in pairsByKeys(_G) do
 		if all == true or not NamesSet[key] then
-			if type(value) == "function" and string.sub(key, 1, 3) == "EEP" then 
-				print(key) 
+			if type(value) == "function" and string.sub(key, 1, 3) == "EEP" then
+				print(key)
 			end
 		end
 	end
@@ -333,10 +333,10 @@ local function ShowGlobalVariables(all)
 	print("")
 
 	-- Show other functions
-	for key, value in pairsByKeys(_G) do 
+	for key, value in pairsByKeys(_G) do
 		if all == true or not NamesSet[key] then
-			if type(value) == "function" and string.sub(key, 1, 3) ~= "EEP" then 
-				print(key) 
+			if type(value) == "function" and string.sub(key, 1, 3) ~= "EEP" then
+				print(key)
 			end
 		end
 	end
@@ -352,7 +352,7 @@ local function ShowGlobalVariables(all)
 	end
 	--]]
 	
-	return ShowGlobalVariables -- 
+	return ShowGlobalVariables --
 end
 
 return ShowGlobalVariables
