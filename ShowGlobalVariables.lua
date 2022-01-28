@@ -1,4 +1,4 @@
--- Module
+-- Module 
 --[[
 Module ShowGlobalVariables.lua
 
@@ -8,18 +8,14 @@ Zumeist funktioniert das Skript dann trotzdem wie erwartet, so dass dieser Fehle
 Das Modul ShowGlobalVariables zeigt globale Variablen und globale Funktionen.
 Die bekannten Namen aus EEP bzw. von Lua können unterdrückt werden, so dass man nur die selbst definierten Namen erhält.
 
-Verwendung:
-local ShowGlobalVariables = require('ShowGlobalVariables')
-ShowGlobalVariables()		-- Unterdrücke bekannte Namen
-ShowGlobalVariables(true)	-- Zeige alle Namen
+Verwendung (auch mehrfach):
+require('ShowGlobalVariables')()		-- nur eigene Variablen und Funktionen
+require('ShowGlobalVariables')(true) 	-- auch Variablen und Funktionen von EEP
 
-Frank Buchholz, 2019-2021
+Frank Buchholz, 2019-2022
 ]]
 
-local _VERSION = 'v2021-11-14'
-
--- Die Funktion reicht bis an das Ende des Moduls
-local function ShowGlobalVariables(all)
+local _VERSION = 'v2022-01-28'
 
 -- bekannte Namen, die nicht gezeigt werden sollen
 local NamesTable = {
@@ -152,7 +148,7 @@ local NamesTable = {
 
 	'EEPRollingstockGetActive', -- Ermittelt, welches Fahrzeug derzeit im Steuerdialog ausgewählt ist.
 	'EEPRollingstockSetActive', -- Wählt das angegebene Fahrzeug im Steuerdialog aus.
-	'EEPRollingstockGetOrientation', -- Ermittelt, welche relative Ausrichtung das angegebene Fahrzeug im Zugverband hat.
+	'EEPRollingstockGetOrientation', -- Ermittelt, welche relative Ausrichtung das angegebene Fahrzeug im Zugverband hat.	
 
 	'EEPGetTrainActive', -- Ermittelt, welcher Zug derzeit im Steuerdialog ausgewählt ist.
 	'EEPSetTrainActive', -- Wählt den angegebenen Zug im Steuerdialog aus.
@@ -161,7 +157,7 @@ local NamesTable = {
 	-- EEP 16.1 functions
 
 	'EEPActivateCtrlDesk',	-- Ruft das Stellpult im Radarfenster auf
-
+	
 	'EEPGetCameraPosition',
 	'EEPSetCameraPosition',
 
@@ -174,10 +170,10 @@ local NamesTable = {
 	'EEPOnSaveAnl',
 
 	'EEPOnTrainExitTrainyard',
-
+	
 	'EEPOnTrainCoupling',
 	'EEPOnTrainLooseCoupling',
-
+	
 	'EEPRollingstockGetHook',
 	'EEPRollingstockGetHookGlue',
 	'EEPRollingstockGetMileage',
@@ -188,7 +184,7 @@ local NamesTable = {
 	'EEPRollingstockSetHorn',	-- Lässt bei einem bestimmten Rollmaterial den Warnton (Pfeife, Hupe) ertönen
 	'EEPRollingstockSetSmoke',
 	'EEPRollingstockSetUserCamera',
-
+	
 	'EEPGetCloudsIntensity',
 	'EEPGetFogIntensity',
 	'EEPGetHailIntensity',
@@ -217,8 +213,8 @@ local NamesTable = {
 	'EEPGetAnlVer',					-- EEP-Versionsnummer, mit der die Anlage vor dem Öffnen zuletzt gespeichert wurde
 	'EEPGetAnlLng',					-- liefert die auf Achsnamen bezogene "Anlagensprache" (als GER, ENG oder FRA)
 	'EEPRollingstockGetUserCamera',	-- related to EEPRollingstockSetUserCamera
-
-
+	
+	
 	-- Lua standard variables
 	'_G',
 	'_VERSION',
@@ -257,73 +253,106 @@ local NamesTable = {
 	'type',
 	'xpcall',
 }
-
+ 
 -- Tabelle (mit impliziten numerischen Schlüssel) in Tabelle mit explizites Schlüsseln übertragen
 local NamesSet = {}
-for key, name in pairs(NamesTable) do
+for key, name in pairs(NamesTable) do 
 	NamesSet[name] = true
 end
 
-print("")
-print("Global Variables:")
-print("")
+-- Utility functions to access a table in sorted order
+local sort = function (a, b)
+	if type(a) == "number" and type(b) == "number" then
+		-- sort numbers
+		return a < b
+	else
+		-- sort anything else
+		return string.lower(tostring(a)) < string.lower(tostring(b))
+	end	
+end
+local function pairsByKeys (t, f)
+	local f = f or sort
+	local a = {}
+	for n in pairs(t) do table.insert(a, n) end
+	table.sort(a, f)
+	local i = 0      -- iterator variable
+	local iter = function ()   -- iterator function
+		i = i + 1
+		if a[i] == nil then return nil
+        else return a[i], t[a[i]]
+        end
+	end
+	return iter
+end
 
--- Show EEP global variables
-for key, value in pairs(_G) do
-	if all == true or not NamesSet[key] then
-	if  string.sub(key, 1, 3) == "EEP" then
-	if type(value) == "string" or type(value) == "number" then
-		print(key, " [", type(value), "] = ", value)
-	elseif type(value) == "table" then
+local function showVariable(key, value)
+	if type(value) == "table" then
 		local size = 0
 		for k,v in pairs(value) do size = size + 1 end
-		print(key, " [", type(value), "] ", size, " entries")
-	end
-	end
-	end
-end
-
-print("")
-
--- Show other global variables
-for key, value in pairs(_G) do
-	if all == true or not NamesSet[key] then
-	if  string.sub(key, 1, 3) ~= "EEP" then
-	if type(value) == "string" or type(value) == "number" then
-		print(key, " [", type(value), "] = ", value)
-	elseif type(value) == "table" then
-		local size = 0
-		for k,v in pairs(value) do size = size + 1 end
-		print(key, " [", type(value), "] ", size, " entries")
-	end
-	end
+		print(key, " [", type(value), "] ", size, " entries") 
+	else -- if type(value) == "string" or type(value) == "number" then 
+		print(key, " [", type(value), "] = ", value) 
 	end
 end
 
-print("")
-print("Functions:")
-print("")
+local function ShowGlobalVariables(all)
 
--- Show EEP functions
-for key, value in pairs(_G) do
-	if all == true or not NamesSet[key] then
-	if type(value) == "function" and string.sub(key, 1, 3) == "EEP" then
-		print(key)
+	print("\nGlobal Variables:")
+
+	-- Show EEP global variables
+	for key, value in pairsByKeys(_G) do 
+		if all == true or not NamesSet[key] then
+			if type(value) ~= "function" and string.sub(key, 1, 3) == "EEP" then
+				showVariable(key, value)
+			end
+		end
 	end
+
+	print("")
+
+	-- Show other global variables
+	for key, value in pairsByKeys(_G) do 
+		if all == true or not NamesSet[key] then
+			if type(value) ~= "function" and string.sub(key, 1, 3) ~= "EEP" then
+				showVariable(key, value)
+			end
+		end
 	end
+
+	print("\nGlobal Functions:")
+
+	-- Show EEP functions
+	for key, value in pairsByKeys(_G) do 
+		if all == true or not NamesSet[key] then
+			if type(value) == "function" and string.sub(key, 1, 3) == "EEP" then 
+				print(key) 
+			end
+		end
+	end
+
+	print("")
+
+	-- Show other functions
+	for key, value in pairsByKeys(_G) do 
+		if all == true or not NamesSet[key] then
+			if type(value) == "function" and string.sub(key, 1, 3) ~= "EEP" then 
+				print(key) 
+			end
+		end
+	end
+
+	print("")
+
+	-- Return self to allow a construction like this:
+	--[[
+	ShowGlobalVariables = require("ShowGlobalVariables")() -- show it during initialization
+
+	function EEPMain()
+		ShowGlobalVariables() -- show it regularly
+	end
+	--]]
+	
+	return ShowGlobalVariables -- 
 end
-
-print("")
-
--- Show other functions
-for key, value in pairs(_G) do
-	if all == true or not NamesSet[key] then
-	if type(value) == "function" and string.sub(key, 1, 3) ~= "EEP" then
-		print(key)
-	end
-	end
-end
-
-end -- function ShowGlobalVariables
 
 return ShowGlobalVariables
