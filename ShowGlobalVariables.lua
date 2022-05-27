@@ -15,204 +15,216 @@ require('ShowGlobalVariables')(true) 	-- auch Variablen und Funktionen von EEP
 Frank Buchholz, 2019-2022
 ]]
 
-local _VERSION = 'v2022-01-28'
+local _VERSION = 'v2022-05-27'
 
 -- bekannte Namen, die nicht gezeigt werden sollen
 local NamesTable = {
-	-- EEP 13 variables
+	-- EEP variables
 
-	'EEPTime',
-	'EEPTimeH',
-	'EEPTimeM',
-	'EEPTimeS',
-	'EEPVer',
+	'EEPTime',                            -- EEP 10.2 plug-in 2
+	'EEPTimeH',                           -- EEP 10.2 plug-in 2
+	'EEPTimeM',                           -- EEP 10.2 plug-in 2
+	'EEPTimeS',                           -- EEP 10.2 plug-in 2
+	'EEPVer',                             -- EEP 10.2 plug-in 2
+	'EEPLng',						                  -- EEP 17 
 
+  -- EEP 10.2 functions
+
+	'clearlog',                           -- EEP 10.2 plug-in 2
+	'EEPMain',                            -- EEP 10.2 plug-in 2
+	'EEPGetSignal',                       -- EEP 10.2 plug-in 2
+	'EEPGetSwitch',                       -- EEP 10.2 plug-in 2
+	'EEPOnSignal_1',	                    -- EEP 10.2 plug-in 2
+	'EEPOnSwitch_1',	                    -- EEP 10.2 plug-in 2
+	'EEPRegisterSignal',                  -- EEP 10.2 plug-in 2
+	'EEPRegisterSwitch',                  -- EEP 10.2 plug-in 2
+	'EEPSetSignal',                       -- EEP 10.2 plug-in 2
+	'EEPSetSwitch',                       -- EEP 10.2 plug-in 2
+
+  -- EEP 11.0 functions
+
+	'EEPGetTrainSpeed',                   -- EEP 11.0
+	'EEPLoadData',                        -- EEP 11.0
+	'EEPRollingstockGetAxis',             -- EEP 11.0
+	'EEPRollingstockGetCouplingFront',    -- EEP 11.0
+	'EEPRollingstockGetCouplingRear',     -- EEP 11.0
+	'EEPRollingstockSetAxis',             -- EEP 11.0
+	'EEPRollingstockSetCouplingFront',    -- EEP 11.0
+	'EEPRollingstockSetCouplingRear',     -- EEP 11.0
+	'EEPRollingstockSetSlot',             -- EEP 11.0
+	'EEPSaveData',                        -- EEP 11.0
+	'EEPSetTrainSpeed',                   -- EEP 11.0
+
+  -- EEP 11.1 functions
+
+	'EEPStructureAnimateAxis',            -- EEP 11.1 Plug-in 1
+	'EEPStructureGetAxis',                -- EEP 11.1 Plug-in 1
+	'EEPStructureGetFire',                -- EEP 11.1 Plug-in 1
+	'EEPStructureGetLight',               -- EEP 11.1 Plug-in 1
+	'EEPStructureGetRotation',            -- EEP 11.1 Plug-in 1
+	'EEPStructureGetSmoke',               -- EEP 11.1 Plug-in 1
+	'EEPStructureSetAxis',                -- EEP 11.1 Plug-in 1
+	'EEPStructureSetFire',                -- EEP 11.1 Plug-in 1
+	'EEPStructureSetLight',               -- EEP 11.1 Plug-in 1
+	'EEPStructureSetPosition',            -- EEP 11.1 Plug-in 1
+	'EEPStructureSetRotation',            -- EEP 11.1 Plug-in 1
+	'EEPStructureSetSmoke',               -- EEP 11.1 Plug-in 1
+
+  -- EEP 11.2 functions
+
+	'EEPGetTrainRoute',                   -- EEP 11.2 Plug-in 2
+	'EEPSetTrainAxis',                    -- EEP 11.2 Plug-in 2
+	'EEPSetTrainCouplingFront',           -- EEP 11.2 Plug-in 2
+	'EEPSetTrainCouplingRear',            -- EEP 11.2 Plug-in 2
+	'EEPSetTrainHook',                    -- EEP 11.2 Plug-in 2
+	'EEPSetTrainHorn',                    -- EEP 11.2 Plug-in 2
+	'EEPSetTrainLight',                   -- EEP 11.2 Plug-in 2, EEP 14.2 Plug-In 2
+	'EEPSetTrainRoute',                   -- EEP 11.2 Plug-in 2
+	'EEPSetTrainSmoke',                   -- EEP 11.2 Plug-in 2
+	'EEPTrainLooseCoupling',              -- EEP 11.2 Plug-in 2
+
+  -- EEP 11.3 functions
+
+	'EEPGetTrainFromTrainyard',           -- EEP 11.3 plug-in 2, EEP 14.2 plug-In 2
+	'EEPIsAuxiliaryTrackReserved',        -- EEP 11.3 Plug-in 3
+	'EEPIsControlTrackReserved',          -- EEP 11.3 Plug-in 3
+	'EEPIsRailTrackReserved',             -- EEP 11.3 Plug-in 3
+	'EEPIsRoadTrackReserved',             -- EEP 11.3 Plug-in 3
+	'EEPIsTramTrackReserved',             -- EEP 11.3 Plug-in 3
+	'EEPLoadProject',                     -- EEP 11.3 Plug-in 3
+	'EEPRegisterAuxiliaryTrack',          -- EEP 11.3 Plug-in 3
+	'EEPRegisterControlTrack',            -- EEP 11.3 Plug-in 3
+	'EEPRegisterRailTrack',               -- EEP 11.3 Plug-in 3
+	'EEPRegisterRoadTrack',               -- EEP 11.3 Plug-in 3
+	'EEPRegisterTramTrack',               -- EEP 11.3 Plug-in 3  
+	'EEPSetCamera',                       -- EEP 11.3 Plug-in 3
+	'EEPSetPerspectiveCamera',            -- EEP 11.3 Plug-in 3, EEP 14.2 Plug-In 2
+  
 	-- EEP 13 functions
+  
+	'EEPChangeInfoSignal',                -- EEP 13
+	'EEPChangeInfoStructure',             -- EEP 13
+	'EEPChangeInfoSwitch',                -- EEP 13
+	'EEPShowInfoSignal',                  -- EEP 13
+	'EEPShowInfoStructure',               -- EEP 13
+	'EEPShowInfoSwitch',                  -- EEP 13
 
-	'clearlog',
-	'EEPMain',
-	'EEPChangeInfoSignal',
-	'EEPChangeInfoStructure',
-	'EEPChangeInfoSwitch',
-	'EEPGetSignal',
-	'EEPGetSwitch',
-	'EEPGetTrainFromTrainyard',
-	'EEPGetTrainRoute',
-	'EEPGetTrainSpeed',
-	'EEPHideInfoTextBottom',
-	'EEPHideInfoTextTop',
-	'EEPIsAuxiliaryTrackReserved',
-	'EEPIsControlTrackReserved',
-	'EEPIsRailTrackReserved',
-	'EEPIsRoadTrackReserved',
-	'EEPIsTramTrackReserved',
-	'EEPLoadData',
-	'EEPLoadProject',
-	'EEPPlaySound',
-	'EEPRegisterAuxiliaryTrack',
-	'EEPRegisterControlTrack',
-	'EEPRegisterRailTrack',
-	'EEPRegisterRoadTrack',
-	'EEPRegisterSignal',
-	'EEPRegisterSwitch',
-	'EEPRegisterTramTrack',
-	'EEPRollingstockGetAxis',
-	'EEPRollingstockGetCouplingFront',
-	'EEPRollingstockGetCouplingRear',
-	'EEPRollingstockSetAxis',
-	'EEPRollingstockSetCouplingFront',
-	'EEPRollingstockSetCouplingRear',
-	'EEPRollingstockSetSlot',
-	'EEPSaveData',
-	'EEPSetCamera',
-	'EEPSetPerspectiveCamera',
-	'EEPSetSignal',
-	'EEPSetSwitch',
-	'EEPSetTrainAxis',
-	'EEPSetTrainCouplingFront',
-	'EEPSetTrainCouplingRear',
-	'EEPSetTrainHook',
-	'EEPSetTrainHorn',
-	'EEPSetTrainLight',
-	'EEPSetTrainRoute',
-	'EEPSetTrainSmoke',
-	'EEPSetTrainSpeed',
-	'EEPShowInfoSignal',
-	'EEPShowInfoStructure',
-	'EEPShowInfoSwitch',
-	'EEPShowInfoTextBottom',
-	'EEPShowInfoTextTop',
-	'EEPShowScrollInfoTextBottom',
-	'EEPShowScrollInfoTextTop',
-	'EEPStructureAnimateAxis',
-	'EEPStructureGetAxis',
-	'EEPStructureGetFire',
-	'EEPStructureGetLight',
-	'EEPStructureGetSmoke',
-	'EEPStructurePlaySound',
-	'EEPStructureSetAxis',
-	'EEPStructureSetFire',
-	'EEPStructureSetLight',
-	'EEPStructureSetPosition',
-	'EEPStructureSetRotation',
-	'EEPStructureSetSmoke',
-	'EEPTrainLooseCoupling',
-	'EEPOnSignal_1',	-- Registrierte Signale rufen selbständig diese Funktion auf, wenn sich ihre Stellung ändert
-	'EEPOnSwitch_1',	-- Registrierte Weichen rufen selbständig diese Funktion auf, wenn sich ihre Stellung ändert
+	-- EEP 13.1 functions
+
+	'EEPHideInfoTextBottom',              -- EEP 13 plug-In 1
+	'EEPHideInfoTextTop',                 -- EEP 13 plug-In 1
+	'EEPPlaySound',                       -- EEP 13 plug-In 1
+	'EEPShowInfoTextBottom',              -- EEP 13 plug-In 1
+	'EEPShowInfoTextTop',                 -- EEP 13 plug-In 1
+	'EEPShowScrollInfoTextBottom',        -- EEP 13 plug-In 1
+	'EEPShowScrollInfoTextTop',           -- EEP 13 plug-In 1
+	'EEPStructurePlaySound',              -- EEP 13 plug-In 1
 
 	-- EEP 13.2 functions
 
-	'EEPGetRollingstockItemName',
-	'EEPGetRollingstockItemsCount',
-	'EEPGetSignalTrainName',
-	'EEPGetSignalTrainsCount',
+	'EEPGetRollingstockItemName',         -- EEP 13.2 plug-in 2
+	'EEPGetRollingstockItemsCount',       -- EEP 13.2 plug-in 2
+	'EEPGetSignalTrainName',              -- EEP 13.2 plug-in 2           
+	'EEPGetSignalTrainsCount',            -- EEP 13.2 plug-in 2
+	'EEPGetTrainyardItemName',            -- EEP 13.2 plug-in 2
+	'EEPGetTrainyardItemStatus',          -- EEP 13.2 plug-in 2
+	'EEPGetTrainyardItemsCount',          -- EEP 13.2 plug-in 2
+
+	-- EEP 14.1 functions
+
+	'EEPOnTrainCoupling',                 -- EEP 14 Plug-In 1
+	'EEPOnTrainExitTrainyard',            -- EEP 14 Plug-In 1
+	'EEPOnTrainLooseCoupling',            -- EEP 14 Plug-In 1
+	'EEPPause',                           -- EEP 14 plug-in 1
+	'EEPSetTrainName',                    -- EEP 14 Plug-In 1
 
 	-- EEP 14.2 functions
 
-	'EEPRollingstockGetLength',
-	'EEPRollingstockGetMotor',
-	'EEPRollingstockGetTrack',
-	'EEPRollingstockGetModelType',
-	'EEPRollingstockGetTagText',
+	'EEPGoodsGetModelType',               -- EEP 14.2 Plug-In 2
+	'EEPGoodsGetPosition',                -- EEP 14.2 Plug-In 2
+	'EEPGoodsSetPosition',                -- EEP 14.2 Plug-In 2
+	'EEPGoodsSetRotation',                -- EEP 14.2 Plug-In 2
+	'EEPRollingstockGetLength',           -- EEP 14.2 Plug-In 2
+	'EEPRollingstockGetModelType',        -- EEP 14.2 Plug-In 2
+	'EEPRollingstockGetMotor',            -- EEP 14.2 Plug-In 2
+	'EEPRollingstockGetTagText',          -- EEP 14.2 Plug-In 2
+	'EEPRollingstockGetTrack',            -- EEP 14.2 Plug-In 2
+	'EEPRollingstockGetTrainName',        -- EEP 14.2 Plug-In 2
+	'EEPRollingstockSetTagText',          -- EEP 14.2 Plug-In 2
+	'EEPSetTime',                         -- EEP 14.2 Plug-In 2
+	'EEPSetTrainHookGlue',                -- EEP 14.2 Plug-In 2
+	'EEPStructureGetModelType',           -- EEP 14.2 Plug-In 2
+	'EEPStructureGetPosition',            -- EEP 14.2 Plug-In 2
+	'EEPStructureGetTagText',             -- EEP 14.2 Plug-In 2
+	'EEPStructureIsAxisAnimate',          -- EEP 14.2 Plug-In 2
+	'EEPStructureSetTagText',             -- EEP 14.2 Plug-In 2
 
-	-- EEP 15 functions (or not assiged to correct release yet)
+	-- EEP 15 functions
 
-	'EEPAuxiliaryTrackSetTextureText',
-	'EEPGetTrainyardItemName',
-	'EEPGetTrainyardItemsCount',
-	'EEPGetTrainyardItemStatus',
-	'EEPGoodsGetModelType',
-	'EEPGoodsGetPosition',
-	'EEPGoodsSetPosition',
-	'EEPGoodsSetRotation',
-	'EEPGoodsSetTextureText',
-	'EEPPause',
-	'EEPRailTrackSetTextureText',
-	'EEPRoadTrackSetTextureText',
-	'EEPRollingstockGetTrainName',
-	'EEPRollingstockSetTagText',
-	'EEPRollingstockSetTextureText',
-	'EEPSetTime',
-	'EEPSetTrainHookGlue',
-	'EEPSetTrainName',
-	'EEPSignalSetTextureText',
-	'EEPStructureGetModelType',
-	'EEPStructureGetPosition',
-	'EEPStructureGetTagText',
-	'EEPStructureIsAxisAnimate',
-	'EEPStructureSetTagText',
-	'EEPStructureSetTextureText',
-	'EEPTramTrackSetTextureText',
+	'EEPAuxiliaryTrackSetTextureText',    -- EEP 15
+	'EEPGoodsSetTextureText',             -- EEP 15
+	'EEPRailTrackSetTextureText',         -- EEP 15
+	'EEPRoadTrackSetTextureText',         -- EEP 15
+	'EEPRollingstockSetTextureText',      -- EEP 15
+	'EEPSignalSetTextureText',            -- EEP 15
+	'EEPStructureSetTextureText',         -- EEP 15
+	'EEPTramTrackSetTextureText',         -- EEP 15
 
 	-- EEP 15.1 functions
 
-	'EEPRollingstockGetActive', -- Ermittelt, welches Fahrzeug derzeit im Steuerdialog ausgewählt ist.
-	'EEPRollingstockSetActive', -- Wählt das angegebene Fahrzeug im Steuerdialog aus.
-	'EEPRollingstockGetOrientation', -- Ermittelt, welche relative Ausrichtung das angegebene Fahrzeug im Zugverband hat.	
-
-	'EEPGetTrainActive', -- Ermittelt, welcher Zug derzeit im Steuerdialog ausgewählt ist.
-	'EEPSetTrainActive', -- Wählt den angegebenen Zug im Steuerdialog aus.
-	'EEPGetTrainLength', -- Ermittelt die Gesamtlänge des angegebenen Zuges.
+	'EEPGetTrainActive',                  -- EEP 15.1 Plug-in 1
+	'EEPGetTrainLength',                  -- EEP 15.1 Plug-in 1
+	'EEPRollingstockGetActive',           -- EEP 15.1 Plug-in 1
+	'EEPRollingstockGetOrientation',      -- EEP 15.1 Plug-in 1
+	'EEPRollingstockSetActive',           -- EEP 15.1 Plug-in 1
+	'EEPSetTrainActive',                  -- EEP 15.1 Plug-in 1
 
 	-- EEP 16.1 functions
 
-	'EEPActivateCtrlDesk',	-- Ruft das Stellpult im Radarfenster auf
-	
-	'EEPGetCameraPosition',
-	'EEPSetCameraPosition',
-
-	'EEPGetCameraRotation',
-	'EEPSetCameraRotation',
-
-	'EEPStructureGetRotation',
-	'EEPGoodsGetRotation',
-
-	'EEPOnSaveAnl',
-
-	'EEPOnTrainExitTrainyard',
-	
-	'EEPOnTrainCoupling',
-	'EEPOnTrainLooseCoupling',
-	
-	'EEPRollingstockGetHook',
-	'EEPRollingstockGetHookGlue',
-	'EEPRollingstockGetMileage',
-	'EEPRollingstockGetPosition',
-	'EEPRollingstockGetSmoke',
-	'EEPRollingstockSetHook',
-	'EEPRollingstockSetHookGlue',
-	'EEPRollingstockSetHorn',	-- Lässt bei einem bestimmten Rollmaterial den Warnton (Pfeife, Hupe) ertönen
-	'EEPRollingstockSetSmoke',
-	'EEPRollingstockSetUserCamera',
-	
-	'EEPGetCloudsIntensity',
-	'EEPGetFogIntensity',
-	'EEPGetHailIntensity',
-	'EEPGetRainIntensity',
-	'EEPGetSnowIntensity',
-	'EEPGetWindIntensity',
-
-	'EEPSetCloudsIntensity',
-	'EEPSetDarkCloudsIntensity',
-	'EEPSetFogIntensity',
-	'EEPSetHailIntensity',
-	'EEPSetRainIntensity',
-	'EEPSetSnowIntensity',
-	'EEPSetWindIntensity',
+	'EEPActivateCtrlDesk',	              -- EEP 16.1 Plug-in 1
+	'EEPGetCameraPosition',	              -- EEP 16.1 Plug-in 1
+	'EEPGetCameraRotation',	              -- EEP 16.1 Plug-in 1
+	'EEPGetCloudsIntensity',              -- EEP 16.1 Plug-in 1
+	'EEPGetFogIntensity',                 -- EEP 16.1 Plug-in 1
+	'EEPGetHailIntensity',                -- EEP 16.1 Plug-in 1
+	'EEPGetRainIntensity',                -- EEP 16.1 Plug-in 1
+	'EEPGetSnowIntensity',                -- EEP 16.1 Plug-in 1
+	'EEPGetWindIntensity',                -- EEP 16.1 Plug-in 1
+	'EEPGoodsGetRotation',	              -- EEP 16.1 Plug-in 1
+	'EEPOnSaveAnl',	                      -- EEP 16.1 Plug-in 1
+	'EEPRollingstockGetHook',	            -- EEP 16.1 Plug-in 1
+	'EEPRollingstockGetHookGlue',		      -- EEP 16.1 Plug-in 1
+	'EEPRollingstockGetMileage',		      -- EEP 16.1 Plug-in 1
+	'EEPRollingstockGetPosition',	        -- EEP 16.1 Plug-in 1
+	'EEPRollingstockGetSmoke',	          -- EEP 16.1 Plug-in 1
+	'EEPRollingstockSetHook',	            -- EEP 16.1 Plug-in 1
+	'EEPRollingstockSetHookGlue',	        -- EEP 16.1 Plug-in 1
+	'EEPRollingstockSetHorn',		          -- EEP 16.1 Plug-in 1
+	'EEPRollingstockSetSmoke',	          -- EEP 16.1 Plug-in 1
+	'EEPRollingstockSetUserCamera',	      -- EEP 16.1 Plug-in 1
+	'EEPSetCameraPosition',	              -- EEP 16.1 Plug-in 1
+	'EEPSetCameraRotation',	              -- EEP 16.1 Plug-in 1
+	'EEPSetCloudsIntensity',              -- EEP 16.1 Plug-in 1
+	'EEPSetDarkCloudsIntensity',          -- EEP 16.1 Plug-in 1
+	'EEPSetFogIntensity',                 -- EEP 16.1 Plug-in 1
+	'EEPSetHailIntensity',                -- EEP 16.1 Plug-in 1
+	'EEPSetRainIntensity',                -- EEP 16.1 Plug-in 1
+	'EEPSetSnowIntensity',                -- EEP 16.1 Plug-in 1
+	'EEPSetWindIntensity',                -- EEP 16.1 Plug-in 1
+  
 
 	-- EEP 16.2 functions
 
 	-- EEP 16.3 functions
-	'EEPRollingstockGetTextureText',	-- Liest den Text einer beschreibbaren Fläche eines Rollmaterials aus
+	'EEPRollingstockGetTextureText',	    -- EEP 16.3 Plug-in 3 
 
 	-- EEP 16.4 functions
 
 	-- EEP 17 variables and functions
-	'EEPLng',						-- Zeige Sprache GER, ENG, FRA der installierten EEP-Version
-	'EEPOnBeforeSaveAnl',
-	'EEPGetAnlVer',					-- EEP-Versionsnummer, mit der die Anlage vor dem Öffnen zuletzt gespeichert wurde
-	'EEPGetAnlLng',					-- liefert die auf Achsnamen bezogene "Anlagensprache" (als GER, ENG oder FRA)
-	'EEPRollingstockGetUserCamera',	-- related to EEPRollingstockSetUserCamera
+	'EEPOnBeforeSaveAnl',					        -- EEP 17
+	'EEPGetAnlVer',					              -- EEP 17 
+	'EEPGetAnlLng',					              -- EEP 17 
+	'EEPRollingstockGetUserCamera',	      -- EEP 17
 	
 	
 	-- Lua standard variables

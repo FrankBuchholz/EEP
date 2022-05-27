@@ -136,12 +136,12 @@ local KontaktTyp = {				-- SetType ist ein Bit-Feld (noch nicht vollstaendig ana
 }
 
 local GebaeudesammlungText = { 		-- GebaudesammlungID
-	[1] = 'Gleisobjekte-Gleise',	-- u.a. Weichen, Bahnhoefe, Bruecken
-	[2] = 'Gebaeudesammlung 2',
-	[3] = 'Gleisobjekte-Strassen',
+	[1] = 'Gleisobjekte Eisenbahn',	-- u.a. Weichen, Bahnhoefe, Bruecken
+	[2] = 'Gleisobjekte Straßenbahn',
+	[3] = 'Gleisobjekte Straßen',
 	[4] = 'Immobilien',				-- u.a. Gebaeude, Mauern, Tunnel, stehende Fahrzeuge
 	[5] = 'Landschaftselemente',	-- u.a. Personen, Flora, Terra
-	[6] = 'Gebaeudesammlung 6'
+	[6] = 'Gleisobjekte Sonstiges (Wasserwege)'
 }
 
 local Statistics = {
