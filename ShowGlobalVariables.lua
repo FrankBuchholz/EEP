@@ -225,7 +225,28 @@ local NamesTable = {
 	'EEPGetAnlVer',					              -- EEP 17 
 	'EEPGetAnlLng',					              -- EEP 17 
 	'EEPRollingstockGetUserCamera',	      -- EEP 17
-	
+
+	-- EEP 17 Plugin 1
+
+	'EEPSetZoneWindIntensity',					  -- EEP 17 Plug-in 1
+	'EEPSetZoneRainIntensity',					  -- EEP 17 Plug-in 1
+	'EEPSetZoneSnowIntensity',					  -- EEP 17 Plug-in 1
+	'EEPSetZoneHailIntensity',					  -- EEP 17 Plug-in 1
+	'EEPSetZoneFogIntensity',					    -- EEP 17 Plug-in 1
+	'EEPSetZoneClouds',					          -- EEP 17 Plug-in 1
+	'EEPSetZonePos',					            -- EEP 17 Plug-in 1
+	'EEPGetZoneWindIntensity',					  -- EEP 17 Plug-in 1
+	'EEPGetZoneRainIntensity',					  -- EEP 17 Plug-in 1
+	'EEPGetZoneSnowIntensity',					  -- EEP 17 Plug-in 1
+	'EEPGetZoneHailIntensity',					  -- EEP 17 Plug-in 1
+	'EEPGetZoneFogIntensity',					    -- EEP 17 Plug-in 1
+	'EEPGetZoneClouds',					          -- EEP 17 Plug-in 1
+	'EEPGetZonePos',					            -- EEP 17 Plug-in 1
+	'EEPGetAnlName',					            -- EEP 17 Plug-in 1
+
+	-- NICHT enthalten:
+	-- EEPSetZoneDarkClouds
+	-- EEPGetZoneDarkClouds
 	
 	-- Lua standard variables
 	'_G',

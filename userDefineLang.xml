@@ -141,7 +141,17 @@
 			EEPGetHailIntensity 				EEPSetHailIntensity  
 			EEPGetRainIntensity 				EEPSetRainIntensity  
 			EEPGetSnowIntensity 				EEPSetSnowIntensity  
-			EEPGetWindIntensity					EEPSetWindIntensity  
+			EEPGetWindIntensity					EEPSetWindIntensity 
+			
+			EEPSetZoneWindIntensity				EEPGetZoneWindIntensity
+			EEPSetZoneRainIntensity				EEPGetZoneRainIntensity
+			EEPSetZoneSnowIntensity				EEPGetZoneSnowIntensity
+			EEPSetZoneHailIntensity				EEPGetZoneHailIntensity
+			EEPSetZoneFogIntensity				EEPGetZoneFogIntensity
+			EEPSetZoneClouds					EEPGetZoneClouds
+			EEPSetZonePos						EEPGetZonePos
+
+			EEPGetAnlName
 			</Keywords>
             <Keywords name="Keywords6"></Keywords>
             <Keywords name="Keywords7"></Keywords>
