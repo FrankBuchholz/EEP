@@ -15,7 +15,7 @@ require('ShowGlobalVariables')(true) 	-- auch Variablen und Funktionen von EEP
 Frank Buchholz, 2019-2022
 ]]
 
-local _VERSION = 'v2022-05-27'
+local _VERSION = 'v2022-10-22'
 
 -- bekannte Namen, die nicht gezeigt werden sollen
 local NamesTable = {
