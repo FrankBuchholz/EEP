@@ -152,6 +152,8 @@
 			EEPSetZonePos						EEPGetZonePos
 
 			EEPGetAnlName
+			
+			EEPSignalSetTagText                 EEPSignalGetTagText
 			</Keywords>
             <Keywords name="Keywords6"></Keywords>
             <Keywords name="Keywords7"></Keywords>

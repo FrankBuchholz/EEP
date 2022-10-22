@@ -243,6 +243,8 @@ local NamesTable = {
 	'EEPGetZoneClouds',					          -- EEP 17 Plug-in 1
 	'EEPGetZonePos',					            -- EEP 17 Plug-in 1
 	'EEPGetAnlName',					            -- EEP 17 Plug-in 1
+	'EEPSignalSetTagText,					        -- EEP 17 Plug-in 1
+	'EEPSignalGetTagText,					        -- EEP 17 Plug-in 1
 
 	-- NICHT enthalten:
 	-- EEPSetZoneDarkClouds
