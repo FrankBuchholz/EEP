@@ -15,7 +15,7 @@ require('ShowGlobalVariables')(true) 	-- auch Variablen und Funktionen von EEP
 Frank Buchholz, 2019-2022
 ]]
 
-local _VERSION = 'v2022-10-22'
+local _VERSION = 'v2022-12-01'
 
 -- bekannte Namen, die nicht gezeigt werden sollen
 local NamesTable = {
@@ -243,8 +243,8 @@ local NamesTable = {
 	'EEPGetZoneClouds',					          -- EEP 17 Plug-in 1
 	'EEPGetZonePos',					            -- EEP 17 Plug-in 1
 	'EEPGetAnlName',					            -- EEP 17 Plug-in 1
-	'EEPSignalSetTagText,					        -- EEP 17 Plug-in 1
-	'EEPSignalGetTagText,					        -- EEP 17 Plug-in 1
+	'EEPSignalSetTagText',					      -- EEP 17 Plug-in 1
+	'EEPSignalGetTagText',					      -- EEP 17 Plug-in 1
 
 	-- NICHT enthalten:
 	-- EEPSetZoneDarkClouds
