@@ -15,7 +15,7 @@ require('ShowGlobalVariables')(true) 	-- auch Variablen und Funktionen von EEP
 Frank Buchholz, 2019-2022
 ]]
 
-local _VERSION = 'v2022-12-01'
+local _VERSION = 'v2023-06-30'
 
 -- bekannte Namen, die nicht gezeigt werden sollen
 local NamesTable = {
@@ -27,6 +27,7 @@ local NamesTable = {
 	'EEPTimeS',                           -- EEP 10.2 plug-in 2
 	'EEPVer',                             -- EEP 10.2 plug-in 2
 	'EEPLng',						                  -- EEP 17 
+	'EEPGrowingTime',		                  -- EEP 17.1 (?)
 
   -- EEP 10.2 functions
 
@@ -250,6 +251,21 @@ local NamesTable = {
 	-- EEPSetZoneDarkClouds
 	-- EEPGetZoneDarkClouds
 	
+	-- EEP 17.2 Plug-in 2
+
+	'EEPStructureGetTextureText',					-- EEP 17.2 Plug-in 2
+	'EEPSignalGetTextureText',					  -- EEP 17.2 Plug-in 2
+	'EEPGoodsGetTextureText',					    -- EEP 17.2 Plug-in 2
+	'EEPRailTrackGetTextureText',					-- EEP 17.2 Plug-in 2
+	'EEPRoadTrackGetTextureText',					-- EEP 17.2 Plug-in 2
+	'EEPTramTrackGetTextureText',					-- EEP 17.2 Plug-in 2
+	'EEPAuxiliaryTrackGetTextureText',		-- EEP 17.2 Plug-in 2
+	'EEPGetSeason',					              -- EEP 17.2 Plug-in 2
+	'EEPGetFramesPerSecond',					    -- EEP 17.2 Plug-in 2
+	'EEPGetCurrentFrame ',					      -- EEP 17.2 Plug-in 2
+	'EEPGetCurrentRenderFrame ',					-- EEP 17.2 Plug-in 2
+	'EEPGetTimeLapse',					          -- EEP 17.2 Plug-in 2
+  
 	-- Lua standard variables
 	'_G',
 	'_VERSION',

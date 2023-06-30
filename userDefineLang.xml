@@ -71,18 +71,18 @@
 			EEPGetSignal EEPSetSignal
 			EEPGetSignalTrainName 
 			EEPGetSignalTrainsCount 
-			EEPSignalSetTextureText 
+			EEPSignalSetTextureText 			EEPSignalGetTextureText
 			EEPShowInfoSignal 					EEPChangeInfoSignal
 
 			EEPRegisterSwitch  
 			EEPGetSwitch 						EEPSetSwitch
 			EEPShowInfoSwitch 					EEPChangeInfoSwitch
 			  
-			EEPAuxiliaryTrackSetTextureText 
-			EEPRailTrackSetTextureText 
-			EEPRoadTrackSetTextureText 
-			EEPTramTrackSetTextureText 
-
+			EEPAuxiliaryTrackSetTextureText 	EEPAuxiliaryTrackGetTextureText
+			EEPRailTrackSetTextureText 			EEPRailTrackGetTextureText
+			EEPRoadTrackSetTextureText 			EEPRoadTrackGetTextureText
+			EEPTramTrackSetTextureText 			EEPTramTrackGetTextureText
+			
 			EEPGetRollingstockItemName 
 			EEPGetRollingstockItemsCount 
 			
@@ -112,15 +112,14 @@
 			EEPStructureIsAxisAnimate 
 			EEPStructurePlaySound 
 			EEPStructureSetRotation 
-			EEPStructureSetTextureText 
+			EEPStructureSetTextureText 			EEPStructureGetTextureText
 			
 			EEPGoodsGetModelType 
 			EEPGoodsGetPosition 
 			EEPGoodsSetPosition 
 			EEPGoodsSetRotation 
-			EEPGoodsSetTextureText 
+			EEPGoodsSetTextureText 				EEPGoodsGetTextureText
 
-			
 			EEPActivateCtrlDesk 
 			EEPOnSaveAnl 
 	
@@ -154,6 +153,18 @@
 			EEPGetAnlName
 			
 			EEPSignalSetTagText                 EEPSignalGetTagText
+
+			EEPRollingstockGetTextureText
+
+			EEPOnBeforeSaveAnl	
+			EEPGetAnlVer	
+			EEPGetAnlLng					       
+			EEPRollingstockGetUserCamera	    
+	
+			EEPGetSeason
+			EEPGetFramesPerSecond				EEPGetCurrentFrame			
+			EEPGetCurrentRenderFrame			
+			EEPGetTimeLapse
 			</Keywords>
             <Keywords name="Keywords6"></Keywords>
             <Keywords name="Keywords7"></Keywords>
