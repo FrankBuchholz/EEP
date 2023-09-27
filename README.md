@@ -21,6 +21,23 @@ ShowGlobalVariables()  -- Unterdrücke bekannte Namen
 ShowGlobalVariables(true) -- Zeige alle Namen
 ```
 
+## Modul `GetEEPversion`
+
+Bestimmt die Version von EEP incl. des installierten Plugins.
+
+Verwendung:
+
+``` lua
+print("EEP Version: ", require("GetEEPversion") )
+```
+
+oder
+
+``` lua
+local EEPversion = require("GetEEPversion")
+print("EEP Version: ", EEPversion )
+```
+
 ## Module `EEP2Lua`
 
 Es ist mit Lua möglich, eine EEP-Anlagedatei zu lesen und zu analysieren. Dazu dient das Modul `EEP2Lua`, das die xml-Datenstruktur einer Anlagedatei in Lua-Tabellen umwandelt. Das Modul `EEP_Inventar` ist ein Beispiel, wie man diese Lua-Tabellen nutzen kann. Beide Module können sowohl in einem EEP-Skript wie auch standalone genutzt werden.
