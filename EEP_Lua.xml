@@ -135,7 +135,8 @@
 			EEPRollingstockSetUserCamera
 			EEPStructureGetRotation
 			
-			EEPGetCloudIntensity 				EEPSetCloudIntensity 
+			EEPGetCloudsIntensity 				EEPSetCloudsIntensity 
+												EEPSetDarkCloudsIntensity
 			EEPGetFogIntensity 					EEPSetFogIntensity  
 			EEPGetHailIntensity 				EEPSetHailIntensity  
 			EEPGetRainIntensity 				EEPSetRainIntensity  
@@ -149,6 +150,7 @@
 			EEPSetZoneFogIntensity				EEPGetZoneFogIntensity
 			EEPSetZoneClouds					EEPGetZoneClouds
 			EEPSetZonePos						EEPGetZonePos
+			EEPGetCloudsMode
 
 			EEPGetAnlName
 			
@@ -158,7 +160,7 @@
 
 			EEPOnBeforeSaveAnl	
 			EEPGetAnlVer	
-			EEPGetAnlLng					       
+			EEPGetAnlLng						EEPLng					       
 			EEPRollingstockGetUserCamera	    
 	
 			EEPGetSeason
