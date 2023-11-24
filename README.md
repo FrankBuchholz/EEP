@@ -143,9 +143,11 @@ printInventarAfterSave = true
 
 ### User defined language EEP_Lua
 
-Installation: Kopiere die Datei [`userDefineLang.xml`](https://raw.githubusercontent.com/FrankBuchholz/EEP/master/userDefineLang.xml) in den entsprechenden Roaming-Ordner:  
+Installation: Kopiere die Datei [`EEP_Lua.xml`](https://raw.githubusercontent.com/FrankBuchholz/EEP/master/EEP_Lua.xml) in den entsprechenden Roaming-Ordner:  
 `C:\Users\<user>\AppData\Roaming\Notepad++\userDefineLang.xml`  
-Wenn dort bereits eine Datei mit benutzerdefinierten Sprachen liegt, dann kopiert man stattdessen das Token `<UserLang name="EEP_Lua">...</UserLang>` in diese vorhandene Datei.  
+Zur Installation öffnet man Notepad++, klickt dort auf den Reiter "Sprache". Im sich öffnenden Fenster scrollt man ganz nach unten. Unterhalb der Trennlinie klickt man auf "Verzeichnis mit benutzerdefinierten Sprachen öffnen ...". Es öffnet sich der Windows-Explorer mit dem entsprechenden Verzeichnis (in der Regel: C:\<Users(Benutzer)>\AppData\Roaming\Notpad++\userDefineLangs). Hierein kopiert man die Datei EEP_Lua.xml.  
+Nach dem Schließen des Windows-Explorers öffnet man erneut Notepad++, klickt auf den Reiter "Sprache" und scrollt wiederum ans Ende des Fensters. Hier befindet sich unterhalb der Trennlinie ein Eintrag "EEP_Lua". Den wählt man durch Anklicken aus.  
+Wer lieber andere Farben und/oder Schriftstile zur Hervorhebung hätte und sich traut das Skript zu ändern findet unter https://npp-user-manual.org/do…-defined-language-system/ eine Anleitung in englischer Sprache.  
 
 ### Auto-completion
 
