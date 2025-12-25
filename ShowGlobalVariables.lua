@@ -12,10 +12,13 @@ Verwendung (auch mehrfach):
 require('ShowGlobalVariables')()		-- nur eigene Variablen und Funktionen
 require('ShowGlobalVariables')(true) 	-- auch Variablen und Funktionen von EEP
 
-Frank Buchholz, 2019-2022
+Quelle: 
+https://www.eepforum.de/filebase/file/2510-aktuelles-lua-handbuch-zu-allen-eep-versionen-deutsch/
+
+Frank Buchholz, 2019-2025
 ]]
 
-local _VERSION = 'v2023-06-30'
+local _VERSION = 'v2025-11-01'
 
 -- bekannte Namen, die nicht gezeigt werden sollen
 local NamesTable = {
@@ -266,6 +269,52 @@ local NamesTable = {
 	'EEPGetCurrentRenderFrame ',					-- EEP 17.2 Plug-in 2
 	'EEPGetTimeLapse',					          -- EEP 17.2 Plug-in 2
   
+	-- EEP 17.2 Plug-in 3
+
+	'EEPSetColourFilter',                         -- EEP 17.3 Plug-in 3
+	'EEPOnTrainStoppedOnSignal',                  -- EEP 17.3 Plug-in 3
+	'EEPSetSignalStopDistance',                   -- EEP 17.3 Plug-in 3
+	'EEPGetSignalStopDistance',                   -- EEP 17.3 Plug-in 3
+	'EEPGetSignalFunctions',                      -- EEP 17.3 Plug-in 3
+	'EEPGetSignalFunction',                       -- EEP 17.3 Plug-in 3
+	'EEPGetSignalItemName',                       -- EEP 17.3 Plug-in 3
+
+	-- EEP 18.0
+
+	'EEPGetTrainLight',                           -- EEP 18.0
+	'EEPGetTrainCouplingFront',                   -- EEP 18.0
+	'EEPGetTrainCouplingRear',                    -- EEP 18.0
+	'EEPTrainChangeOrientation',                  -- EEP 18.0
+	'EEPRollingstockSetAxisByNumber',             -- EEP 18.0
+	'EEPRollingstockGetAxisByNumber',             -- EEP 18.0
+	'EEPRollingstockChangeOrientation',           -- EEP 18.0
+	'EEPStructureSetAxisByNumber',                -- EEP 18.0
+	'EEPStructureGetAxisByNumber',                -- EEP 18.0
+	'EEPGoodsSetAxis',                            -- EEP 18.0
+	'EEPGoodsGetAxis',                            -- EEP 18.0
+	'EEPGoodsSetAxisByNumber',                    -- EEP 18.0
+	'EEPGoodsGetAxisByNumber',                    -- EEP 18.0
+	'EEPGetPerspectiveCamera',                    -- EEP 18.0
+	'EEPGoodsSetTagText',                         -- EEP 18.0
+	'EEPGoodsGetTagText',                         -- EEP 18.0
+	'EEPSetSeason',                               -- EEP 18.0
+
+	-- EEP 18.1 Plug-in 1
+
+	'EEPCheckSetRoute',                           -- EEP 18.1 Plug-in 1
+	'EEPRollingstockGetHookPosition',             -- EEP 18.1 Plug-in 1
+	'EEPStructureSetLightingColour',              -- EEP 18.1 Plug-in 1
+	'EEPRailTrackChangeAppearance',               -- EEP 18.1 Plug-in 1
+	'EEPRoadTrackChangeAppearance',               -- EEP 18.1 Plug-in 1
+	'EEPTramTrackChangeAppearance',               -- EEP 18.1 Plug-in 1
+	'EEPAuxiliaryTrackChangeAppearance',          -- EEP 18.1 Plug-in 1
+	'EEPGetAnlPath',                              -- EEP 18.1 Plug-in 1
+	'EEPOnTrainEnterTrainyard',                   -- EEP 18.1 Plug-in 1
+	'EEPIsTrainInTrainyard',                      -- EEP 18.1 Plug-in 1
+	'EEPPutTrainToTrainyard',                     -- EEP 18.1 Plug-in 1
+	'EEPSwitchSetTagText',                        -- EEP 18.1 Plug-in 1
+	'EEPSwitchGetTagText',                        -- EEP 18.1 Plug-in 1
+
 	-- Lua standard variables
 	'_G',
 	'_VERSION',

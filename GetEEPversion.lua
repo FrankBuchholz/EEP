@@ -19,7 +19,7 @@ end
 
 ]]
 
-local _VERSION = 'v2023-09-27'
+local _VERSION = 'v2025-11-01'
 
 local function EEPversion()
   -- Ein bestimmtes Plugin ist genau dann in einer Version installiert 
@@ -34,6 +34,8 @@ local function EEPversion()
   if v == 16 and EEPRollingstockGetTextureText then p = p + " plugin 3" end
   if v == 17 and EEPGetAnlName                 then p = p + " plugin 1" end
   if v == 17 and EEPStructureGetTextureText    then p = p + " plugin 2" end
+  if v == 17 and EEPGetSignalFunction          then p = p + " plugin 3" end
+  if v == 18 and EEPGetAnlPath                 then p = p + " plugin 1" end
   -- Zeige die Version mit genau 1 Nachkommastelle gefolgt vom Plugin an
   return string.format("%.1f", EEPVer)..p 
 end
